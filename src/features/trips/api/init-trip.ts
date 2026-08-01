@@ -8,10 +8,16 @@ import { z } from 'zod';
 
 import { getTripAgent } from '#/agents/trip-agent';
 import { db, trip } from '#/db/db.server';
+import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
 import { auth } from '#/lib/auth';
 
+const initTripInputSchema = z.object({
+  prompt: z.string().trim().min(1).max(4000),
+});
+type InitTripInput = z.infer<typeof initTripInputSchema>;
+
 export const initTrip = createServerFn({ method: 'POST' })
-  .validator(z.object({ prompt: z.string().trim().min(1).max(4_000) }))
+  .validator(initTripInputSchema)
   .handler(async ({ data }) => {
     const session = await auth.api.getSession({ headers: getRequestHeaders() });
 
@@ -36,8 +42,12 @@ export const initTrip = createServerFn({ method: 'POST' })
 
 export function useInitTrip() {
   const initTripServerFn = useServerFn(initTrip);
+  const initAuthSession = useInitAuthSession();
 
   return useMutation({
-    mutationFn: initTripServerFn,
+    mutationFn: async (data: InitTripInput) => {
+      await initAuthSession.mutateAsync();
+      return initTripServerFn({ data });
+    },
   });
 }

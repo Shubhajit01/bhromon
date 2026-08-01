@@ -5,6 +5,7 @@ import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { env } from 'cloudflare:workers';
 
 import { db } from '#/db/db.server';
+import { schemas } from '#/db/relations';
 
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
@@ -13,6 +14,6 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  database: drizzleAdapter(db, { provider: 'sqlite' }),
+  database: drizzleAdapter(db, { provider: 'sqlite', schema: schemas }),
   plugins: [anonymous(), tanstackStartCookies()],
 });

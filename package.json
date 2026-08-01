@@ -40,7 +40,7 @@
     "better-auth": "^1.6.25",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "drizzle-orm": "1.0.0-beta.22",
+    "drizzle-orm": "1.0.0-rc.4",
     "react": "^19.2.0",
     "react-aria-components": "^1.19.0",
     "react-dom": "^19.2.0",
@@ -53,6 +53,7 @@
     "zod": "^4"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-decorators": "^8.0.2",
     "@better-auth/cli": "^1.4.21",
     "@cloudflare/vite-plugin": "^1.26.0",
     "@rolldown/plugin-babel": "^0.2.3",
@@ -64,7 +65,7 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
     "babel-plugin-react-compiler": "^1.0.0",
-    "drizzle-kit": "1.0.0-beta.22",
+    "drizzle-kit": "1.0.0-rc.4",
     "eslint": "^9.20.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-simple-import-sort": "^14.0.0",

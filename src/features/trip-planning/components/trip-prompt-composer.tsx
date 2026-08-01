@@ -20,7 +20,7 @@ function TripPromptComposer() {
       className="w-full"
       onSubmit={(event) => {
         event.preventDefault();
-        initTrip.mutate({ data: { prompt } });
+        initTrip.mutate({ prompt });
       }}
     >
       <FieldGroup>
