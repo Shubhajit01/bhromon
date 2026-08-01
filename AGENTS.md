@@ -2,6 +2,11 @@
 
 Bhromon is an AI-powered self-tour planning platform. Build the smallest vertical slice that lets a traveller describe a trip, refine a draft itinerary in chat, view it on a map, and confirm it.
 
+## Code conventions
+
+- Prefer interfaces over type aliases for object-shaped TypeScript declarations. Keep type aliases for unions, intersections, and other types that cannot be expressed naturally as interfaces.
+- Prefer minimal, image-led UI with one dominant action, warm personal copy, and no elements that do not support the user's next step.
+
 ## Todo
 
 - [ ] `feat-001` Foundation: Create the TanStack Start and Cloudflare deployment foundation with D1, Drizzle, and repeatable local verification.

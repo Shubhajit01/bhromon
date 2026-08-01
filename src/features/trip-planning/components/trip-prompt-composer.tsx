@@ -1,0 +1,46 @@
+import { PaperPlaneTiltIcon } from '@phosphor-icons/react';
+
+import { Field, FieldGroup, FieldLabel } from '#/components/ui/field';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupTextarea,
+} from '#/components/ui/input-group';
+
+function TripPromptComposer() {
+  return (
+    <form className="w-full" onSubmit={(event) => event.preventDefault()}>
+      <FieldGroup>
+        <Field>
+          <FieldLabel htmlFor="trip-prompt" className="sr-only">
+            Describe the trip you want to plan
+          </FieldLabel>
+          <InputGroup variant="paper">
+            <InputGroupTextarea
+              id="trip-prompt"
+              name="trip-prompt"
+              required
+              enterKeyHint="send"
+              placeholder="I want a food-and-train journey through Japan in October…"
+              className="min-h-20 px-5 pt-4 sm:min-h-24 text-lg!"
+            />
+            <InputGroupAddon align="block-end" className="px-4 pb-4">
+              <InputGroupButton
+                type="submit"
+                variant="default"
+                size="icon-sm"
+                aria-label="Start planning"
+                className="ml-auto"
+              >
+                <PaperPlaneTiltIcon weight="bold" />
+              </InputGroupButton>
+            </InputGroupAddon>
+          </InputGroup>
+        </Field>
+      </FieldGroup>
+    </form>
+  );
+}
+
+export { TripPromptComposer };
