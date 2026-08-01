@@ -21,9 +21,10 @@ function TripPromptComposer() {
               id="trip-prompt"
               name="trip-prompt"
               required
+              rows={6}
               enterKeyHint="send"
               placeholder="I want a food-and-train journey through Japan in October…"
-              className="min-h-20 px-5 pt-4 sm:min-h-24 text-lg!"
+              className="h-20 max-h-20 sm:max-h-24 px-5 pt-4 sm:min-h-24 text-lg!"
             />
             <InputGroupAddon align="block-end" className="px-4 pb-4">
               <InputGroupButton

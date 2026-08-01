@@ -55,7 +55,9 @@ function Home() {
 
           <h1 className="max-w-5xl font-fancy text-background font-thin text-balance text-5xl text-center leading-tight">
             Every journey should feel{' '}
-            <span className="bg-primary px-2 inline-block">like yours</span>
+            <span className="bg-foreground text-background px-2 inline-block">
+              like yours
+            </span>
           </h1>
 
           <div className="mt-1 w-full max-w-3xl">
