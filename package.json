@@ -17,6 +17,7 @@
     "cf-typegen": "wrangler types",
     "auth:generate": "better-auth generate --output src/db/auth.schema.ts -y",
     "db:generate": "drizzle-kit generate",
+    "db:studio": "drizzle-kit studio",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote"
   },
@@ -74,6 +75,8 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@prisma/client",
+      "better-sqlite3",
       "core-js-pure",
       "esbuild",
       "lightningcss",
