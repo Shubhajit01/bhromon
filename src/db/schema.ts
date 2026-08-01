@@ -1,8 +1,25 @@
-import { defineRelations } from 'drizzle-orm';
+import { defineRelations, sql } from 'drizzle-orm';
+import { check, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 import * as authSchema from './auth.schema';
 
 export * from './auth.schema';
+
+export const tripStatuses = ['draft', 'confirmed'] as const;
+
+export type TripStatus = (typeof tripStatuses)[number];
+
+export const trip = sqliteTable(
+  'trip',
+  {
+    id: text('id').primaryKey(),
+    title: text('title').notNull(),
+    status: text('status').$type<TripStatus>().notNull().default('draft'),
+  },
+  (table) => [
+    check('trip_status_check', sql`${table.status} in ('draft', 'confirmed')`),
+  ],
+);
 
 export const relations = defineRelations(authSchema, (r) => ({
   user: {

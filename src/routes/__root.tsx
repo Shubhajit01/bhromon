@@ -1,6 +1,12 @@
 import { TanStackDevtools } from '@tanstack/react-devtools';
-import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Scripts,
+} from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+
+import type { QueryClient } from '@tanstack/react-query';
 
 import { logoOnDarkUrl, logoUrl } from '#/components/logo';
 import { site } from '#/config/site';
@@ -8,11 +14,14 @@ import { preloadFont } from '#/lib/helpers';
 
 import fontsCss from '../styles/fonts.css?url';
 import appCss from '../styles/globals.css?url';
-// import merriweatherFontUrl from '@fontsource-variable/merriweather/files/merriweather-latin-wght-normal.woff2?url';
-import ibmFontUrl from '@fontsource/ibm-plex-serif/files/ibm-plex-serif-latin-400-normal.woff2?url';
-import interFontUrl from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import geistFontUrl from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
+import merriweatherFontUrl from '@fontsource-variable/merriweather/files/merriweather-latin-wght-normal.woff2?url';
 
-export const Route = createRootRoute({
+interface RootContext {
+  queryClient: QueryClient;
+}
+
+export const Route = createRootRouteWithContext<RootContext>()({
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
@@ -32,8 +41,8 @@ export const Route = createRootRoute({
         href: logoOnDarkUrl,
         media: '(prefers-color-scheme: dark)',
       },
-      preloadFont(interFontUrl),
-      preloadFont(ibmFontUrl),
+      preloadFont(geistFontUrl),
+      preloadFont(merriweatherFontUrl),
 
       { rel: 'stylesheet', href: appCss },
       { rel: 'stylesheet', href: fontsCss },
