@@ -5,8 +5,9 @@ import { TripPromptComposer } from '#/features/trip-planning/components/trip-pro
 import { preloadImage } from '#/lib/helpers';
 import { seo } from '#/lib/seo';
 
-import himalayanValleyAvif from '#/assets/images/himalayan-valley.png?format=avif&width=2000&fit=cover&enhanced';
-import himalayanValleyWebp from '#/assets/images/himalayan-valley.png?format=webp&width=2000&fit=cover&enhanced';
+import himalayanValleyAvif from '#/assets/images/himalayan-valley.png?format=avif&enhanced';
+import himalayanValleyWebp from '#/assets/images/himalayan-valley.png?format=webp&enhanced';
+import himalayanValleyFallback from '#/assets/images/himalayan-valley.png?format=webp&w=20&inline&enhanced';
 
 export const Route = createFileRoute('/')({
   component: Home,
@@ -23,9 +24,14 @@ function Home() {
   return (
     <main>
       <section
-        className="grid min-h-svh overflow-hidden bg-background *:[grid-area:stack] group"
-        style={{ gridTemplateAreas: '"stack"' }}
+        className="grid min-h-svh overflow-hidden *:[grid-area:stack] group bg-no-repeat bg-cover bg-bottom"
+        style={{
+          gridTemplateAreas: '"stack"',
+          backgroundImage: `url("${himalayanValleyFallback}")`,
+        }}
       >
+        <div aria-hidden="true" className="backdrop-blur" />
+
         <picture>
           <source srcSet={himalayanValleyAvif} type="image/avif" />
           <source srcSet={himalayanValleyWebp} type="image/webp" />
@@ -33,7 +39,7 @@ function Home() {
             src={himalayanValleyWebp}
             alt=""
             fetchPriority="high"
-            className="size-full object-cover"
+            className="size-full relative object-cover object-bottom"
           />
         </picture>
 
@@ -42,7 +48,7 @@ function Home() {
           className="backdrop-blur-sm opacity-0 transition-opacity duration-500 group-focus-within:opacity-100"
         />
 
-        <div aria-hidden="true" className="bg-slate-900/70" />
+        <div aria-hidden="true" className="relative bg-slate-900/70" />
 
         <div className="relative flex flex-col gap-6 items-center justify-center px-6">
           <Logo variant="dark" />
