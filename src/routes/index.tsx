@@ -39,7 +39,7 @@ function Home() {
             src={himalayanValleyWebp}
             alt=""
             fetchPriority="high"
-            className="size-full relative object-cover object-bottom"
+            className="size-full relative object-cover object-bottom select-none"
           />
         </picture>
 
