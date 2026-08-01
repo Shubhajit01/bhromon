@@ -1,9 +1,9 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "ba731989-f131-42d8-a474-308e1619bb0d",
+  "id": "006dbd1d-7ee8-45ca-bafd-1ac2825dd148",
   "prevIds": [
-    "d13769f8-4ee9-4257-b57e-b5e8a8bc6b6d"
+    "00000000-0000-0000-0000-000000000000"
   ],
   "ddl": [
     {
@@ -42,6 +42,16 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "table": "trip"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
       "name": "title",
       "entityType": "columns",
       "table": "trip"
@@ -53,6 +63,26 @@
       "default": "'draft'",
       "generated": null,
       "name": "status",
+      "entityType": "columns",
+      "table": "trip"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(cast(unixepoch('subsecond') * 1000 as integer))",
+      "generated": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "table": "trip"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(cast(unixepoch('subsecond') * 1000 as integer))",
+      "generated": null,
+      "name": "updated_at",
       "entityType": "columns",
       "table": "trip"
     },
@@ -405,6 +435,21 @@
       "name": "updated_at",
       "entityType": "columns",
       "table": "verification"
+    },
+    {
+      "columns": [
+        "user_id"
+      ],
+      "tableTo": "user",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "name": "fk_trip_user_id_user_id_fk",
+      "entityType": "fks",
+      "table": "trip"
     },
     {
       "columns": [

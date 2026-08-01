@@ -1,3 +1,14 @@
+CREATE TABLE `trip` (
+	`id` text PRIMARY KEY,
+	`user_id` text NOT NULL,
+	`title` text NOT NULL,
+	`status` text DEFAULT 'draft' NOT NULL,
+	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	CONSTRAINT `fk_trip_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
+	CONSTRAINT "trip_status_check" CHECK("status" in ('draft', 'confirmed'))
+);
+--> statement-breakpoint
 CREATE TABLE `account` (
 	`id` text PRIMARY KEY,
 	`account_id` text NOT NULL,

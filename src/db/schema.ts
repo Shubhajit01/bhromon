@@ -1,5 +1,5 @@
-import { defineRelations, sql } from 'drizzle-orm';
-import { check, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
+import { check, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 import * as authSchema from './auth.schema';
 
@@ -13,31 +13,20 @@ export const trip = sqliteTable(
   'trip',
   {
     id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => authSchema.user.id, { onDelete: 'cascade' }),
     title: text('title').notNull(),
     status: text('status').$type<TripStatus>().notNull().default('draft'),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdateFn(() => sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
   },
   (table) => [
     check('trip_status_check', sql`${table.status} in ('draft', 'confirmed')`),
   ],
 );
-
-export const relations = defineRelations(authSchema, (r) => ({
-  user: {
-    sessions: r.many.session(),
-    accounts: r.many.account(),
-  },
-  session: {
-    user: r.one.user({
-      from: r.session.userId,
-      to: r.user.id,
-      optional: false,
-    }),
-  },
-  account: {
-    user: r.one.user({
-      from: r.account.userId,
-      to: r.user.id,
-      optional: false,
-    }),
-  },
-}));
