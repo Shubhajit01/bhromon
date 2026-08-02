@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import type { ComponentProps } from 'react';
+
 import { PaperPlaneTiltIcon } from '@phosphor-icons/react';
 
 import { Field, FieldGroup, FieldLabel } from '#/components/ui/field';
@@ -11,7 +13,11 @@ import {
 } from '#/components/ui/input-group';
 import { useInitTrip } from '#/features/trip/api/init-trip';
 
-function TripPromptComposer() {
+interface TripPromptComposerProps {
+  variant?: ComponentProps<typeof InputGroup>['variant'];
+}
+
+function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
   const [prompt, setPrompt] = useState('');
   const initTrip = useInitTrip();
 
@@ -28,7 +34,7 @@ function TripPromptComposer() {
           <FieldLabel htmlFor="trip-prompt" className="sr-only">
             Describe the trip you want to plan
           </FieldLabel>
-          <InputGroup variant="paper">
+          <InputGroup variant={variant}>
             <InputGroupTextarea
               id="trip-prompt"
               name="trip-prompt"

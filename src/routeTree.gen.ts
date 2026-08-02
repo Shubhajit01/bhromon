@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as ProtectedMeRouteImport } from './routes/_protected/me'
-import { Route as TripsTripIdRouteImport } from './routes/trips/$tripId'
+import { Route as ProtectedTIndexRouteImport } from './routes/_protected/t/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ProtectedTTripIdIndexRouteImport } from './routes/_protected/t/$tripId/index'
+import { Route as ProtectedTTripIdChatRouteImport } from './routes/_protected/t/$tripId/chat'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,55 +31,73 @@ const ProtectedMeRoute = ProtectedMeRouteImport.update({
   path: '/me',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const TripsTripIdRoute = TripsTripIdRouteImport.update({
-  id: '/trips/$tripId',
-  path: '/trips/$tripId',
-  getParentRoute: () => rootRouteImport,
+const ProtectedTIndexRoute = ProtectedTIndexRouteImport.update({
+  id: '/t/',
+  path: '/t/',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedTTripIdIndexRoute = ProtectedTTripIdIndexRouteImport.update({
+  id: '/t/$tripId/',
+  path: '/t/$tripId/',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedTTripIdChatRoute = ProtectedTTripIdChatRouteImport.update({
+  id: '/t/$tripId/chat',
+  path: '/t/$tripId/chat',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/me': typeof ProtectedMeRoute
-  '/trips/$tripId': typeof TripsTripIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/t/': typeof ProtectedTIndexRoute
+  '/t/$tripId/chat': typeof ProtectedTTripIdChatRoute
+  '/t/$tripId/': typeof ProtectedTTripIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/me': typeof ProtectedMeRoute
-  '/trips/$tripId': typeof TripsTripIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/t': typeof ProtectedTIndexRoute
+  '/t/$tripId/chat': typeof ProtectedTTripIdChatRoute
+  '/t/$tripId': typeof ProtectedTTripIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteWithChildren
   '/_protected/me': typeof ProtectedMeRoute
-  '/trips/$tripId': typeof TripsTripIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_protected/t/': typeof ProtectedTIndexRoute
+  '/_protected/t/$tripId/chat': typeof ProtectedTTripIdChatRoute
+  '/_protected/t/$tripId/': typeof ProtectedTTripIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/me' | '/trips/$tripId' | '/api/auth/$'
+  fullPaths:
+    '/' | '/me' | '/api/auth/$' | '/t/' | '/t/$tripId/chat' | '/t/$tripId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/me' | '/trips/$tripId' | '/api/auth/$'
+  to: '/' | '/me' | '/api/auth/$' | '/t' | '/t/$tripId/chat' | '/t/$tripId'
   id:
     | '__root__'
     | '/'
     | '/_protected'
     | '/_protected/me'
-    | '/trips/$tripId'
     | '/api/auth/$'
+    | '/_protected/t/'
+    | '/_protected/t/$tripId/chat'
+    | '/_protected/t/$tripId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedRoute: typeof ProtectedRouteWithChildren
-  TripsTripIdRoute: typeof TripsTripIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -104,12 +124,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedMeRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/trips/$tripId': {
-      id: '/trips/$tripId'
-      path: '/trips/$tripId'
-      fullPath: '/trips/$tripId'
-      preLoaderRoute: typeof TripsTripIdRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_protected/t/': {
+      id: '/_protected/t/'
+      path: '/t'
+      fullPath: '/t/'
+      preLoaderRoute: typeof ProtectedTIndexRouteImport
+      parentRoute: typeof ProtectedRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -118,15 +138,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/t/$tripId/': {
+      id: '/_protected/t/$tripId/'
+      path: '/t/$tripId'
+      fullPath: '/t/$tripId/'
+      preLoaderRoute: typeof ProtectedTTripIdIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/t/$tripId/chat': {
+      id: '/_protected/t/$tripId/chat'
+      path: '/t/$tripId/chat'
+      fullPath: '/t/$tripId/chat'
+      preLoaderRoute: typeof ProtectedTTripIdChatRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
   }
 }
 
 interface ProtectedRouteChildren {
   ProtectedMeRoute: typeof ProtectedMeRoute
+  ProtectedTIndexRoute: typeof ProtectedTIndexRoute
+  ProtectedTTripIdChatRoute: typeof ProtectedTTripIdChatRoute
+  ProtectedTTripIdIndexRoute: typeof ProtectedTTripIdIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedMeRoute: ProtectedMeRoute,
+  ProtectedTIndexRoute: ProtectedTIndexRoute,
+  ProtectedTTripIdChatRoute: ProtectedTTripIdChatRoute,
+  ProtectedTTripIdIndexRoute: ProtectedTTripIdIndexRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
@@ -136,7 +176,6 @@ const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRoute: ProtectedRouteWithChildren,
-  TripsTripIdRoute: TripsTripIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

@@ -43,7 +43,7 @@ export const initTrip = createServerFn({ method: 'POST' })
     const tripAgent = await getTripAgent(id);
     await tripAgent.persistInitialPrompt(data.prompt);
 
-    throw redirect({ to: '/trips/$tripId', params: { tripId: id } });
+    throw redirect({ to: '/t/$tripId', params: { tripId: id } });
   });
 
 export function useInitTrip() {

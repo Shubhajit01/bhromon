@@ -1,16 +1,14 @@
 import type * as React from 'react';
 
+import { Link } from '@tanstack/react-router';
+
+import type { LinkProps } from '@tanstack/react-router';
+
 import { cva } from 'class-variance-authority';
-import {
-  Button as ButtonPrimitive,
-  Link as LinkPrimitive,
-} from 'react-aria-components';
+import { Button as ButtonPrimitive } from 'react-aria-components';
 
 import type { VariantProps } from 'class-variance-authority';
-import type {
-  ButtonProps as ButtonPrimitiveProps,
-  LinkProps as LinkPrimitiveProps,
-} from 'react-aria-components';
+import type { ButtonProps as ButtonPrimitiveProps } from 'react-aria-components';
 
 import { cn } from '#/lib/utils.ts';
 
@@ -75,12 +73,12 @@ function LinkButton({
   variant = 'default',
   size = 'default',
   ...props
-}: Omit<LinkPrimitiveProps, 'className'> &
+}: Omit<LinkProps, 'className'> &
   VariantProps<typeof buttonVariants> & {
     className?: string;
   }) {
   return (
-    <LinkPrimitive
+    <Link
       data-slot="button"
       data-variant={variant}
       data-size={size}
@@ -90,4 +88,4 @@ function LinkButton({
   );
 }
 
-export { Button, LinkButton, buttonVariants };
+export { Button, buttonVariants, LinkButton };

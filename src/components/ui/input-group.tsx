@@ -18,7 +18,7 @@ const inputGroupVariants = cva(
       variant: {
         default: '',
         paper:
-          'border-border bg-background text-foreground shadow-lg backdrop-blur-md [&_[data-slot=input-group-control]]:placeholder:text-muted-foreground',
+          'border-border bg-background text-foreground [&_[data-slot=input-group-control]]:placeholder:text-muted-foreground',
       },
     },
     defaultVariants: {
