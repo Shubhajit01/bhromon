@@ -21,6 +21,7 @@ interface CurrentUser {
   id: string;
   name: string;
   email: string;
+  isAnonymous: boolean | null | undefined;
   image?: string | null;
 }
 
@@ -58,17 +59,27 @@ export function useIsAuthenticated() {
   return data;
 }
 
-export function useMaybeCurrentUser() {
-  const { data } = useSuspenseQuery(getCurrentUserOptions());
-  return data;
+export function useMaybeCurrentUser<T = CurrentUser | null>(
+  selector?: (d: CurrentUser | null) => T,
+): T {
+  const { data } = useSuspenseQuery({
+    ...getCurrentUserOptions(),
+    select: (d) => (selector ? selector(d) : d),
+  });
+  return data as T;
 }
 
-export function useCurrentUser() {
-  const user = useMaybeCurrentUser();
-  if (!user) {
-    throw new UserNotAuthenticatedError();
-  }
-  return user;
+export function useCurrentUser<T = CurrentUser>(
+  selector?: (d: CurrentUser) => T,
+): T {
+  const user = useMaybeCurrentUser((d) => {
+    if (!d) {
+      throw new UserNotAuthenticatedError();
+    }
+    return selector ? selector(d) : d;
+  });
+
+  return user as T;
 }
 
 export function useInvalidateCurrentUser() {

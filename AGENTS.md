@@ -33,6 +33,14 @@ Use this structure for entity queries by default. A `get-<entity-in-kebab-case>.
 5. Export `use<Entity>` as the main consumer hook. Prefer `useSuspenseQuery(get<Entity>QueryOptions(...args))` unless the caller needs non-suspense behaviour.
 6. Export `useInvalidate<Entity>`, returning a helper that accepts the same entity inputs and invalidates the matching query via the canonical query-options function.
 
+### Selector-pattern opt-in
+
+Do not add selector support to query hooks by default. Before implementing a selector pattern for any query API, explicitly ask the user whether they want it and wait for confirmation; selectors are an intentional API choice, not a default convention.
+
+When approved, an optional selector callback may be accepted by the hook. Use a default generic so `use<Entity>()` returns the original query data and `use<Entity>((data) => ...)` returns the selector result. For hooks that guarantee an entity exists, validate that guarantee before invoking the selector so its parameter is non-null.
+
+See `src/features/auth/api/get-current-user.ts` for the reference implementation.
+
 `src/features/auth/api/get-current-user.ts` is a special case and exposes extra auth-specific helpers. Do not treat its full exported surface as the default entity-query template; use the structure above instead.
 
 ## Data-write convention
