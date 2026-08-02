@@ -7,7 +7,14 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '#/components/ui/empty';
-import { ItemGroup } from '#/components/ui/item';
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemGroup,
+  ItemMedia,
+} from '#/components/ui/item';
+import { Skeleton } from '#/components/ui/skeleton';
 import { useTrips } from '#/features/trip/api/get-trips';
 import { TripCard } from '#/features/trip/components/trip-card';
 
@@ -64,4 +71,30 @@ function TripList({ status }: TripListProps) {
   );
 }
 
-export { TripList };
+function TripListFallback() {
+  return (
+    <ItemGroup className="gap-2" aria-label="Loading trips" aria-busy>
+      {Array.from({ length: 5 }, (_, index) => (
+        <Item
+          key={index}
+          role="listitem"
+          variant="outline"
+          className="rounded-2xl border-border bg-card"
+        >
+          <ItemMedia>
+            <Skeleton className="size-5 rounded-full" />
+          </ItemMedia>
+          <ItemContent className="flex flex-row items-center gap-2">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-4 w-16" />
+          </ItemContent>
+          <ItemActions className="ml-auto">
+            <Skeleton className="h-3 w-14" />
+          </ItemActions>
+        </Item>
+      ))}
+    </ItemGroup>
+  );
+}
+
+export { TripList, TripListFallback };

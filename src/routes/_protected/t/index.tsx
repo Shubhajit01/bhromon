@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { z } from 'zod';
@@ -5,7 +7,10 @@ import { z } from 'zod';
 import { Logo } from '#/components/logo';
 import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
 import { loadTrips } from '#/features/trip/api/get-trips';
-import { TripList } from '#/features/trip/components/trip-list';
+import {
+  TripList,
+  TripListFallback,
+} from '#/features/trip/components/trip-list';
 import { TripPromptComposer } from '#/features/trip/components/trip-prompt-composer';
 import { TripStatusFilter } from '#/features/trip/components/trip-status-filter';
 import { tripStatusFilterSchema } from '#/features/trip/types/trip-status-filter';
@@ -17,7 +22,9 @@ const tripSearchSchema = z.object({
 
 export const Route = createFileRoute('/_protected/t/')({
   validateSearch: tripSearchSchema,
-  loader: ({ context }) => loadTrips(context.queryClient),
+  loader: ({ context }) => {
+    void loadTrips(context.queryClient);
+  },
   head: () => ({
     meta: seo({ title: 'Your trips' }),
   }),
@@ -61,7 +68,9 @@ function TripsPage() {
           <TripStatusFilter status={status} />
         </div>
 
-        <TripList status={status} />
+        <Suspense fallback={<TripListFallback />}>
+          <TripList status={status} />
+        </Suspense>
       </section>
     </main>
   );
