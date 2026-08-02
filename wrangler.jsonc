@@ -31,6 +31,7 @@
       "new_sqlite_classes": ["TripAgent"],
     },
   ],
+  "ai": { "binding": "AI" },
   /**
    * Smart Placement
    * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

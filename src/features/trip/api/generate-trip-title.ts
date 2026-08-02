@@ -1,0 +1,44 @@
+import { createServerFn } from '@tanstack/react-start';
+
+import { generateText, Output } from 'ai';
+import { env } from 'cloudflare:workers';
+import { createWorkersAI } from 'workers-ai-provider';
+import z from 'zod';
+
+export const generateTripTitleSchema = z.object({
+  prompt: z.string(),
+});
+
+export type GenerateTripTitleInput = z.infer<typeof generateTripTitleSchema>;
+
+export const generateTripTitle = createServerFn()
+  .validator(generateTripTitleSchema)
+  .handler(async ({ data }) => {
+    const workersai = createWorkersAI({ binding: env.AI });
+    const model = workersai('@cf/meta/llama-3.1-8b-instruct-fast');
+
+    const { output } = await generateText({
+      model,
+      instructions:
+        'You are a writer.' +
+        'You understand a piece of text and provides a title that suits that piece of text.\n' +
+        'Task: You will be given user prompt that starts a chat thread. Your task is to generate a short title from it.\n\n' +
+        'Rules:\n' +
+        '1. If the user is trying to abuse or use foul language - simply write Foul and abuse\n' +
+        '2. If you cannot understand the text generate a random text\n' +
+        '3. Do NOT give the same text back as title\n' +
+        '4. Title should be around 3-4 words max\n' +
+        '5. If you encounter PII data, ignore it - do NOT use it in the title',
+      prompt:
+        'Here is the user initial prompt. Generate title for this:\n' +
+        'Prompt:\n\n' +
+        data.prompt,
+      output: Output.object({
+        schema: z.object({
+          title: z.string().describe('Short title generated from user prompt'),
+        }),
+      }),
+    });
+
+    return output.title;
+  });

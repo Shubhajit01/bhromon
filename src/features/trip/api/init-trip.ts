@@ -1,15 +1,16 @@
 import { useMutation } from '@tanstack/react-query';
 import { redirect } from '@tanstack/react-router';
 import { createServerFn, useServerFn } from '@tanstack/react-start';
-import { getRequestHeaders } from '@tanstack/react-start/server';
 
 import { ulid } from 'ulid';
 import { z } from 'zod';
 
 import { getTripAgent } from '#/agents/trip-agent';
 import { db, trip } from '#/db/db.server';
+import { getCurrentUser } from '#/features/auth/api/get-current-user';
 import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
-import { auth } from '#/lib/auth';
+
+import { generateTripTitle } from './generate-trip-title';
 
 const initTripInputSchema = z.object({
   prompt: z.string().trim().min(1).max(4000),
@@ -20,18 +21,22 @@ type InitTripInput = z.infer<typeof initTripInputSchema>;
 export const initTrip = createServerFn({ method: 'POST' })
   .validator(initTripInputSchema)
   .handler(async ({ data }) => {
-    const session = await auth.api.getSession({ headers: getRequestHeaders() });
+    const user = await getCurrentUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error('Authentication required to create a trip');
     }
 
     const id = ulid();
 
+    const title = await generateTripTitle({
+      data: { prompt: data.prompt },
+    });
+
     await db.insert(trip).values({
       id,
-      userId: session.user.id,
-      title: 'New trip',
+      userId: user.id,
+      title,
       status: 'draft',
     });
 
