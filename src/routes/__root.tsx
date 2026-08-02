@@ -9,6 +9,7 @@ import type { QueryClient } from '@tanstack/react-query';
 
 import { logoOnDarkUrl, logoUrl } from '#/components/logo';
 import { site } from '#/config/site';
+import { loadCurrentUser } from '#/features/auth/api/get-current-user';
 import { preloadFont } from '#/lib/helpers';
 
 import fontsCss from '../styles/fonts.css?url';
@@ -47,6 +48,9 @@ export const Route = createRootRouteWithContext<RootContext>()({
       { rel: 'stylesheet', href: fontsCss },
     ],
   }),
+  async beforeLoad({ context }) {
+    await loadCurrentUser(context.queryClient);
+  },
   shellComponent: RootDocument,
 });
 
