@@ -5,6 +5,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { Logo } from '#/components/logo';
+import { useCurrentUser } from '#/features/auth/api/get-current-user';
 import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
 import { loadTrips } from '#/features/trip/api/get-trips';
 import {
@@ -32,13 +33,16 @@ export const Route = createFileRoute('/_protected/t/')({
 });
 
 function TripsPage() {
+  const name = useCurrentUser((s) => s.name);
+  const isAnonymous = useCurrentUser((s) => s.isAnonymous);
+
   const status = Route.useSearch({
     select: (s) => s.status,
   });
 
   return (
     <main className="min-h-svh bg-background flex flex-col gap-8 items-stretch">
-      <header className="flex gap-4 pt-12 max-w-3xl px-6 lg:px-0 mx-auto items-start justify-between w-full sm:pt-16">
+      <header className="flex gap-4 pt-12 max-w-3xl px-6 lg:px-0 mx-auto items-center justify-between w-full sm:pt-16">
         <Link to="/">
           <Logo variant="light" size={28} />
         </Link>
@@ -48,7 +52,7 @@ function TripsPage() {
 
       <section className="mx-auto max-w-3xl text-left gap-4 flex w-full flex-col  px-6 lg:px-0 ">
         <h1 className="mt-3 text-balance text-3xl text-foreground">
-          Where will we wander next?
+          Hi {isAnonymous ? 'there' : name}, Where will we wander next?
         </h1>
 
         <TripPromptComposer variant="default" />

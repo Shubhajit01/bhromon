@@ -2,16 +2,23 @@ import { useState } from 'react';
 
 import type { ComponentProps } from 'react';
 
-import { PaperPlaneTiltIcon } from '@phosphor-icons/react';
+import { InfoIcon, PaperPlaneTiltIcon } from '@phosphor-icons/react';
 
 import { Field, FieldGroup, FieldLabel } from '#/components/ui/field';
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
+  InputGroupText,
   InputGroupTextarea,
 } from '#/components/ui/input-group';
-import { useInitTrip } from '#/features/trip/api/init-trip';
+import {
+  initTripInputSchema,
+  MIN_PROMPT_LENGTH,
+  useInitTrip,
+} from '#/features/trip/api/init-trip';
+
+import { useInvalidateTrips } from '../api/get-trips';
 
 interface TripPromptComposerProps {
   variant?: ComponentProps<typeof InputGroup>['variant'];
@@ -19,16 +26,18 @@ interface TripPromptComposerProps {
 
 function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
   const [prompt, setPrompt] = useState('');
+  const { success: isValidPrompt } = initTripInputSchema.safeParse({ prompt });
+
   const initTrip = useInitTrip();
+  const invalidateTrips = useInvalidateTrips();
+
+  const handleSubmit = async (event: React.SubmitEvent) => {
+    event.preventDefault();
+    initTrip.mutate({ prompt }, { onSuccess: () => invalidateTrips() });
+  };
 
   return (
-    <form
-      className="w-full"
-      onSubmit={(event) => {
-        event.preventDefault();
-        initTrip.mutate({ prompt });
-      }}
-    >
+    <form className="w-full" onSubmit={handleSubmit}>
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="trip-prompt" className="sr-only">
@@ -48,12 +57,20 @@ function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
               onChange={(event) => setPrompt(event.target.value)}
             />
             <InputGroupAddon align="block-end" className="px-4 pb-4">
+              <InputGroupText>
+                {prompt.length >= MIN_PROMPT_LENGTH / 4 && !isValidPrompt ? (
+                  <span className="font-normal text-destructive inline-flex items-center gap-1 animate-in fade-in">
+                    <InfoIcon weight="bold" />
+                    Make it longer with atleast {MIN_PROMPT_LENGTH} characters
+                  </span>
+                ) : null}
+              </InputGroupText>
               <InputGroupButton
                 type="submit"
                 variant="default"
                 size="icon-sm"
                 aria-label="Start planning"
-                isDisabled={initTrip.isPending}
+                isDisabled={initTrip.isPending || !isValidPrompt}
                 className="ml-auto"
               >
                 <PaperPlaneTiltIcon weight="bold" />

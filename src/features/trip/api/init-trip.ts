@@ -12,8 +12,11 @@ import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
 
 import { generateTripTitle } from './generate-trip-title';
 
-const initTripInputSchema = z.object({
-  prompt: z.string().trim().min(1).max(4000),
+export const MIN_PROMPT_LENGTH = 50;
+export const MAX_PROMPT_LENGTH = 4000;
+
+export const initTripInputSchema = z.object({
+  prompt: z.string().trim().min(MIN_PROMPT_LENGTH).max(MAX_PROMPT_LENGTH),
 });
 
 type InitTripInput = z.infer<typeof initTripInputSchema>;

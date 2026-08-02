@@ -31,13 +31,13 @@ function TripCard({ trip }: TripCardProps) {
       <Item
         role="listitem"
         variant="outline"
-        className="rounded-2xl border-border bg-card transition-colors group-hover/trip:bg-muted/50 group-focus-visible/trip:border-primary"
+        className="rounded-2xl @container border-border bg-card transition-colors group-hover/trip:bg-muted/50 group-focus-visible/trip:border-primary"
       >
         <ItemMedia>
           {isConfirmed ? <IslandIcon size={20} /> : <BarricadeIcon size={20} />}
         </ItemMedia>
-        <ItemContent className="flex items-center gap-2 flex-row">
-          <ItemTitle>{trip.title}</ItemTitle>
+        <ItemContent className="flex @sm:items-center @sm:gap-2 @sm:flex-row">
+          <ItemTitle className="text-balance">{trip.title}</ItemTitle>
           <ItemDescription className="flex items-center gap-1.5">
             <span
               aria-hidden="true"
@@ -49,8 +49,8 @@ function TripCard({ trip }: TripCardProps) {
             {isConfirmed ? 'Confirmed' : 'Draft'}
           </ItemDescription>
         </ItemContent>
-        <ItemActions className="ml-auto text-xs text-muted-foreground">
-          <ItemDescription className="text-xs">
+        <ItemActions className="ml-auto text-muted-foreground hidden @sm:flex">
+          <ItemDescription className="text-sm">
             <ClientOnly>
               <TimeAgo date={trip.updatedAt} minPeriod={10} />
             </ClientOnly>

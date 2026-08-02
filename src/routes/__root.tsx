@@ -47,6 +47,9 @@ export const Route = createRootRouteWithContext<RootContext>()({
       { rel: 'stylesheet', href: appCss },
       { rel: 'stylesheet', href: fontsCss },
     ],
+    scripts: import.meta.env.DEV
+      ? [{ src: '//unpkg.com/react-scan/dist/auto.global.js' }]
+      : [],
   }),
   async beforeLoad({ context }) {
     await loadCurrentUser(context.queryClient);
