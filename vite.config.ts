@@ -1,4 +1,3 @@
-import { devtools } from '@tanstack/devtools-vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 
 import { cloudflare } from '@cloudflare/vite-plugin';
@@ -12,7 +11,6 @@ import { imagetools } from 'vite-imagetools';
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
   plugins: [
-    devtools(),
     cloudflare({ viteEnvironment: { name: 'ssr' } }),
     agents(),
     tailwindcss(),
