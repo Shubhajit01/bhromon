@@ -14,6 +14,7 @@ import { auth } from '#/lib/auth';
 const initTripInputSchema = z.object({
   prompt: z.string().trim().min(1).max(4000),
 });
+
 type InitTripInput = z.infer<typeof initTripInputSchema>;
 
 export const initTrip = createServerFn({ method: 'POST' })
@@ -41,8 +42,8 @@ export const initTrip = createServerFn({ method: 'POST' })
   });
 
 export function useInitTrip() {
-  const initTripServerFn = useServerFn(initTrip);
   const initAuthSession = useInitAuthSession();
+  const initTripServerFn = useServerFn(initTrip);
 
   return useMutation({
     mutationFn: async (data: InitTripInput) => {

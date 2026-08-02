@@ -9,7 +9,7 @@ import {
   InputGroupButton,
   InputGroupTextarea,
 } from '#/components/ui/input-group';
-import { useInitTrip } from '#/features/trips/api/init-trip';
+import { useInitTrip } from '#/features/trip/api/init-trip';
 
 function TripPromptComposer() {
   const [prompt, setPrompt] = useState('');

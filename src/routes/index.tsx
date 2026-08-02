@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { Logo } from '#/components/logo';
-import { TripPromptComposer } from '#/features/trip-planning/components/trip-prompt-composer';
+import { TripPromptComposer } from '#/features/trip/components/trip-prompt-composer';
 import { preloadImage } from '#/lib/helpers';
 import { seo } from '#/lib/seo';
 
