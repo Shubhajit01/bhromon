@@ -1,17 +1,34 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 
+import { z } from 'zod';
+
 import { Logo } from '#/components/logo';
 import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
 import { loadTrips } from '#/features/trip/api/get-trips';
 import { TripList } from '#/features/trip/components/trip-list';
 import { TripPromptComposer } from '#/features/trip/components/trip-prompt-composer';
+import { TripStatusFilter } from '#/features/trip/components/trip-status-filter';
+import { tripStatusFilterSchema } from '#/features/trip/types/trip-status-filter';
+import { seo } from '#/lib/seo';
+
+const tripSearchSchema = z.object({
+  status: tripStatusFilterSchema.catch('all'),
+});
 
 export const Route = createFileRoute('/_protected/t/')({
+  validateSearch: tripSearchSchema,
   loader: ({ context }) => loadTrips(context.queryClient),
+  head: () => ({
+    meta: seo({ title: 'Your trips' }),
+  }),
   component: TripsPage,
 });
 
 function TripsPage() {
+  const status = Route.useSearch({
+    select: (s) => s.status,
+  });
+
   return (
     <main className="min-h-svh bg-background flex flex-col gap-8 items-stretch">
       <header className="flex gap-4 pt-12 max-w-3xl px-6 lg:px-0 mx-auto items-start justify-between w-full sm:pt-16">
@@ -41,9 +58,10 @@ function TripsPage() {
           >
             Your trips
           </h2>
+          <TripStatusFilter status={status} />
         </div>
 
-        <TripList />
+        <TripList status={status} />
       </section>
     </main>
   );

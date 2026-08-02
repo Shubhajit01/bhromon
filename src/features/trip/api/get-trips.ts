@@ -49,7 +49,8 @@ export async function loadTrips(queryClient: QueryClient) {
 }
 
 export function useTrips() {
-  return useSuspenseQuery(getTripsQueryOptions());
+  const { data } = useSuspenseQuery(getTripsQueryOptions());
+  return data;
 }
 
 export function useInvalidateTrips() {

@@ -1,27 +1,63 @@
+import { SuitcaseRollingIcon } from '@phosphor-icons/react';
+
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '#/components/ui/empty';
 import { ItemGroup } from '#/components/ui/item';
 import { useTrips } from '#/features/trip/api/get-trips';
 import { TripCard } from '#/features/trip/components/trip-card';
 
-function TripList() {
-  const { data: trips } = useTrips();
+import type { TripStatusFilter } from '#/features/trip/types/trip-status-filter';
+
+interface TripListProps {
+  status: TripStatusFilter;
+}
+
+function TripList({ status }: TripListProps) {
+  const trips = useTrips();
+  const filteredTrips =
+    status === 'all' ? trips : trips.filter((trip) => trip.status === status);
 
   if (trips.length === 0) {
     return (
-      <div className="rounded-3xl border border-dashed border-border bg-card/55 px-6 py-12 text-center sm:px-10">
-        <p className="text-lg font-medium tracking-[-0.01em] text-foreground">
-          Your next journey starts here
-        </p>
-        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-          Share a few details in the prompt above and we’ll turn them into a
-          trip you can shape together.
-        </p>
-      </div>
+      <Empty className="border bg-card/55">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <SuitcaseRollingIcon weight="duotone" />
+          </EmptyMedia>
+          <EmptyTitle>Your next journey starts here</EmptyTitle>
+          <EmptyDescription>
+            Share a few details in the prompt above and we&apos;ll turn them
+            into a trip you can shape together.
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    );
+  }
+
+  if (filteredTrips.length === 0) {
+    return (
+      <Empty className="border bg-card/55">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <SuitcaseRollingIcon weight="duotone" />
+          </EmptyMedia>
+          <EmptyTitle>No {status} trips yet</EmptyTitle>
+          <EmptyDescription>
+            Try another filter to see the rest of your trips.
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     );
   }
 
   return (
     <ItemGroup className="gap-2">
-      {trips.map((trip) => (
+      {filteredTrips.map((trip) => (
         <TripCard key={trip.id} trip={trip} />
       ))}
     </ItemGroup>
