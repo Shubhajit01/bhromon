@@ -17,6 +17,9 @@ import { TripStatusFilter } from '#/features/trip/components/trip-status-filter'
 import { tripStatusFilterSchema } from '#/features/trip/types/trip-status-filter';
 import { seo } from '#/lib/seo';
 
+import mountainBgAvif from '#/assets/images/mountain-stencil.png?grayscale&w=850&format=avif&enhanced';
+import mountainBgWebp from '#/assets/images/mountain-stencil.png?grayscale&w=850&format=webp&enhanced';
+
 const tripSearchSchema = z.object({
   status: tripStatusFilterSchema.catch('all'),
 });
@@ -42,6 +45,15 @@ function TripsPage() {
 
   return (
     <main className="min-h-svh bg-background flex flex-col gap-8 items-stretch">
+      <picture>
+        <source srcSet={mountainBgAvif} type="image/avif" />
+        <img
+          alt=""
+          src={mountainBgWebp}
+          className="fixed left-0 bottom-0 w-full h-full md:w-3/4 md:h-3/4 xl:w-2/4 xl:h-2/4 opacity-50 object-contain select-none pointer-events-none object-bottom"
+        />
+      </picture>
+
       <header className="flex gap-4 pt-12 items-center justify-between box sm:pt-16">
         <Link to="/">
           <Logo variant="light" size={28} />

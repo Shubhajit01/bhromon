@@ -26,7 +26,7 @@ function TripCard({ trip }: TripCardProps) {
     <Link
       to="/t/$tripId"
       params={{ tripId: trip.id }}
-      className="group/trip block rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+      className="group/trip block rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-primary/20 backdrop-blur-sm"
     >
       <Item
         role="listitem"
