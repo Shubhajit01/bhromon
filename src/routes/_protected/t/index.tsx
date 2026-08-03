@@ -2,12 +2,11 @@ import { Suspense } from 'react';
 
 import { createFileRoute, Link } from '@tanstack/react-router';
 
-import { CircleWavyWarningIcon } from '@phosphor-icons/react';
 import { z } from 'zod';
 
 import { Logo } from '#/components/logo';
-import { Button } from '#/components/ui/button';
 import { useCurrentUser } from '#/features/auth/api/get-current-user';
+import { AnonymousUserBanner } from '#/features/auth/components/anonymous-user-banner';
 import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
 import { loadTrips } from '#/features/trip/api/get-trips';
 import {
@@ -46,36 +45,11 @@ function TripsPage() {
   });
 
   return (
-    <main
-      data-anonymous={isAnonymous}
-      className="group min-h-svh bg-background flex flex-col gap-8 items-stretch isolate"
-    >
-      {isAnonymous ? (
-        <aside className="bg-primary w-full sticky top-0 left-0 z-2 animate-in slide-in-from-top fade-in duration-500">
-          <div className="box py-2.5 flex items-center gap-4">
-            <CircleWavyWarningIcon
-              size={28}
-              weight="fill"
-              className="text-primary-foreground hidden sm:inline"
-            />
-            <div className="text-primary-foreground mr-auto text-pretty">
-              <p className="text-sm sm:text-base">
-                You&apos;re exploring as a guest.
-              </p>
-              <p className="text-xs sm:text-sm text-primary-foreground/75 -mt-1">
-                Claim this account to keep your trips safe and available
-                anytime.
-              </p>
-            </div>
-
-            <Button size="sm" variant="outline">
-              Claim
-            </Button>
-          </div>
-        </aside>
-      ) : null}
-
-      <picture className="fixed left-0 bottom-0 w-full h-full md:w-3/4 md:h-3/4 xl:w-2/4 xl:h-2/4 opacity-50">
+    <>
+      <picture
+        aria-hidden="true"
+        className="fixed left-0 bottom-0 w-full h-full md:w-3/4 md:h-3/4 xl:w-2/4 xl:h-2/4 opacity-50"
+      >
         <source srcSet={mountainBgAvif} type="image/avif" />
         <img
           alt=""
@@ -84,42 +58,49 @@ function TripsPage() {
         />
       </picture>
 
-      <header className="flex gap-4 group-data-[anonymous=false]:pt-12 items-center justify-between box group-data-[anonymous=false]:sm:pt-16">
-        <Link to="/">
-          <Logo variant="light" size={32} />
-        </Link>
-
-        <CurrentUserAvatar />
-      </header>
-
-      <section className="text-left gap-4 flex flex-col box">
-        <h1 className="mt-3 text-balance text-3xl tracking-tight text-foreground">
-          Hi {isAnonymous ? 'there' : name}, Where will we wander next?
-        </h1>
-
-        <div className="backdrop-blur-sm">
-          <TripPromptComposer variant="default" />
-        </div>
-      </section>
-
-      <section
-        className="pb-12 sm:pb-16 box"
-        aria-labelledby="trip-list-heading"
+      <main
+        data-anonymous={isAnonymous}
+        className="group min-h-svh flex flex-col gap-8 items-stretch isolate"
       >
-        <div className="mb-3 flex items-baseline justify-between gap-4">
-          <h2
-            id="trip-list-heading"
-            className="text-2xl font-medium tracking-[-0.02em] text-foreground"
-          >
-            Your trips
-          </h2>
-          <TripStatusFilter status={status} />
-        </div>
+        <AnonymousUserBanner />
 
-        <Suspense fallback={<TripListFallback />}>
-          <TripList status={status} />
-        </Suspense>
-      </section>
-    </main>
+        <header className="flex gap-4 group-data-[anonymous=false]:pt-12 items-center justify-between box group-data-[anonymous=false]:sm:pt-16">
+          <Link to="/">
+            <Logo variant="light" size={32} />
+          </Link>
+
+          <CurrentUserAvatar />
+        </header>
+
+        <section className="text-left gap-4 flex flex-col box">
+          <h1 className="mt-3 text-balance text-3xl tracking-tight text-foreground">
+            Hi {isAnonymous ? 'there' : name}, Where will we wander next?
+          </h1>
+
+          <div className="backdrop-blur-sm">
+            <TripPromptComposer variant="default" />
+          </div>
+        </section>
+
+        <section
+          className="pb-12 sm:pb-16 box"
+          aria-labelledby="trip-list-heading"
+        >
+          <div className="mb-3 flex items-baseline justify-between gap-4">
+            <h2
+              id="trip-list-heading"
+              className="text-xl font-medium tracking-[-0.02em] text-foreground"
+            >
+              Your trips
+            </h2>
+            <TripStatusFilter status={status} />
+          </div>
+
+          <Suspense fallback={<TripListFallback />}>
+            <TripList status={status} />
+          </Suspense>
+        </section>
+      </main>
+    </>
   );
 }
