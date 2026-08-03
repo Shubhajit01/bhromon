@@ -32,7 +32,7 @@ function AnonymousUserBanner({
           className="text-primary-foreground hidden sm:inline"
         />
         <div className="text-primary-foreground mr-auto text-pretty">
-          <p className="text-sm sm:text-base">
+          <p className="text-sm sm:text-base font-medium">
             You&apos;re exploring as a guest.
           </p>
           <p className="text-xs sm:text-sm text-primary-foreground/75 -mt-1">

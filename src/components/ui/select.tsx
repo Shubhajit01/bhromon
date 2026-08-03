@@ -69,7 +69,7 @@ function SelectValue<T extends object>({
     <SelectValuePrimitive
       data-slot="select-value"
       className={cn(
-        'flex flex-1 text-left data-placeholder:text-muted-foreground',
+        'flex flex-1 text-left font-medium data-placeholder:text-muted-foreground',
         className,
       )}
       {...props}
