@@ -32,7 +32,6 @@ function TripStatusFilter({ status }: TripStatusFilterProps) {
       onChange={(key) => {
         const nextFilter = tripStatusFilterSchema.parse(key);
         navigate({
-          viewTransition: true,
           search: (previous) => ({ ...previous, status: nextFilter }),
         });
       }}

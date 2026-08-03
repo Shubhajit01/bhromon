@@ -50,9 +50,11 @@ function TripCard({ trip }: TripCardProps) {
           </ItemDescription>
         </ItemContent>
         <ItemActions className="ml-auto text-muted-foreground hidden @sm:flex">
-          <ItemDescription className="text-sm">
+          <ItemDescription>
             <ClientOnly>
-              <TimeAgo date={trip.updatedAt} minPeriod={10} />
+              <span className="text-sm animate-in fade-in duration-100">
+                <TimeAgo date={trip.updatedAt} minPeriod={10} />
+              </span>
             </ClientOnly>
           </ItemDescription>
         </ItemActions>
