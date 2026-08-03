@@ -42,7 +42,7 @@ function TripsPage() {
 
   return (
     <main className="min-h-svh bg-background flex flex-col gap-8 items-stretch">
-      <header className="flex gap-4 pt-12 max-w-3xl px-6 lg:px-0 mx-auto items-center justify-between w-full sm:pt-16">
+      <header className="flex gap-4 pt-12 items-center justify-between box sm:pt-16">
         <Link to="/">
           <Logo variant="light" size={28} />
         </Link>
@@ -50,7 +50,7 @@ function TripsPage() {
         <CurrentUserAvatar />
       </header>
 
-      <section className="mx-auto max-w-3xl text-left gap-4 flex w-full flex-col  px-6 lg:px-0 ">
+      <section className="text-left gap-4 flex flex-col box">
         <h1 className="mt-3 text-balance text-3xl text-foreground">
           Hi {isAnonymous ? 'there' : name}, Where will we wander next?
         </h1>
@@ -59,7 +59,7 @@ function TripsPage() {
       </section>
 
       <section
-        className="pb-12 sm:pb-16 mx-auto w-full max-w-3xl  px-6 lg:px-0 "
+        className="pb-12 sm:pb-16 box"
         aria-labelledby="trip-list-heading"
       >
         <div className="mb-3 flex items-baseline justify-between gap-4">

@@ -151,3 +151,9 @@
     box-shadow: none;
   }
 }
+
+@layer utilities {
+  .box {
+    @apply mx-auto w-full max-w-3xl px-6 lg:px-0;
+  }
+}
