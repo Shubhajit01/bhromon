@@ -7,6 +7,8 @@ import { createServerFn } from '@tanstack/react-start';
 
 import type { QueryClient } from '@tanstack/react-query';
 
+import ms from 'ms';
+
 import { ANCHOR_KEYS } from '#/config/anchor-keys';
 import { COLLECTION } from '#/config/collection';
 import { db, desc, eq, trip } from '#/db/db.server';
@@ -40,6 +42,7 @@ export const getTrips = createServerFn({ method: 'GET' }).handler(async () => {
 
 export const getTripsQueryOptions = () =>
   queryOptions({
+    staleTime: ms('1d'),
     queryKey: [ANCHOR_KEYS.TRIP, COLLECTION.MANY],
     queryFn: ({ signal }) => getTrips({ signal }),
   });

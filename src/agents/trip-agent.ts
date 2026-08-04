@@ -23,6 +23,10 @@ export class TripAgent extends AIChatAgent {
       headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     });
   }
+
+  getMessages() {
+    return this.messages;
+  }
 }
 
 export function getTripAgent(id: string) {

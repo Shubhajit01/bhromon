@@ -18,10 +18,7 @@ function AnonymousUserBanner({
   return (
     <aside
       aria-label="Guest account notice"
-      className={cn(
-        'bg-primary w-full sticky top-0 left-0 z-2 animate-in slide-in-from-top fade-in duration-500',
-        className,
-      )}
+      className={cn('bg-primary w-full sticky top-0 left-0 z-2', className)}
       {...props}
     >
       <div className="box py-2.5 flex items-center gap-4">

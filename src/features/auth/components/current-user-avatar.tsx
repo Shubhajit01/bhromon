@@ -20,10 +20,13 @@ function getInitials(name: string) {
 }
 
 function CurrentUserAvatar(props: ComponentProps<typeof Avatar>) {
-  const { name, image } = useCurrentUser();
+  const { name, image, hash } = useCurrentUser();
+
+  const avatarUrl = `https://api.dicebear.com/10.x/open-peeps/svg?seed=${hash}&size=32`;
+
   return (
     <Avatar {...props}>
-      {image ? <AvatarImage src={image} alt={name} /> : null}
+      <AvatarImage src={image || avatarUrl} alt={name} />
       <AvatarFallback>{getInitials(name) || 'U'}</AvatarFallback>
     </Avatar>
   );

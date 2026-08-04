@@ -24,7 +24,7 @@ function TripCard({ trip }: TripCardProps) {
 
   return (
     <Link
-      to="/t/$tripId"
+      to="/t/$tripId/chat"
       params={{ tripId: trip.id }}
       className="group/trip block rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-primary/20 backdrop-blur-sm"
     >

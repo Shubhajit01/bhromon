@@ -1,11 +1,6 @@
-import * as React from 'react';
+import { Label as LabelPrimitive, LabelContext } from 'react-aria-components';
 
-import {
-  Label as LabelPrimitive,
-  LabelContext
-} from 'react-aria-components';
-
-import type {LabelProps} from 'react-aria-components';
+import type { LabelProps } from 'react-aria-components';
 
 import { cn } from '#/lib/utils.ts';
 

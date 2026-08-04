@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { LinkButton } from '#/components/ui/button';
 
-export const Route = createFileRoute('/_protected/t/$tripId/')({
+export const Route = createFileRoute('/_p/t/$tripId/')({
   component: RouteComponent,
 });
 

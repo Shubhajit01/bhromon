@@ -25,7 +25,7 @@ const tripSearchSchema = z.object({
   status: tripStatusFilterSchema.catch('all'),
 });
 
-export const Route = createFileRoute('/_protected/t/')({
+export const Route = createFileRoute('/_p/t/')({
   validateSearch: tripSearchSchema,
   loader: ({ context }) => {
     void loadTrips(context.queryClient);
@@ -54,7 +54,7 @@ function TripsPage() {
         <img
           alt=""
           src={mountainBgWebp}
-          className="object-contain size-full select-none pointer-events-none object-center sm:object-bottom"
+          className="object-contain size-full select-none pointer-events-none object-center sm:object-bottom mix-blend-multiply"
         />
       </picture>
 

@@ -11,6 +11,7 @@ import { getCurrentUser } from '#/features/auth/api/get-current-user';
 import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
 
 import { generateTripTitle } from './generate-trip-title';
+import { useInvalidateTrips } from './get-trips';
 
 export const MIN_PROMPT_LENGTH = 50;
 export const MAX_PROMPT_LENGTH = 4000;
@@ -53,10 +54,15 @@ export function useInitTrip() {
   const initAuthSession = useInitAuthSession();
   const initTripServerFn = useServerFn(initTrip);
 
+  const invalidateTrips = useInvalidateTrips();
+
   return useMutation({
     mutationFn: async (data: InitTripInput) => {
       await initAuthSession.mutateAsync();
       return initTripServerFn({ data });
+    },
+    onSuccess: () => {
+      void invalidateTrips();
     },
   });
 }

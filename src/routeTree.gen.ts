@@ -10,94 +10,109 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProtectedRouteImport } from './routes/_protected'
-import { Route as ProtectedMeRouteImport } from './routes/_protected/me'
-import { Route as ProtectedTIndexRouteImport } from './routes/_protected/t/index'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ProtectedTTripIdIndexRouteImport } from './routes/_protected/t/$tripId/index'
-import { Route as ProtectedTTripIdChatRouteImport } from './routes/_protected/t/$tripId/chat'
+import { Route as PRouteImport } from './routes/_p'
+import { Route as PMeRouteImport } from './routes/_p.me'
+import { Route as PTIndexRouteImport } from './routes/_p.t.index'
+import { Route as PTTripIdRouteImport } from './routes/_p.t.$tripId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
+import { Route as PTTripIdIndexRouteImport } from './routes/_p.t.$tripId.index'
+import { Route as PTTripIdChatRouteImport } from './routes/_p.t.$tripId.chat'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedRoute = ProtectedRouteImport.update({
-  id: '/_protected',
+const PRoute = PRouteImport.update({
+  id: '/_p',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedMeRoute = ProtectedMeRouteImport.update({
+const PMeRoute = PMeRouteImport.update({
   id: '/me',
   path: '/me',
-  getParentRoute: () => ProtectedRoute,
+  getParentRoute: () => PRoute,
 } as any)
-const ProtectedTIndexRoute = ProtectedTIndexRouteImport.update({
+const PTIndexRoute = PTIndexRouteImport.update({
   id: '/t/',
   path: '/t/',
-  getParentRoute: () => ProtectedRoute,
+  getParentRoute: () => PRoute,
+} as any)
+const PTTripIdRoute = PTTripIdRouteImport.update({
+  id: '/t/$tripId',
+  path: '/t/$tripId',
+  getParentRoute: () => PRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedTTripIdIndexRoute = ProtectedTTripIdIndexRouteImport.update({
-  id: '/t/$tripId/',
-  path: '/t/$tripId/',
-  getParentRoute: () => ProtectedRoute,
+const PTTripIdIndexRoute = PTTripIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PTTripIdRoute,
 } as any)
-const ProtectedTTripIdChatRoute = ProtectedTTripIdChatRouteImport.update({
-  id: '/t/$tripId/chat',
-  path: '/t/$tripId/chat',
-  getParentRoute: () => ProtectedRoute,
+const PTTripIdChatRoute = PTTripIdChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => PTTripIdRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/me': typeof ProtectedMeRoute
+  '/me': typeof PMeRoute
+  '/t/$tripId': typeof PTTripIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/t/': typeof ProtectedTIndexRoute
-  '/t/$tripId/chat': typeof ProtectedTTripIdChatRoute
-  '/t/$tripId/': typeof ProtectedTTripIdIndexRoute
+  '/t/': typeof PTIndexRoute
+  '/t/$tripId/chat': typeof PTTripIdChatRoute
+  '/t/$tripId/': typeof PTTripIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/me': typeof ProtectedMeRoute
+  '/me': typeof PMeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/t': typeof ProtectedTIndexRoute
-  '/t/$tripId/chat': typeof ProtectedTTripIdChatRoute
-  '/t/$tripId': typeof ProtectedTTripIdIndexRoute
+  '/t': typeof PTIndexRoute
+  '/t/$tripId/chat': typeof PTTripIdChatRoute
+  '/t/$tripId': typeof PTTripIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_protected': typeof ProtectedRouteWithChildren
-  '/_protected/me': typeof ProtectedMeRoute
+  '/_p': typeof PRouteWithChildren
+  '/_p/me': typeof PMeRoute
+  '/_p/t/$tripId': typeof PTTripIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/_protected/t/': typeof ProtectedTIndexRoute
-  '/_protected/t/$tripId/chat': typeof ProtectedTTripIdChatRoute
-  '/_protected/t/$tripId/': typeof ProtectedTTripIdIndexRoute
+  '/_p/t/': typeof PTIndexRoute
+  '/_p/t/$tripId/chat': typeof PTTripIdChatRoute
+  '/_p/t/$tripId/': typeof PTTripIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/me' | '/api/auth/$' | '/t/' | '/t/$tripId/chat' | '/t/$tripId/'
+    | '/'
+    | '/me'
+    | '/t/$tripId'
+    | '/api/auth/$'
+    | '/t/'
+    | '/t/$tripId/chat'
+    | '/t/$tripId/'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/me' | '/api/auth/$' | '/t' | '/t/$tripId/chat' | '/t/$tripId'
   id:
     | '__root__'
     | '/'
-    | '/_protected'
-    | '/_protected/me'
+    | '/_p'
+    | '/_p/me'
+    | '/_p/t/$tripId'
     | '/api/auth/$'
-    | '/_protected/t/'
-    | '/_protected/t/$tripId/chat'
-    | '/_protected/t/$tripId/'
+    | '/_p/t/'
+    | '/_p/t/$tripId/chat'
+    | '/_p/t/$tripId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ProtectedRoute: typeof ProtectedRouteWithChildren
+  PRoute: typeof PRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -110,26 +125,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_protected': {
-      id: '/_protected'
+    '/_p': {
+      id: '/_p'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof ProtectedRouteImport
+      preLoaderRoute: typeof PRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_protected/me': {
-      id: '/_protected/me'
+    '/_p/me': {
+      id: '/_p/me'
       path: '/me'
       fullPath: '/me'
-      preLoaderRoute: typeof ProtectedMeRouteImport
-      parentRoute: typeof ProtectedRoute
+      preLoaderRoute: typeof PMeRouteImport
+      parentRoute: typeof PRoute
     }
-    '/_protected/t/': {
-      id: '/_protected/t/'
+    '/_p/t/': {
+      id: '/_p/t/'
       path: '/t'
       fullPath: '/t/'
-      preLoaderRoute: typeof ProtectedTIndexRouteImport
-      parentRoute: typeof ProtectedRoute
+      preLoaderRoute: typeof PTIndexRouteImport
+      parentRoute: typeof PRoute
+    }
+    '/_p/t/$tripId': {
+      id: '/_p/t/$tripId'
+      path: '/t/$tripId'
+      fullPath: '/t/$tripId'
+      preLoaderRoute: typeof PTTripIdRouteImport
+      parentRoute: typeof PRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -138,44 +160,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_protected/t/$tripId/': {
-      id: '/_protected/t/$tripId/'
-      path: '/t/$tripId'
+    '/_p/t/$tripId/': {
+      id: '/_p/t/$tripId/'
+      path: '/'
       fullPath: '/t/$tripId/'
-      preLoaderRoute: typeof ProtectedTTripIdIndexRouteImport
-      parentRoute: typeof ProtectedRoute
+      preLoaderRoute: typeof PTTripIdIndexRouteImport
+      parentRoute: typeof PTTripIdRoute
     }
-    '/_protected/t/$tripId/chat': {
-      id: '/_protected/t/$tripId/chat'
-      path: '/t/$tripId/chat'
+    '/_p/t/$tripId/chat': {
+      id: '/_p/t/$tripId/chat'
+      path: '/chat'
       fullPath: '/t/$tripId/chat'
-      preLoaderRoute: typeof ProtectedTTripIdChatRouteImport
-      parentRoute: typeof ProtectedRoute
+      preLoaderRoute: typeof PTTripIdChatRouteImport
+      parentRoute: typeof PTTripIdRoute
     }
   }
 }
 
-interface ProtectedRouteChildren {
-  ProtectedMeRoute: typeof ProtectedMeRoute
-  ProtectedTIndexRoute: typeof ProtectedTIndexRoute
-  ProtectedTTripIdChatRoute: typeof ProtectedTTripIdChatRoute
-  ProtectedTTripIdIndexRoute: typeof ProtectedTTripIdIndexRoute
+interface PTTripIdRouteChildren {
+  PTTripIdChatRoute: typeof PTTripIdChatRoute
+  PTTripIdIndexRoute: typeof PTTripIdIndexRoute
 }
 
-const ProtectedRouteChildren: ProtectedRouteChildren = {
-  ProtectedMeRoute: ProtectedMeRoute,
-  ProtectedTIndexRoute: ProtectedTIndexRoute,
-  ProtectedTTripIdChatRoute: ProtectedTTripIdChatRoute,
-  ProtectedTTripIdIndexRoute: ProtectedTTripIdIndexRoute,
+const PTTripIdRouteChildren: PTTripIdRouteChildren = {
+  PTTripIdChatRoute: PTTripIdChatRoute,
+  PTTripIdIndexRoute: PTTripIdIndexRoute,
 }
 
-const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
-  ProtectedRouteChildren,
+const PTTripIdRouteWithChildren = PTTripIdRoute._addFileChildren(
+  PTTripIdRouteChildren,
 )
+
+interface PRouteChildren {
+  PMeRoute: typeof PMeRoute
+  PTTripIdRoute: typeof PTTripIdRouteWithChildren
+  PTIndexRoute: typeof PTIndexRoute
+}
+
+const PRouteChildren: PRouteChildren = {
+  PMeRoute: PMeRoute,
+  PTTripIdRoute: PTTripIdRouteWithChildren,
+  PTIndexRoute: PTIndexRoute,
+}
+
+const PRouteWithChildren = PRoute._addFileChildren(PRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ProtectedRoute: ProtectedRouteWithChildren,
+  PRoute: PRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

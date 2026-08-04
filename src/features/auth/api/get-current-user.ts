@@ -14,6 +14,7 @@ import ms from 'ms';
 import { ANCHOR_KEYS } from '#/config/anchor-keys';
 import { auth } from '#/lib/auth';
 import { authClient } from '#/lib/auth-client';
+import { hashify } from '#/lib/utils';
 
 import { UserNotAuthenticatedError } from '../errors/user-not-authenticated';
 
@@ -22,6 +23,7 @@ interface CurrentUser {
   name: string;
   email: string;
   isAnonymous: boolean | null | undefined;
+  hash: string;
   image?: string | null;
 }
 
@@ -29,15 +31,17 @@ export const getCurrentUser = createIsomorphicFn()
   .server(async (): Promise<CurrentUser | null> => {
     const headers = getRequestHeaders();
     const session = await auth.api.getSession({ headers });
-    return session?.user
+    const user = session?.user
       ? pick(session.user, ['name', 'email', 'id', 'image', 'isAnonymous'])
       : null;
+    return user ? { ...user, hash: await hashify(user.id) } : null;
   })
   .client(async (): Promise<CurrentUser | null> => {
     const { data } = await authClient.getSession();
-    return data?.user
+    const user = data?.user
       ? pick(data.user, ['name', 'email', 'id', 'image', 'isAnonymous'])
       : null;
+    return user ? { ...user, hash: await hashify(user.id) } : null;
   });
 
 export const getCurrentUserOptions = () =>
