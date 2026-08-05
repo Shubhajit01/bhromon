@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import type { ComponentProps } from 'react';
 
-import { InfoIcon, PaperPlaneTiltIcon } from '@phosphor-icons/react';
+import { ArrowUpIcon, InfoIcon } from '@phosphor-icons/react';
 
 import { Field, FieldGroup, FieldLabel } from '#/components/ui/field';
 import {
@@ -73,7 +73,7 @@ function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
                 isDisabled={initTrip.isPending || !isValidPrompt}
                 className="ml-auto"
               >
-                <PaperPlaneTiltIcon weight="bold" />
+                <ArrowUpIcon weight="bold" />
               </InputGroupButton>
             </InputGroupAddon>
           </InputGroup>

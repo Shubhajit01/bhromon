@@ -7,10 +7,11 @@ import { createServerFn } from '@tanstack/react-start';
 
 import type { QueryClient } from '@tanstack/react-query';
 
-import z from 'zod';
+import { z } from 'zod';
 
 import { getTripAgent } from '#/agents/trip-agent';
 import { ANCHOR_KEYS } from '#/config/anchor-keys';
+import { COLLECTION } from '#/config/collection';
 
 export const getTripMessagesInputSchema = z.object({
   tripId: z.string(),
@@ -27,7 +28,7 @@ export const getTripMessages = createServerFn({ method: 'GET' })
 
 export const getTripMessagesQueryOptions = (input: GetTripMessagesInput) =>
   queryOptions({
-    queryKey: [ANCHOR_KEYS.TRIP, 'messages', input.tripId],
+    queryKey: [ANCHOR_KEYS.TRIP, 'messages', COLLECTION.MANY, input.tripId],
     queryFn: ({ signal }) => getTripMessages({ data: input, signal }),
   });
 
