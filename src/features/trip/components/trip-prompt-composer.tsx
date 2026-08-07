@@ -26,7 +26,8 @@ interface TripPromptComposerProps {
 
 function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
   const [prompt, setPrompt] = useState('');
-  const { success: isValidPrompt } = initTripInputSchema.safeParse({ prompt });
+  const { success: isValidPrompt } =
+    initTripInputSchema.shape.prompt.safeParse(prompt);
 
   const initTrip = useInitTrip();
   const invalidateTrips = useInvalidateTrips();

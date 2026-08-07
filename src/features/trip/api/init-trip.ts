@@ -9,6 +9,10 @@ import { db, trip } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
 import { getTripAgent } from '#/features/trip-chat/agents/trip-agent';
+import {
+  getUserTimeContext,
+  userTimeContextSchema,
+} from '#/features/trip-chat/utils/user-time-context';
 
 import { generateTripTitle } from './generate-trip-title';
 import { useInvalidateTrips } from './get-trips';
@@ -18,9 +22,12 @@ export const MAX_PROMPT_LENGTH = 4000;
 
 export const initTripInputSchema = z.object({
   prompt: z.string().trim().min(MIN_PROMPT_LENGTH).max(MAX_PROMPT_LENGTH),
+  userTimeContext: userTimeContextSchema,
 });
 
-type InitTripInput = z.infer<typeof initTripInputSchema>;
+export type InitTripInput = z.infer<typeof initTripInputSchema>;
+
+type InitTripMutationInput = Pick<InitTripInput, 'prompt'>;
 
 export const initTrip = createServerFn({ method: 'POST' })
   .validator(initTripInputSchema)
@@ -45,7 +52,7 @@ export const initTrip = createServerFn({ method: 'POST' })
     });
 
     const tripAgent = await getTripAgent(id);
-    await tripAgent.persistInitialPrompt(data.prompt);
+    await tripAgent.persistInitialPrompt(data.prompt, data.userTimeContext);
 
     throw redirect({ to: '/t/$tripId', params: { tripId: id } });
   });
@@ -57,9 +64,11 @@ export function useInitTrip() {
   const invalidateTrips = useInvalidateTrips();
 
   return useMutation({
-    mutationFn: async (data: InitTripInput) => {
+    mutationFn: async (data: InitTripMutationInput) => {
       await initAuthSession.mutateAsync();
-      return initTripServerFn({ data });
+      return initTripServerFn({
+        data: { ...data, userTimeContext: getUserTimeContext() },
+      });
     },
     onSuccess: () => {
       void invalidateTrips();
