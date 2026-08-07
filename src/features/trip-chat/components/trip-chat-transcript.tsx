@@ -34,7 +34,7 @@ export function TripChatTranscript({
           aria-label="Trip planning conversation"
           aria-relevant="additions"
         >
-          <MessageScrollerContent className="box pb-12">
+          <MessageScrollerContent className="box pt-6 pb-12">
             {groups.length ? (
               groups.map((group) => (
                 <MessageScrollerItem key={group.id}>

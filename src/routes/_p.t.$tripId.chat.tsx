@@ -34,7 +34,7 @@ function Trip() {
   const { tripId } = Route.useParams();
 
   return (
-    <div className="flex h-dvh min-h-0 flex-col gap-2">
+    <div className="flex h-dvh min-h-0 flex-col">
       <AnonymousUserBanner />
       <TripHeader tripId={tripId} />
       <main className="grid min-h-0 grow">
@@ -52,11 +52,11 @@ function TripHeader({ tripId }: { tripId: string }) {
   const navigate = useNavigate();
 
   return (
-    <header className="box grid grid-cols-[auto_minmax(0,1fr)_auto] items-center py-4">
+    <header className="box flex items-center gap-3 py-4 border-b border-muted lg:border-0 lg:gap-0">
       <Button
         size="icon-lg"
         variant="outline"
-        className="-ml-10 -translate-x-full"
+        className="lg:-ml-10 lg:-translate-x-2/4"
         aria-label="Back"
         onPress={() =>
           can
@@ -67,7 +67,7 @@ function TripHeader({ tripId }: { tripId: string }) {
         <ArrowLeftIcon weight="bold" />
       </Button>
 
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="truncate text-base font-medium tracking-tight">
           {trip.title}
         </p>
@@ -75,7 +75,6 @@ function TripHeader({ tripId }: { tripId: string }) {
           Chat and decide your itinerary
         </p>
       </div>
-      <span aria-hidden="true" />
     </header>
   );
 }
