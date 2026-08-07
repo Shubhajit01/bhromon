@@ -9,9 +9,9 @@ import type { QueryClient } from '@tanstack/react-query';
 
 import { z } from 'zod';
 
-import { getTripAgent } from '#/agents/trip-agent';
 import { ANCHOR_KEYS } from '#/config/anchor-keys';
 import { COLLECTION } from '#/config/collection';
+import { getTripAgent } from '#/features/trip-chat/agents/trip-agent';
 
 export const getTripMessagesInputSchema = z.object({
   tripId: z.string(),

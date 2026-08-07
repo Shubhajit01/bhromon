@@ -2,7 +2,7 @@ import startServer from '@tanstack/react-start/server-entry';
 
 import { routeAgentRequest } from 'agents';
 
-export { TripAgent } from '#/agents/trip-agent';
+export { TripAgent } from '#/features/trip-chat/agents/trip-agent';
 
 export default {
   async fetch(request: Request, env: Env) {

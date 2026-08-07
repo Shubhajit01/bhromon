@@ -5,10 +5,10 @@ import { createServerFn, useServerFn } from '@tanstack/react-start';
 import { ulid } from 'ulid';
 import { z } from 'zod';
 
-import { getTripAgent } from '#/agents/trip-agent';
 import { db, trip } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
+import { getTripAgent } from '#/features/trip-chat/agents/trip-agent';
 
 import { generateTripTitle } from './generate-trip-title';
 import { useInvalidateTrips } from './get-trips';
