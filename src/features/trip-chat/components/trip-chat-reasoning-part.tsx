@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { CaretDownIcon } from '@phosphor-icons/react';
+import { BrainIcon, CaretDownIcon } from '@phosphor-icons/react';
 import { Streamdown } from 'streamdown';
 
 import type { ReasoningUIPart } from 'ai';
@@ -43,11 +43,17 @@ export function TripChatReasoningPart({
       <Marker
         id={buttonId}
         render={(props) => <button {...props} type="button" />}
-        className="w-auto gap-1 outline-none hover:text-foreground focus-visible:text-foreground focus-visible:underline focus-visible:underline-offset-4"
+        className={cn(
+          'w-auto gap-1 outline-none hover:text-foreground focus-visible:text-foreground focus-visible:underline focus-visible:underline-offset-4',
+          isExpanded && 'text-foreground',
+        )}
         aria-expanded={isExpanded}
         aria-controls={contentId}
         onClick={() => setIsExpanded((expanded) => !expanded)}
       >
+        <MarkerIcon>
+          <BrainIcon />
+        </MarkerIcon>
         <MarkerContent className={cn(isReasoningStreaming && 'shimmer')}>
           <ReasoningStatus
             isStreaming={isReasoningStreaming}
@@ -56,7 +62,12 @@ export function TripChatReasoningPart({
           />
         </MarkerContent>
         <MarkerIcon>
-          <CaretDownIcon />
+          <CaretDownIcon
+            className={cn(
+              'transition-transform duration-200 ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none',
+              isExpanded && 'rotate-180',
+            )}
+          />
         </MarkerIcon>
       </Marker>
 

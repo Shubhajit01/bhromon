@@ -1,4 +1,9 @@
+import { WrenchIcon } from '@phosphor-icons/react';
+import { getToolName, isToolUIPart } from 'ai';
 import { Streamdown } from 'streamdown';
+
+import { Marker, MarkerContent, MarkerIcon } from '#/components/ui/marker';
+import { cn } from '#/lib/utils';
 
 import { TripChatReasoningPart } from './trip-chat-reasoning-part';
 
@@ -51,5 +56,50 @@ export function TripChatMessagePart({
     );
   }
 
+  if (isToolUIPart(part) && !isUser) {
+    const isToolRunning =
+      part.state === 'input-streaming' || part.state === 'input-available';
+
+    return (
+      <Marker className="w-auto gap-1">
+        <MarkerIcon>
+          <WrenchIcon />
+        </MarkerIcon>
+        <MarkerContent className={cn(isToolRunning && 'shimmer')}>
+          {getToolStatus(part.state, formatToolName(getToolName(part)))}
+        </MarkerContent>
+      </Marker>
+    );
+  }
+
   return null;
+}
+
+function formatToolName(toolName: string) {
+  const words = toolName
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/[-_]+/g, ' ')
+    .toLowerCase();
+
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+function getToolStatus(state: string, toolName: string) {
+  switch (state) {
+    case 'input-streaming':
+    case 'input-available':
+      return `Using ${toolName}`;
+    case 'approval-requested':
+      return `${toolName} needs approval`;
+    case 'approval-responded':
+      return `Starting ${toolName}`;
+    case 'output-available':
+      return `Used ${toolName}`;
+    case 'output-error':
+      return `${toolName} failed`;
+    case 'output-denied':
+      return `${toolName} denied`;
+    default:
+      return toolName;
+  }
 }

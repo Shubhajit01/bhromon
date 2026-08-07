@@ -28,7 +28,7 @@ export function TripChatMessage({
     <Message align={isUser ? 'end' : 'start'}>
       <MessageContent>
         <Bubble variant={isUser ? 'default' : 'ghost'}>
-          <BubbleContent>
+          <BubbleContent className={isUser ? undefined : 'flex flex-col gap-2'}>
             {message.parts.map((part, partIndex) => (
               <TripChatMessagePart
                 key={`${message.id}:${part.type}:${partIndex}`}
