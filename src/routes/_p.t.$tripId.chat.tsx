@@ -12,15 +12,22 @@ import { AnonymousUserBanner } from '#/features/auth/components/anonymous-user-b
 import { loadTrip, useTrip } from '#/features/trip/api/get-trip';
 import { loadTripMessages } from '#/features/trip-chat/api/get-trip-messages';
 import { TripChat } from '#/features/trip-chat/components/trip-chat';
+import { seo } from '#/lib/seo';
 
 export const Route = createFileRoute('/_p/t/$tripId/chat')({
   component: Trip,
   async loader({ params, context }) {
-    await Promise.all([
+    const [trip] = await Promise.all([
       loadTrip(context.queryClient, { tripId: params.tripId }),
       loadTripMessages(context.queryClient, { tripId: params.tripId }),
     ]);
+    return { trip };
   },
+  head: ({ loaderData }) => ({
+    meta: seo({
+      title: [loaderData?.trip.title, 'Trip'],
+    }),
+  }),
 });
 
 function Trip() {

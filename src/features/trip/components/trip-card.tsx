@@ -1,5 +1,6 @@
 import { ClientOnly, Link } from '@tanstack/react-router';
 
+import { diffDays } from '@formkit/tempo';
 import { BarricadeIcon, IslandIcon } from '@phosphor-icons/react';
 import TimeAgo from 'react-timeago';
 
@@ -22,10 +23,16 @@ interface TripCardProps {
 function TripCard({ trip }: TripCardProps) {
   const isConfirmed = trip.status === 'confirmed';
 
+  const diff = diffDays(trip.updatedAt);
+  const isRecent = diff >= -3;
+
   return (
     <Link
       to="/t/$tripId/chat"
+      data-diff={diff}
       params={{ tripId: trip.id }}
+      data-preload={isRecent ? 'render' : 'intent'}
+      preload={isRecent ? 'render' : 'intent'}
       className="group/trip block rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-primary/20 backdrop-blur-sm"
     >
       <Item

@@ -2,7 +2,7 @@ import type { AnyRouteMatch } from '@tanstack/react-router';
 
 import { site } from '#/config/site';
 
-type MultiSingleValue = string | Array<string>;
+type MultiSingleValue = string | Array<string | undefined>;
 
 interface SeoOptions {
   title?: MultiSingleValue;

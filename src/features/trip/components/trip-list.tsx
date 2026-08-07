@@ -1,3 +1,4 @@
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { SuitcaseRollingIcon } from '@phosphor-icons/react';
 
 import {
@@ -25,6 +26,8 @@ interface TripListProps {
 }
 
 function TripList({ status }: TripListProps) {
+  const [parentRef] = useAutoAnimate();
+
   const trips = useTrips();
   const filteredTrips =
     status === 'all' ? trips : trips.filter((trip) => trip.status === status);
@@ -63,7 +66,7 @@ function TripList({ status }: TripListProps) {
   }
 
   return (
-    <ItemGroup className="gap-2">
+    <ItemGroup ref={parentRef} className="gap-2">
       {filteredTrips.map((trip) => (
         <TripCard key={trip.id} trip={trip} />
       ))}

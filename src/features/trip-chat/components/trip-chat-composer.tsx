@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 
-import type { FormEvent, KeyboardEvent } from 'react';
+import type { KeyboardEvent, SubmitEvent } from 'react';
 
 import { ArrowUpIcon, StopIcon } from '@phosphor-icons/react';
 
@@ -36,7 +36,7 @@ export function TripChatComposer(props: TripChatComposerProps) {
   const inputId = useId();
   const normalizedPrompt = prompt.trim();
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (props.mode !== 'compose' || !normalizedPrompt) {
@@ -96,7 +96,7 @@ export function TripChatComposer(props: TripChatComposerProps) {
                       ? 'Reconnecting'
                       : 'Stop generating'
                 }
-                className="ml-auto size-11"
+                className="ml-auto"
                 isDisabled={
                   isUnavailable || (isComposeMode && !normalizedPrompt)
                 }
