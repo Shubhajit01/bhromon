@@ -23,7 +23,7 @@ const filterOptions = [
 ] as const;
 
 function TripStatusFilter({ status }: TripStatusFilterProps) {
-  const navigate = useNavigate({ from: '/t/' });
+  const navigate = useNavigate({ from: '/t/trips' });
 
   return (
     <Select

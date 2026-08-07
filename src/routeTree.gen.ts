@@ -14,6 +14,7 @@ import { Route as PRouteImport } from './routes/_p'
 import { Route as PMeRouteImport } from './routes/_p.me'
 import { Route as PTIndexRouteImport } from './routes/_p.t.index'
 import { Route as PTTripIdRouteImport } from './routes/_p.t.$tripId'
+import { Route as PTTripsRouteImport } from './routes/_p.t.trips'
 import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
 import { Route as PTTripIdIndexRouteImport } from './routes/_p.t.$tripId.index'
 import { Route as PTTripIdChatRouteImport } from './routes/_p.t.$tripId.chat'
@@ -42,6 +43,11 @@ const PTTripIdRoute = PTTripIdRouteImport.update({
   path: '/t/$tripId',
   getParentRoute: () => PRoute,
 } as any)
+const PTTripsRoute = PTTripsRouteImport.update({
+  id: '/t/trips',
+  path: '/t/trips',
+  getParentRoute: () => PRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -62,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/me': typeof PMeRoute
   '/t/$tripId': typeof PTTripIdRouteWithChildren
+  '/t/trips': typeof PTTripsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/t/': typeof PTIndexRoute
   '/t/$tripId/chat': typeof PTTripIdChatRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/me': typeof PMeRoute
+  '/t/trips': typeof PTTripsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/t': typeof PTIndexRoute
   '/t/$tripId/chat': typeof PTTripIdChatRoute
@@ -81,6 +89,7 @@ export interface FileRoutesById {
   '/_p': typeof PRouteWithChildren
   '/_p/me': typeof PMeRoute
   '/_p/t/$tripId': typeof PTTripIdRouteWithChildren
+  '/_p/t/trips': typeof PTTripsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_p/t/': typeof PTIndexRoute
   '/_p/t/$tripId/chat': typeof PTTripIdChatRoute
@@ -92,18 +101,27 @@ export interface FileRouteTypes {
     | '/'
     | '/me'
     | '/t/$tripId'
+    | '/t/trips'
     | '/api/auth/$'
     | '/t/'
     | '/t/$tripId/chat'
     | '/t/$tripId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/me' | '/api/auth/$' | '/t' | '/t/$tripId/chat' | '/t/$tripId'
+  to:
+    | '/'
+    | '/me'
+    | '/t/trips'
+    | '/api/auth/$'
+    | '/t'
+    | '/t/$tripId/chat'
+    | '/t/$tripId'
   id:
     | '__root__'
     | '/'
     | '/_p'
     | '/_p/me'
     | '/_p/t/$tripId'
+    | '/_p/t/trips'
     | '/api/auth/$'
     | '/_p/t/'
     | '/_p/t/$tripId/chat'
@@ -153,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PTTripIdRouteImport
       parentRoute: typeof PRoute
     }
+    '/_p/t/trips': {
+      id: '/_p/t/trips'
+      path: '/t/trips'
+      fullPath: '/t/trips'
+      preLoaderRoute: typeof PTTripsRouteImport
+      parentRoute: typeof PRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -194,12 +219,14 @@ const PTTripIdRouteWithChildren = PTTripIdRoute._addFileChildren(
 interface PRouteChildren {
   PMeRoute: typeof PMeRoute
   PTTripIdRoute: typeof PTTripIdRouteWithChildren
+  PTTripsRoute: typeof PTTripsRoute
   PTIndexRoute: typeof PTIndexRoute
 }
 
 const PRouteChildren: PRouteChildren = {
   PMeRoute: PMeRoute,
   PTTripIdRoute: PTTripIdRouteWithChildren,
+  PTTripsRoute: PTTripsRoute,
   PTIndexRoute: PTIndexRoute,
 }
 
