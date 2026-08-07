@@ -1,6 +1,6 @@
 import { AIChatAgent } from '@cloudflare/ai-chat';
 import { getAgentByName } from 'agents';
-import { convertToModelMessages, streamText } from 'ai';
+import { convertToModelMessages, isStepCount, streamText } from 'ai';
 import { env } from 'cloudflare:workers';
 import { createWorkersAI } from 'workers-ai-provider';
 
@@ -8,6 +8,7 @@ import type { OnChatMessageOptions } from '@cloudflare/ai-chat';
 
 import { userTimeContextSchema } from '../../utils/user-time-context';
 import { createTripAgentSystemPrompt } from './prompt';
+import { getWeatherTool } from './tools/get-weather';
 
 import type {
   TripChatMessage,
@@ -18,6 +19,10 @@ import type { UserTimeContext } from '../../utils/user-time-context';
 interface TripAgentState {
   userTimeContext: UserTimeContext | null;
 }
+
+export const tripAgentTools = {
+  getWeather: getWeatherTool,
+};
 
 export class TripAgent extends AIChatAgent<Env, TripAgentState> {
   initialState: TripAgentState = { userTimeContext: null };
@@ -65,6 +70,8 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
       model: workersAI('@cf/zai-org/glm-4.7-flash'),
       instructions: createTripAgentSystemPrompt(userTimeContext),
       messages: await convertToModelMessages(this.messages),
+      tools: tripAgentTools,
+      stopWhen: isStepCount(3),
     });
 
     return result.toUIMessageStreamResponse<TripChatMessage>({
