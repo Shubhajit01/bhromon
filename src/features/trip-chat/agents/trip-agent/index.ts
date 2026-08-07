@@ -1,7 +1,5 @@
 import { AIChatAgent } from '@cloudflare/ai-chat';
-import { getAgentByName } from 'agents';
 import { convertToModelMessages, isStepCount, streamText } from 'ai';
-import { env } from 'cloudflare:workers';
 import { createWorkersAI } from 'workers-ai-provider';
 
 import type { OnChatMessageOptions } from '@cloudflare/ai-chat';
@@ -99,8 +97,4 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
   getMessages(): TripChatMessage[] {
     return this.messages as TripChatMessage[];
   }
-}
-
-export function getTripAgent(id: string) {
-  return getAgentByName<Env, TripAgent>(env.TripAgent, id);
 }

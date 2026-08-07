@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { redirect } from '@tanstack/react-router';
 import { createServerFn, useServerFn } from '@tanstack/react-start';
+import { getRequestHeaders } from '@tanstack/react-start/server';
 
 import { ulid } from 'ulid';
 import { z } from 'zod';
@@ -8,7 +9,7 @@ import { z } from 'zod';
 import { db, trip } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
-import { getTripAgent } from '#/features/trip-chat/agents/trip-agent';
+import { getAuthorizedTripAgent } from '#/features/trip-chat/agents/trip-agent/require-trip-agent-access.server';
 import {
   getUserTimeContext,
   userTimeContextSchema,
@@ -51,7 +52,10 @@ export const initTrip = createServerFn({ method: 'POST' })
       status: 'draft',
     });
 
-    const tripAgent = await getTripAgent(id);
+    const tripAgent = await getAuthorizedTripAgent({
+      headers: getRequestHeaders(),
+      tripId: id,
+    });
     await tripAgent.persistInitialPrompt(data.prompt, data.userTimeContext);
 
     throw redirect({ to: '/t/$tripId', params: { tripId: id } });

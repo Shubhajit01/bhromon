@@ -4,6 +4,7 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
+import { getRequestHeaders } from '@tanstack/react-start/server';
 
 import type { QueryClient } from '@tanstack/react-query';
 
@@ -11,7 +12,7 @@ import { z } from 'zod';
 
 import { ANCHOR_KEYS } from '#/config/anchor-keys';
 import { COLLECTION } from '#/config/collection';
-import { getTripAgent } from '#/features/trip-chat/agents/trip-agent';
+import { getAuthorizedTripAgent } from '#/features/trip-chat/agents/trip-agent/require-trip-agent-access.server';
 
 export const getTripMessagesInputSchema = z.object({
   tripId: z.string(),
@@ -22,7 +23,10 @@ export type GetTripMessagesInput = z.infer<typeof getTripMessagesInputSchema>;
 export const getTripMessages = createServerFn({ method: 'GET' })
   .validator(getTripMessagesInputSchema)
   .handler(async ({ data }) => {
-    const agent = await getTripAgent(data.tripId);
+    const agent = await getAuthorizedTripAgent({
+      headers: getRequestHeaders(),
+      tripId: data.tripId,
+    });
     return agent.getMessages();
   });
 
