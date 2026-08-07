@@ -79,9 +79,9 @@ export function TripChatComposer(props: TripChatComposerProps) {
               onKeyDown={handleKeyDown}
               id={inputId}
               name={inputId}
-              rows={2}
+              rows={1}
               enterKeyHint="send"
-              className="min-h-20 max-h-40 overflow-y-auto px-5 pt-4 text-base!"
+              className="h-16 overflow-y-auto px-5 pt-4"
               placeholder="Make day two slower, swap a flight for a train, or add somewhere local…"
             />
             <InputGroupAddon align="block-end" className="px-4 pb-4">
