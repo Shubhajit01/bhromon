@@ -9,6 +9,10 @@ import type { OnChatMessageOptions } from '@cloudflare/ai-chat';
 import { userTimeContextSchema } from '../../utils/user-time-context';
 import { createTripAgentSystemPrompt } from './prompt';
 
+import type {
+  TripChatMessage,
+  TripChatMessageMetadata,
+} from '../../types/trip-chat-message';
 import type { UserTimeContext } from '../../utils/user-time-context';
 
 interface TripAgentState {
@@ -56,17 +60,37 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
     }
 
     const workersAI = createWorkersAI({ binding: this.env.AI });
+    let reasoningStartedAt: number | undefined;
     const result = streamText({
       model: workersAI('@cf/zai-org/glm-4.7-flash'),
       instructions: createTripAgentSystemPrompt(userTimeContext),
       messages: await convertToModelMessages(this.messages),
     });
 
-    return result.toUIMessageStreamResponse();
+    return result.toUIMessageStreamResponse<TripChatMessage>({
+      messageMetadata: ({ part }): TripChatMessageMetadata | undefined => {
+        if (part.type === 'reasoning-start') {
+          reasoningStartedAt = Date.now();
+          return { reasoningStartedAt };
+        }
+
+        if (part.type === 'reasoning-end' && reasoningStartedAt !== undefined) {
+          const reasoningEndedAt = Date.now();
+
+          return {
+            reasoningStartedAt,
+            reasoningEndedAt,
+            reasoningDurationMs: reasoningEndedAt - reasoningStartedAt,
+          };
+        }
+
+        return undefined;
+      },
+    });
   }
 
-  getMessages() {
-    return this.messages;
+  getMessages(): TripChatMessage[] {
+    return this.messages as TripChatMessage[];
   }
 }
 

@@ -1,5 +1,3 @@
-import type { UIMessage } from 'ai';
-
 import { MessageGroup } from '#/components/ui/message';
 import {
   MessageScroller,
@@ -12,8 +10,10 @@ import {
 import { groupTripChatMessages } from '../utils/group-trip-chat-messages';
 import { TripChatMessage } from './trip-chat-message';
 
+import type { TripChatMessage as TripChatMessageType } from '../types/trip-chat-message';
+
 interface TripChatTranscriptProps {
-  messages: UIMessage[];
+  messages: TripChatMessageType[];
   isStreaming: boolean;
 }
 
@@ -62,7 +62,7 @@ export function TripChatTranscript({
   );
 }
 
-function getLatestAssistantMessageId(messages: UIMessage[]) {
+function getLatestAssistantMessageId(messages: TripChatMessageType[]) {
   for (let index = messages.length - 1; index >= 0; index -= 1) {
     const message = messages[index];
     if (message.role === 'assistant' && message.parts.length) {

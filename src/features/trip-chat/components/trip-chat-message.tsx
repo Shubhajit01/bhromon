@@ -1,12 +1,12 @@
-import type { UIMessage } from 'ai';
-
 import { Bubble, BubbleContent } from '#/components/ui/bubble';
 import { Message, MessageContent } from '#/components/ui/message';
 
 import { TripChatMessagePart } from './trip-chat-message-part';
 
+import type { TripChatMessage as TripChatMessageType } from '../types/trip-chat-message';
+
 interface TripChatMessageProps {
-  message: UIMessage;
+  message: TripChatMessageType;
   isStreaming: boolean;
 }
 
@@ -29,6 +29,7 @@ export function TripChatMessage({
                 partIndex={partIndex}
                 isStreaming={isStreaming}
                 isUser={isUser}
+                metadata={message.metadata}
               />
             ))}
           </BubbleContent>

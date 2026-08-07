@@ -1,13 +1,13 @@
-import type { UIMessage } from 'ai';
+import type { TripChatMessage } from '../types/trip-chat-message';
 
 export interface TripChatMessageGroup {
   id: string;
-  role: UIMessage['role'];
-  messages: UIMessage[];
+  role: TripChatMessage['role'];
+  messages: TripChatMessage[];
 }
 
 export function groupTripChatMessages(
-  messages: UIMessage[],
+  messages: TripChatMessage[],
 ): TripChatMessageGroup[] {
   const groups: TripChatMessageGroup[] = [];
 

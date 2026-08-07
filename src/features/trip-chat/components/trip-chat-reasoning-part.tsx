@@ -6,14 +6,18 @@ import { Streamdown } from 'streamdown';
 
 import type { ReasoningUIPart } from 'ai';
 
+import { ElapsedTime } from '#/components/elapsed-time';
 import { Marker, MarkerContent, MarkerIcon } from '#/components/ui/marker';
 import { cn } from '#/lib/utils';
+
+import type { TripChatMessageMetadata } from '../types/trip-chat-message';
 
 interface TripChatReasoningPartProps {
   messageId: string;
   partIndex: number;
   part: ReasoningUIPart;
   isStreaming: boolean;
+  metadata?: TripChatMessageMetadata;
 }
 
 export function TripChatReasoningPart({
@@ -21,6 +25,7 @@ export function TripChatReasoningPart({
   partIndex,
   part,
   isStreaming,
+  metadata,
 }: TripChatReasoningPartProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [containerRef] = useAutoAnimate<HTMLDivElement>({
@@ -30,6 +35,8 @@ export function TripChatReasoningPart({
   const buttonId = `trip-chat-reasoning-trigger-${messageId}-${partIndex}`;
   const contentId = `trip-chat-reasoning-content-${messageId}-${partIndex}`;
   const isReasoningStreaming = isStreaming && part.state !== 'done';
+  const reasoningStartedAt = metadata?.reasoningStartedAt;
+  const reasoningEndedAt = metadata?.reasoningEndedAt;
 
   return (
     <div ref={containerRef} className="flex flex-col items-start gap-1">
@@ -42,7 +49,11 @@ export function TripChatReasoningPart({
         onClick={() => setIsExpanded((expanded) => !expanded)}
       >
         <MarkerContent className={cn(isReasoningStreaming && 'shimmer')}>
-          Thinking
+          <ReasoningStatus
+            isStreaming={isReasoningStreaming}
+            startedAt={reasoningStartedAt}
+            endedAt={reasoningEndedAt}
+          />
         </MarkerContent>
         <MarkerIcon>
           <CaretDownIcon />
@@ -56,11 +67,42 @@ export function TripChatReasoningPart({
           aria-labelledby={buttonId}
           className="max-w-[70ch] pl-0.5 pb-4"
         >
-          <Streamdown isAnimating={isReasoningStreaming} className="typeset typeset-docs text-sm text-muted-foreground">
+          <Streamdown
+            isAnimating={isReasoningStreaming}
+            className="typeset typeset-docs text-sm text-muted-foreground"
+          >
             {part.text}
           </Streamdown>
         </div>
       ) : null}
     </div>
+  );
+}
+
+function ReasoningStatus({
+  isStreaming,
+  startedAt,
+  endedAt,
+}: {
+  isStreaming: boolean;
+  startedAt?: number;
+  endedAt?: number;
+}) {
+  const status = isStreaming ? 'Thinking' : 'Thought';
+  const hasDuration =
+    startedAt !== undefined && (isStreaming || endedAt !== undefined);
+
+  if (!hasDuration) {
+    return status;
+  }
+
+  return (
+    <>
+      {status} for{' '}
+      <ElapsedTime
+        startTime={startedAt}
+        endTime={isStreaming ? undefined : endedAt}
+      />
+    </>
   );
 }

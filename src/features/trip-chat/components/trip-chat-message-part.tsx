@@ -1,15 +1,19 @@
 import { Streamdown } from 'streamdown';
 
-import type { UIMessage } from 'ai';
-
 import { TripChatReasoningPart } from './trip-chat-reasoning-part';
+
+import type {
+  TripChatMessage,
+  TripChatMessageMetadata,
+} from '../types/trip-chat-message';
 
 interface TripChatMessagePartProps {
   messageId: string;
-  part: UIMessage['parts'][number];
+  part: TripChatMessage['parts'][number];
   partIndex: number;
   isStreaming: boolean;
   isUser: boolean;
+  metadata?: TripChatMessageMetadata;
 }
 
 export function TripChatMessagePart({
@@ -18,6 +22,7 @@ export function TripChatMessagePart({
   partIndex,
   isStreaming,
   isUser,
+  metadata,
 }: TripChatMessagePartProps) {
   if (part.type === 'reasoning' && !isUser) {
     return (
@@ -26,6 +31,7 @@ export function TripChatMessagePart({
         partIndex={partIndex}
         part={part}
         isStreaming={isStreaming}
+        metadata={metadata}
       />
     );
   }
@@ -38,7 +44,7 @@ export function TripChatMessagePart({
     return (
       <Streamdown
         isAnimating={isStreaming && part.state !== 'done'}
-        className="typeset text-foreground"
+        className="typeset typeset-docs text-foreground text-sm"
       >
         {part.text}
       </Streamdown>
