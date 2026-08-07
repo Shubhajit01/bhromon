@@ -49,7 +49,10 @@ export function TripChat({ tripId }: TripChatProps) {
   const composerMode = getComposerMode(activity, handleSend, stop);
 
   return (
-    <MessageScrollerProvider autoScroll defaultScrollPosition="start">
+    <MessageScrollerProvider
+      defaultScrollPosition="start"
+      autoScroll={activity === TRIP_CHAT_ACTIVITY.STREAMING}
+    >
       <div className="flex h-full min-h-0 flex-col gap-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <TripChatTranscript
           messages={messages}

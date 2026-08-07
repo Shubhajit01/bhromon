@@ -1,0 +1,66 @@
+import { useState } from 'react';
+
+import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { CaretDownIcon } from '@phosphor-icons/react';
+import { Streamdown } from 'streamdown';
+
+import type { ReasoningUIPart } from 'ai';
+
+import { Marker, MarkerContent, MarkerIcon } from '#/components/ui/marker';
+import { cn } from '#/lib/utils';
+
+interface TripChatReasoningPartProps {
+  messageId: string;
+  partIndex: number;
+  part: ReasoningUIPart;
+  isStreaming: boolean;
+}
+
+export function TripChatReasoningPart({
+  messageId,
+  partIndex,
+  part,
+  isStreaming,
+}: TripChatReasoningPartProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [containerRef] = useAutoAnimate<HTMLDivElement>({
+    duration: 200,
+    easing: 'ease-out',
+  });
+  const buttonId = `trip-chat-reasoning-trigger-${messageId}-${partIndex}`;
+  const contentId = `trip-chat-reasoning-content-${messageId}-${partIndex}`;
+  const isReasoningStreaming = isStreaming && part.state !== 'done';
+
+  return (
+    <div ref={containerRef} className="flex flex-col items-start gap-1">
+      <Marker
+        id={buttonId}
+        render={(props) => <button {...props} type="button" />}
+        className="w-auto gap-1 outline-none hover:text-foreground focus-visible:text-foreground focus-visible:underline focus-visible:underline-offset-4"
+        aria-expanded={isExpanded}
+        aria-controls={contentId}
+        onClick={() => setIsExpanded((expanded) => !expanded)}
+      >
+        <MarkerContent className={cn(isReasoningStreaming && 'shimmer')}>
+          Thinking
+        </MarkerContent>
+        <MarkerIcon>
+          <CaretDownIcon />
+        </MarkerIcon>
+      </Marker>
+
+      {isExpanded ? (
+        <div
+          id={contentId}
+          role="region"
+          aria-labelledby={buttonId}
+          className="max-w-[70ch] pl-0.5 pb-4"
+        >
+          <Streamdown isAnimating={isReasoningStreaming} className="typeset typeset-docs text-sm text-muted-foreground">
+            {part.text}
+          </Streamdown>
+        </div>
+      ) : null}
+    </div>
+  );
+}

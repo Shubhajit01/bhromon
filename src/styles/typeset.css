@@ -1,11 +1,11 @@
 @layer components {
   .typeset {
-    --typeset-font-body: inherit;
-    --typeset-font-heading: var(--font-heading);
-    --typeset-font-mono: var(--font-mono);
-    --typeset-size: 1em;
-    --typeset-leading: 1.75;
-    --typeset-flow: 1.25em;
+  --typeset-font-body: var(--font-geist);
+  --typeset-font-heading: var(--font-geist);
+  --typeset-font-mono: var(--font-geist-mono);
+  --typeset-size: 15px;
+  --typeset-leading: 1.6;
+  --typeset-flow: 1em;
   }
 }
 
@@ -197,8 +197,10 @@
       padding-inline-start: 1.5em;
     }
     &:where(li) {
-      margin-block-start: 0.5em;
       padding-inline-start: 0.4em;
+    }
+    &:where(li + li) {
+      margin-block-start: 0.25em;
     }
     &:where(li > p, li > ul, li > ol) {
       margin-block-start: 0.5em;
