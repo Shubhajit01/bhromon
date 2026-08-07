@@ -1,6 +1,8 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 
+import { fetchAsJson } from '#/utils/cache.server';
+
 interface LocationResponse {
   results?: Array<{
     name: string;
@@ -19,10 +21,8 @@ interface WeatherResponse {
   };
 }
 
-async function fetchJson<T>(url: string, signal?: AbortSignal) {
-  const response = await fetch(url, { signal });
-  return response.ok ? ((await response.json()) as T) : null;
-}
+const GEOCODING_CACHE_SECONDS = 60 * 60 * 24 * 30;
+const FORECAST_CACHE_SECONDS = 60 * 60;
 
 function getCondition(code: number) {
   if (code === 0) return 'clear';
@@ -44,10 +44,20 @@ export const getWeatherTool = tool({
     date: z.string().describe('Date in YYYY-MM-DD format'),
   }),
   execute: async ({ location, date }, { abortSignal }) => {
-    const locationQuery = new URLSearchParams({ name: location, count: '1' });
-    const locationData = await fetchJson<LocationResponse>(
+    const normalizedLocation = location
+      .trim()
+      .replace(/\s+/g, ' ')
+      .toLowerCase();
+    const locationQuery = new URLSearchParams({
+      name: normalizedLocation,
+      count: '1',
+    });
+    const locationData = await fetchAsJson<LocationResponse>(
       `https://geocoding-api.open-meteo.com/v1/search?${locationQuery}`,
-      abortSignal,
+      {
+        cacheTtlSeconds: GEOCODING_CACHE_SECONDS,
+        signal: abortSignal,
+      },
     );
     const place = locationData?.results?.at(0);
     if (!place) return { available: false, reason: 'Location not found' };
@@ -61,9 +71,12 @@ export const getWeatherTool = tool({
       daily:
         'weather_code,temperature_2m_min,temperature_2m_max,precipitation_probability_max',
     });
-    const weather = await fetchJson<WeatherResponse>(
+    const weather = await fetchAsJson<WeatherResponse>(
       `https://api.open-meteo.com/v1/forecast?${weatherQuery}`,
-      abortSignal,
+      {
+        cacheTtlSeconds: FORECAST_CACHE_SECONDS,
+        signal: abortSignal,
+      },
     );
     const weatherCode = weather?.daily?.weather_code.at(0);
     if (weatherCode === undefined) {

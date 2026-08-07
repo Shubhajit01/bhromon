@@ -1,5 +1,9 @@
 import { Bubble, BubbleContent } from '#/components/ui/bubble';
-import { Message, MessageContent } from '#/components/ui/message';
+import {
+  Message,
+  MessageContent,
+  MessageFooter,
+} from '#/components/ui/message';
 
 import { TripChatMessagePart } from './trip-chat-message-part';
 
@@ -15,6 +19,10 @@ export function TripChatMessage({
   isStreaming,
 }: TripChatMessageProps) {
   const isUser = message.role === 'user';
+  const hasWeatherResult = message.parts.some(
+    (part) =>
+      part.type === 'tool-getWeather' && part.state === 'output-available',
+  );
 
   return (
     <Message align={isUser ? 'end' : 'start'}>
@@ -34,6 +42,29 @@ export function TripChatMessage({
             ))}
           </BubbleContent>
         </Bubble>
+        {hasWeatherResult && (
+          <MessageFooter>
+            Weather data by&nbsp;
+            <a
+              href="https://open-meteo.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-3 hover:text-foreground"
+            >
+              Open-Meteo.com
+            </a>
+            &nbsp;
+            <a
+              href="https://creativecommons.org/licenses/by/4.0/"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-3 hover:text-foreground"
+            >
+              CC BY 4.0
+            </a>
+            . Forecast summary adapted by Bhromon.
+          </MessageFooter>
+        )}
       </MessageContent>
     </Message>
   );
