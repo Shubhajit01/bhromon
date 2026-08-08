@@ -60,6 +60,8 @@ export const getTrip = createServerFn({ method: 'GET' })
     };
   });
 
+export type Trip = NonNullable<Awaited<ReturnType<typeof getTrip>>>;
+
 export const getTripQueryOptions = (input: GetTripInput) =>
   queryOptions({
     staleTime: ms('1d'),
