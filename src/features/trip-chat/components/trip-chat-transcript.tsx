@@ -13,15 +13,18 @@ import { groupTripChatMessages } from '../utils/group-trip-chat-messages';
 import { TripChatMessage } from './trip-chat-message';
 
 import type { TripChatMessage as TripChatMessageType } from '../types/trip-chat-message';
+import type { TripChatToolApprovalResponse } from './save-itinerary-approval';
 
 interface TripChatTranscriptProps {
   messages: TripChatMessageType[];
   isStreaming: boolean;
+  onToolApproval: (response: TripChatToolApprovalResponse) => void;
 }
 
 export const TripChatTranscript = memo(function TripChatTranscript({
   messages,
   isStreaming,
+  onToolApproval,
 }: TripChatTranscriptProps) {
   const groups = groupTripChatMessages(messages);
   const activeMessageId = isStreaming
@@ -46,6 +49,7 @@ export const TripChatTranscript = memo(function TripChatTranscript({
                         key={message.id}
                         message={message}
                         isStreaming={message.id === activeMessageId}
+                        onToolApproval={onToolApproval}
                       />
                     ))}
                   </MessageGroup>

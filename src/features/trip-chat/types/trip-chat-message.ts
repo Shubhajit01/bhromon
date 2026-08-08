@@ -1,4 +1,6 @@
-import type { UIMessage } from 'ai';
+import type { InferUITools, UIMessage } from 'ai';
+
+import type { createTripAgentTools } from '../agents/trip-agent/tools';
 
 export interface TripChatMessageMetadata {
   reasoningStartedAt?: number;
@@ -6,4 +8,8 @@ export interface TripChatMessageMetadata {
   reasoningDurationMs?: number;
 }
 
-export type TripChatMessage = UIMessage<TripChatMessageMetadata>;
+export type TripChatMessage = UIMessage<
+  TripChatMessageMetadata,
+  never,
+  InferUITools<ReturnType<typeof createTripAgentTools>>
+>;

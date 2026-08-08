@@ -9,11 +9,10 @@ import {
 import { createWorkersAI } from 'workers-ai-provider';
 
 import type { OnChatMessageOptions } from '@cloudflare/ai-chat';
-import type { ToolSet } from 'ai';
 
 import { userTimeContextSchema } from '../../utils/user-time-context';
 import { createTripAgentSystemPrompt } from './prompt';
-import { getWeatherTool } from './tools/get-weather';
+import { createTripAgentTools } from './tools';
 
 import type {
   TripChatMessage,
@@ -24,10 +23,6 @@ import type { UserTimeContext } from '../../utils/user-time-context';
 interface TripAgentState {
   userTimeContext: UserTimeContext | null;
 }
-
-export const tripAgentTools = {
-  getWeather: getWeatherTool,
-};
 
 export class TripAgent extends AIChatAgent<Env, TripAgentState> {
   initialState: TripAgentState = { userTimeContext: null };
@@ -70,18 +65,20 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
     }
 
     const workersAI = createWorkersAI({ binding: this.env.AI });
+    const tools = createTripAgentTools(this.name);
     let reasoningStartedAt: number | undefined;
     const result = streamText({
       reasoning: 'medium',
       model: workersAI('@cf/zai-org/glm-4.7-flash'),
       instructions: createTripAgentSystemPrompt(userTimeContext),
       messages: await convertToModelMessages(this.messages),
-      tools: tripAgentTools,
+      tools,
+      toolApproval: { saveItinerary: 'user-approval' },
       stopWhen: isStepCount(3),
     });
 
     return createUIMessageStreamResponse({
-      stream: toUIMessageStream<ToolSet, TripChatMessage>({
+      stream: toUIMessageStream<typeof tools, TripChatMessage>({
         stream: result.stream,
         messageMetadata: ({ part }): TripChatMessageMetadata | undefined => {
           if (part.type === 'reasoning-start') {

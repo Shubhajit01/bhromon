@@ -11,15 +11,18 @@ import { site } from '#/config/site';
 import { TripChatMessagePart } from './trip-chat-message-part';
 
 import type { TripChatMessage as TripChatMessageType } from '../types/trip-chat-message';
+import type { TripChatToolApprovalResponse } from './save-itinerary-approval';
 
 interface TripChatMessageProps {
   message: TripChatMessageType;
   isStreaming: boolean;
+  onToolApproval: (response: TripChatToolApprovalResponse) => void;
 }
 
 export const TripChatMessage = memo(function TripChatMessage({
   message,
   isStreaming,
+  onToolApproval,
 }: TripChatMessageProps) {
   const isUser = message.role === 'user';
   const hasWeatherResult = message.parts.some(
@@ -47,6 +50,7 @@ export const TripChatMessage = memo(function TripChatMessage({
                 isStreaming={isStreaming}
                 isUser={isUser}
                 metadata={message.metadata}
+                onToolApproval={onToolApproval}
               />
             ))}
           </BubbleContent>

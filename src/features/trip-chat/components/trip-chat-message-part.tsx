@@ -5,12 +5,14 @@ import { Streamdown } from 'streamdown';
 import { Marker, MarkerContent, MarkerIcon } from '#/components/ui/marker';
 import { cn } from '#/lib/utils';
 
+import { SaveItineraryApproval } from './save-itinerary-approval';
 import { TripChatReasoningPart } from './trip-chat-reasoning-part';
 
 import type {
   TripChatMessage,
   TripChatMessageMetadata,
 } from '../types/trip-chat-message';
+import type { TripChatToolApprovalResponse } from './save-itinerary-approval';
 
 interface TripChatMessagePartProps {
   messageId: string;
@@ -19,6 +21,7 @@ interface TripChatMessagePartProps {
   isStreaming: boolean;
   isUser: boolean;
   metadata?: TripChatMessageMetadata;
+  onToolApproval: (response: TripChatToolApprovalResponse) => void;
 }
 
 export function TripChatMessagePart({
@@ -28,6 +31,7 @@ export function TripChatMessagePart({
   isStreaming,
   isUser,
   metadata,
+  onToolApproval,
 }: TripChatMessagePartProps) {
   if (part.type === 'reasoning' && !isUser) {
     return (
@@ -55,6 +59,12 @@ export function TripChatMessagePart({
           {part.text}
         </Streamdown>
       </div>
+    );
+  }
+
+  if (part.type === 'tool-saveItinerary' && !isUser) {
+    return (
+      <SaveItineraryApproval invocation={part} onRespond={onToolApproval} />
     );
   }
 

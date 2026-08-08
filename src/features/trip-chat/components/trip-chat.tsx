@@ -1,4 +1,6 @@
-import { useDeferredValue } from 'react';
+import { useDeferredValue, useState } from 'react';
+
+import { Navigate } from '@tanstack/react-router';
 
 import type { ChatStatus } from 'ai';
 
@@ -11,12 +13,17 @@ import { TripChatFeedback } from './trip-chat-feedback';
 import { TripChatTranscript } from './trip-chat-transcript';
 
 import type { TripChatActivity } from '../types/trip-chat-activity';
+import type { TripChatMessage } from '../types/trip-chat-message';
+import type { TripChatToolApprovalResponse } from './save-itinerary-approval';
 
 interface TripChatProps {
   tripId: string;
 }
 
 export function TripChat({ tripId }: TripChatProps) {
+  const [approvedSaveToolCallId, setApprovedSaveToolCallId] = useState<
+    string | null
+  >(null);
   const {
     messages,
     sendMessage,
@@ -28,9 +35,17 @@ export function TripChat({ tripId }: TripChatProps) {
     isStreaming,
     isRecovering,
     connectionError,
+    addToolApprovalResponse,
   } = useTripChat({ tripId });
 
   const displayMessages = useDeferredValue(messages);
+
+  if (
+    approvedSaveToolCallId &&
+    hasSavedItinerary(messages, approvedSaveToolCallId)
+  ) {
+    return <Navigate to="/t/$tripId" params={{ tripId }} />;
+  }
 
   const activity = getTripChatActivity({
     connectionError,
@@ -50,6 +65,16 @@ export function TripChat({ tripId }: TripChatProps) {
     void regenerate();
   };
 
+  const handleToolApproval = ({
+    approvalId,
+    approved,
+    toolCallId,
+  }: TripChatToolApprovalResponse) => {
+    setApprovedSaveToolCallId(approved ? toolCallId : null);
+
+    addToolApprovalResponse({ id: approvalId, approved });
+  };
+
   const composerMode = getComposerMode(activity, handleSend, stop);
 
   return (
@@ -59,8 +84,9 @@ export function TripChat({ tripId }: TripChatProps) {
     >
       <div className="flex h-full min-h-0 flex-col gap-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <TripChatTranscript
-          messages={messages}
+          messages={displayMessages}
           isStreaming={activity === TRIP_CHAT_ACTIVITY.STREAMING}
+          onToolApproval={handleToolApproval}
         />
 
         <div className="box flex shrink-0 flex-col gap-2">
@@ -69,6 +95,17 @@ export function TripChat({ tripId }: TripChatProps) {
         </div>
       </div>
     </MessageScrollerProvider>
+  );
+}
+
+function hasSavedItinerary(messages: TripChatMessage[], toolCallId: string) {
+  return messages.some((message) =>
+    message.parts.some(
+      (part) =>
+        part.type === 'tool-saveItinerary' &&
+        part.toolCallId === toolCallId &&
+        part.state === 'output-available',
+    ),
   );
 }
 
