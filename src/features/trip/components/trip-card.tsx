@@ -28,7 +28,7 @@ function TripCard({ trip }: TripCardProps) {
 
   return (
     <Link
-      to="/t/$tripId/chat"
+      to="/t/$tripId"
       data-diff={diff}
       params={{ tripId: trip.id }}
       data-preload={isRecent ? 'render' : 'intent'}

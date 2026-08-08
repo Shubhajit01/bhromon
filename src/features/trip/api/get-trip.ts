@@ -12,8 +12,17 @@ import { z } from 'zod';
 
 import { ANCHOR_KEYS } from '#/config/anchor-keys';
 import { COLLECTION } from '#/config/collection';
-import { and, db, eq, trip } from '#/db/db.server';
+import {
+  and,
+  db,
+  eq,
+  itineraryRevision,
+  itineraryRevisionStatuses,
+  trip,
+} from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
+
+import { itineraryV1Schema } from '../schemas/itinerary/v1';
 
 export const getTripInputSchema = z.object({
   tripId: z.string(),
@@ -30,13 +39,32 @@ export const getTrip = createServerFn({ method: 'GET' })
       throw new Error('Authentication required to view trip');
     }
 
-    const [tripRecord] = await db
-      .select()
-      .from(trip)
-      .where(and(eq(trip.id, data.tripId), eq(trip.userId, user.id)))
-      .limit(1);
+    const tripRecord = await db.query.trip.findFirst({
+      where: {
+        id: data.tripId,
+        userId: user.id,
+      },
+      columns: {
+        id: true,
+        title: true,
+        status: true,
+      },
+      with: {
+        itineraryRevisions: true,
+      },
+    });
 
-    return tripRecord;
+    if (!tripRecord) {
+      return null;
+    }
+
+    return {
+      ...tripRecord,
+      itineraryRevisions: tripRecord.itineraryRevisions.map((it) => ({
+        ...it,
+        content: itineraryV1Schema.parse(it.content),
+      })),
+    };
   });
 
 export const getTripQueryOptions = (input: GetTripInput) =>
