@@ -50,13 +50,13 @@ function TripsPage() {
     <>
       <picture
         aria-hidden="true"
-        className="fixed left-0 bottom-0 w-full h-full md:w-3/4 md:h-3/4 xl:w-2/4 xl:h-2/4 opacity-50"
+        className="fixed left-0 bottom-0 w-full h-full md:w-3/4 md:h-3/4 xl:w-2/4 xl:h-2/4 opacity-10"
       >
         <source srcSet={mountainBgAvif} type="image/avif" />
         <img
           alt=""
           src={mountainBgWebp}
-          className="object-contain size-full select-none pointer-events-none object-center sm:object-bottom mix-blend-multiply"
+          className="object-contain size-full select-none pointer-events-none object-center sm:object-bottom mix-blend-multiply dark:invert"
         />
       </picture>
 
