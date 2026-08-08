@@ -7,6 +7,7 @@ import { Streamdown } from 'streamdown';
 import type { ReasoningUIPart } from 'ai';
 
 import { ElapsedTime } from '#/components/elapsed-time';
+import { Card, CardContent, CardTitle } from '#/components/ui/card';
 import { Marker, MarkerContent, MarkerIcon } from '#/components/ui/marker';
 import { cn } from '#/lib/utils';
 
@@ -39,7 +40,11 @@ export function TripChatReasoningPart({
   const reasoningEndedAt = metadata?.reasoningEndedAt;
 
   return (
-    <div ref={containerRef} className="flex flex-col items-start gap-1">
+    <div
+      ref={containerRef}
+      data-part-type="reasoning"
+      className="flex flex-col items-start gap-2"
+    >
       <Marker
         id={buttonId}
         render={(props) => <button {...props} type="button" />}
@@ -72,19 +77,22 @@ export function TripChatReasoningPart({
       </Marker>
 
       {isExpanded ? (
-        <div
+        <Card
+          size="sm"
           id={contentId}
           role="region"
           aria-labelledby={buttonId}
-          className="max-w-[70ch] pl-0.5 pb-4"
+          className="rounded-xl border shadow-none"
         >
-          <Streamdown
-            isAnimating={isReasoningStreaming}
-            className="typeset typeset-docs text-sm text-muted-foreground"
-          >
-            {part.text}
-          </Streamdown>
-        </div>
+          <CardContent>
+            <Streamdown
+              isAnimating={isReasoningStreaming}
+              className="typeset typeset-docs text-sm text-muted-foreground"
+            >
+              {part.text}
+            </Streamdown>
+          </CardContent>
+        </Card>
       ) : null}
     </div>
   );

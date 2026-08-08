@@ -136,6 +136,10 @@
   [role='button']:not(:disabled) {
     cursor: pointer;
   }
+
+  [data-streamdown='list-item'] {
+    @apply py-0.5!;
+  }
 }
 
 @media (prefers-reduced-transparency: reduce) {

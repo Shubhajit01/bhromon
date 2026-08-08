@@ -10,7 +10,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { logoOnDarkUrl, logoUrl } from '#/components/logo';
 import { site } from '#/config/site';
 import { loadCurrentUser } from '#/features/auth/api/get-current-user';
-import { preloadFont } from '#/lib/helpers';
+import { preloadFontAsLink } from '#/lib/helpers';
 
 import fontsCss from '../styles/fonts.css?url';
 import appCss from '../styles/globals.css?url';
@@ -41,8 +41,8 @@ export const Route = createRootRouteWithContext<RootContext>()({
         href: logoOnDarkUrl,
         media: '(prefers-color-scheme: dark)',
       },
-      preloadFont(geistFontUrl),
-      preloadFont(merriweatherFontUrl),
+      preloadFontAsLink(geistFontUrl),
+      preloadFontAsLink(merriweatherFontUrl),
 
       { rel: 'stylesheet', href: appCss },
       { rel: 'stylesheet', href: fontsCss },

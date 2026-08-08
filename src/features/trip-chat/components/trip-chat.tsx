@@ -50,7 +50,7 @@ export function TripChat({ tripId }: TripChatProps) {
 
   return (
     <MessageScrollerProvider
-      defaultScrollPosition="start"
+      defaultScrollPosition="end"
       autoScroll={activity === TRIP_CHAT_ACTIVITY.STREAMING}
     >
       <div className="flex h-full min-h-0 flex-col gap-4 pb-[max(1rem,env(safe-area-inset-bottom))]">

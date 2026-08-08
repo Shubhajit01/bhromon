@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { Logo } from '#/components/logo';
 import { TripPromptComposer } from '#/features/trip/components/trip-prompt-composer';
-import { preloadImage } from '#/lib/helpers';
+import { preloadImageAsLink } from '#/lib/helpers';
 import { seo } from '#/lib/seo';
 
 import himalayanValleyAvif from '#/assets/images/himalayan-valley.png?format=avif&enhanced';
@@ -14,8 +14,8 @@ export const Route = createFileRoute('/')({
   head: () => ({
     meta: seo(),
     links: [
-      preloadImage('image/webp', himalayanValleyWebp),
-      preloadImage('image/avif', himalayanValleyAvif),
+      preloadImageAsLink('image/webp', himalayanValleyWebp),
+      preloadImageAsLink('image/avif', himalayanValleyAvif),
     ],
   }),
 });

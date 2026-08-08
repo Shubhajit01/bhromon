@@ -43,16 +43,18 @@ export function TripChatMessagePart({
 
   if (part.type === 'text') {
     if (isUser) {
-      return <p>{part.text}</p>;
+      return <p data-part-type="text">{part.text}</p>;
     }
 
     return (
-      <Streamdown
-        isAnimating={isStreaming && part.state !== 'done'}
-        className="typeset typeset-docs text-foreground text-sm"
-      >
-        {part.text}
-      </Streamdown>
+      <div data-part-type="text">
+        <Streamdown
+          isAnimating={isStreaming && part.state !== 'done'}
+          className="typeset typeset-docs text-foreground text-sm"
+        >
+          {part.text}
+        </Streamdown>
+      </div>
     );
   }
 
@@ -61,7 +63,7 @@ export function TripChatMessagePart({
       part.state === 'input-streaming' || part.state === 'input-available';
 
     return (
-      <Marker className="w-auto gap-1">
+      <Marker data-part-type="tool" className="w-auto gap-1">
         <MarkerIcon>
           <WrenchIcon />
         </MarkerIcon>

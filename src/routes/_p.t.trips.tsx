@@ -16,6 +16,7 @@ import {
 import { TripPromptComposer } from '#/features/trip/components/trip-prompt-composer';
 import { TripStatusFilter } from '#/features/trip/components/trip-status-filter';
 import { tripStatusFilterSchema } from '#/features/trip/types/trip-status-filter';
+import { preloadImage } from '#/lib/helpers';
 import { seo } from '#/lib/seo';
 
 import mountainBgAvif from '#/assets/images/mountain-stencil.png?grayscale&w=850&format=avif&enhanced';
@@ -28,6 +29,7 @@ const tripSearchSchema = z.object({
 export const Route = createFileRoute('/_p/t/trips')({
   validateSearch: tripSearchSchema,
   loader: ({ context }) => {
+    preloadImage(mountainBgWebp);
     void loadTrips(context.queryClient);
   },
   head: () => ({
