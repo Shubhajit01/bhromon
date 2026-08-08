@@ -51,14 +51,6 @@ export const itineraryItemV1Schema = z
         path: ['endTime'],
       });
     }
-
-    if (item.startTime && item.endTime && item.endTime <= item.startTime) {
-      context.addIssue({
-        code: 'custom',
-        message: 'End time must be later than start time',
-        path: ['endTime'],
-      });
-    }
   });
 
 export const itineraryDayV1Schema = z.object({
