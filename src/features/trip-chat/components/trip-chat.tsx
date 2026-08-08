@@ -1,3 +1,5 @@
+import { useDeferredValue } from 'react';
+
 import type { ChatStatus } from 'ai';
 
 import { MessageScrollerProvider } from '#/components/ui/message-scroller';
@@ -27,6 +29,8 @@ export function TripChat({ tripId }: TripChatProps) {
     isRecovering,
     connectionError,
   } = useTripChat({ tripId });
+
+  const displayMessages = useDeferredValue(messages);
 
   const activity = getTripChatActivity({
     connectionError,

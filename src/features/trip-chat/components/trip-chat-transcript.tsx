@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import { MessageGroup } from '#/components/ui/message';
 import {
   MessageScroller,
@@ -17,7 +19,7 @@ interface TripChatTranscriptProps {
   isStreaming: boolean;
 }
 
-export function TripChatTranscript({
+export const TripChatTranscript = memo(function TripChatTranscript({
   messages,
   isStreaming,
 }: TripChatTranscriptProps) {
@@ -60,7 +62,7 @@ export function TripChatTranscript({
       </MessageScroller>
     </div>
   );
-}
+});
 
 function getLatestAssistantMessageId(messages: TripChatMessageType[]) {
   for (let index = messages.length - 1; index >= 0; index -= 1) {

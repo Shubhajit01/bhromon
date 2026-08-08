@@ -1,8 +1,15 @@
 import { AIChatAgent } from '@cloudflare/ai-chat';
-import { convertToModelMessages, isStepCount, streamText } from 'ai';
+import {
+  convertToModelMessages,
+  createUIMessageStreamResponse,
+  isStepCount,
+  streamText,
+  toUIMessageStream,
+} from 'ai';
 import { createWorkersAI } from 'workers-ai-provider';
 
 import type { OnChatMessageOptions } from '@cloudflare/ai-chat';
+import type { ToolSet } from 'ai';
 
 import { userTimeContextSchema } from '../../utils/user-time-context';
 import { createTripAgentSystemPrompt } from './prompt';
@@ -65,6 +72,7 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
     const workersAI = createWorkersAI({ binding: this.env.AI });
     let reasoningStartedAt: number | undefined;
     const result = streamText({
+      reasoning: 'medium',
       model: workersAI('@cf/zai-org/glm-4.7-flash'),
       instructions: createTripAgentSystemPrompt(userTimeContext),
       messages: await convertToModelMessages(this.messages),
@@ -72,25 +80,31 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
       stopWhen: isStepCount(3),
     });
 
-    return result.toUIMessageStreamResponse<TripChatMessage>({
-      messageMetadata: ({ part }): TripChatMessageMetadata | undefined => {
-        if (part.type === 'reasoning-start') {
-          reasoningStartedAt = Date.now();
-          return { reasoningStartedAt };
-        }
+    return createUIMessageStreamResponse({
+      stream: toUIMessageStream<ToolSet, TripChatMessage>({
+        stream: result.stream,
+        messageMetadata: ({ part }): TripChatMessageMetadata | undefined => {
+          if (part.type === 'reasoning-start') {
+            reasoningStartedAt = Date.now();
+            return { reasoningStartedAt };
+          }
 
-        if (part.type === 'reasoning-end' && reasoningStartedAt !== undefined) {
-          const reasoningEndedAt = Date.now();
+          if (
+            part.type === 'reasoning-end' &&
+            reasoningStartedAt !== undefined
+          ) {
+            const reasoningEndedAt = Date.now();
 
-          return {
-            reasoningStartedAt,
-            reasoningEndedAt,
-            reasoningDurationMs: reasoningEndedAt - reasoningStartedAt,
-          };
-        }
+            return {
+              reasoningStartedAt,
+              reasoningEndedAt,
+              reasoningDurationMs: reasoningEndedAt - reasoningStartedAt,
+            };
+          }
 
-        return undefined;
-      },
+          return undefined;
+        },
+      }),
     });
   }
 

@@ -1,9 +1,12 @@
+import { memo } from 'react';
+
 import { Bubble, BubbleContent } from '#/components/ui/bubble';
 import {
   Message,
   MessageContent,
   MessageFooter,
 } from '#/components/ui/message';
+import { site } from '#/config/site';
 
 import { TripChatMessagePart } from './trip-chat-message-part';
 
@@ -14,7 +17,7 @@ interface TripChatMessageProps {
   isStreaming: boolean;
 }
 
-export function TripChatMessage({
+export const TripChatMessage = memo(function TripChatMessage({
   message,
   isStreaming,
 }: TripChatMessageProps) {
@@ -68,10 +71,10 @@ export function TripChatMessage({
             >
               CC BY 4.0
             </a>
-            . Forecast summary adapted by Bhromon.
+            . Forecast summary adapted by {site.name}.
           </MessageFooter>
         )}
       </MessageContent>
     </Message>
   );
-}
+});

@@ -15,6 +15,7 @@ export function preloadImageAsLink(
 }
 
 export function preloadImage(src: string): void {
+  if (import.meta.env.SSR) return;
   const image = new Image();
   image.src = src;
 }
