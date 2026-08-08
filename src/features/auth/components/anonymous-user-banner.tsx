@@ -18,7 +18,10 @@ function AnonymousUserBanner({
   return (
     <aside
       aria-label="Guest account notice"
-      className={cn('bg-primary w-full sticky top-0 left-0 z-2', className)}
+      className={cn(
+        'bg-accent-foreground w-full sticky top-0 left-0 z-2',
+        className,
+      )}
       {...props}
     >
       <div className="box py-2.5 flex items-center gap-4">
@@ -32,7 +35,7 @@ function AnonymousUserBanner({
           <p className="text-sm sm:text-base font-medium">
             You&apos;re exploring as a guest.
           </p>
-          <p className="text-xs sm:text-sm text-primary-foreground/75 -mt-1">
+          <p className="text-xs sm:text-sm text-accent/75 -mt-1">
             Claim this account to keep your trips safe and available anytime.
           </p>
         </div>

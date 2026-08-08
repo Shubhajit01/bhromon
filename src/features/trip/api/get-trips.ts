@@ -11,7 +11,7 @@ import ms from 'ms';
 
 import { ANCHOR_KEYS } from '#/config/anchor-keys';
 import { COLLECTION } from '#/config/collection';
-import { db, desc, eq, trip } from '#/db/db.server';
+import { db } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 
 export interface TripListItem {
@@ -28,16 +28,21 @@ export const getTrips = createServerFn({ method: 'GET' }).handler(async () => {
     throw new Error('Authentication required to view trips');
   }
 
-  return db
-    .select({
-      id: trip.id,
-      status: trip.status,
-      title: trip.title,
-      updatedAt: trip.updatedAt,
-    })
-    .from(trip)
-    .where(eq(trip.userId, user.id))
-    .orderBy(desc(trip.updatedAt), desc(trip.id));
+  return db.query.trip.findMany({
+    columns: {
+      id: true,
+      status: true,
+      title: true,
+      updatedAt: true,
+    },
+    where: {
+      userId: user.id,
+    },
+    orderBy: {
+      updatedAt: 'desc',
+      id: 'desc',
+    },
+  });
 });
 
 export const getTripsQueryOptions = () =>

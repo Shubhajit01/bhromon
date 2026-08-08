@@ -27,7 +27,8 @@ export const getTripMessages = createServerFn({ method: 'GET' })
       headers: getRequestHeaders(),
       tripId: data.tripId,
     });
-    return agent.getMessages();
+    // @ts-ignore TODO: Check once
+    return agent.getMessages() as any;
   });
 
 export const getTripMessagesQueryOptions = (input: GetTripMessagesInput) =>

@@ -8,7 +8,7 @@ interface TripItineraryEmptyProps {
 
 export function TripItineraryEmpty({ action }: TripItineraryEmptyProps) {
   return (
-    <section className="relative mt-8 flex min-h-80 items-start overflow-hidden rounded-2xl bg-muted/50 px-6 py-10 sm:min-h-96 sm:px-10 sm:py-12">
+    <section className="relative flex min-h-80 items-start overflow-hidden rounded-2xl bg-muted/50 px-6 py-10 sm:min-h-96 sm:px-10 sm:py-12">
       <img
         src={mountainStencil}
         alt=""

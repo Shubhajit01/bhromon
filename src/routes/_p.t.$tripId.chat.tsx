@@ -56,7 +56,7 @@ function TripHeader({ tripId }: { tripId: string }) {
       <Button
         size="icon-sm"
         variant="outline"
-        className="lg:-ml-10 lg:-translate-x-2/4"
+        className="lg:-ml-8 lg:-translate-x-2/4"
         aria-label="Back"
         onPress={() =>
           can

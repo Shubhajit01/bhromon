@@ -15,6 +15,7 @@ import { COLLECTION } from '#/config/collection';
 import { db } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 
+import { TripNotFoundError } from '../errors/trip-not-found-error';
 import { itineraryV1Schema } from '../schemas/itinerary/v1';
 
 export const getTripInputSchema = z.object({
@@ -48,7 +49,7 @@ export const getTrip = createServerFn({ method: 'GET' })
     });
 
     if (!tripRecord) {
-      return null;
+      throw new TripNotFoundError();
     }
 
     return {
