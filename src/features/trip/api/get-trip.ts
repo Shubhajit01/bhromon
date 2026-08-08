@@ -12,14 +12,7 @@ import { z } from 'zod';
 
 import { ANCHOR_KEYS } from '#/config/anchor-keys';
 import { COLLECTION } from '#/config/collection';
-import {
-  and,
-  db,
-  eq,
-  itineraryRevision,
-  itineraryRevisionStatuses,
-  trip,
-} from '#/db/db.server';
+import { db } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 
 import { itineraryV1Schema } from '../schemas/itinerary/v1';
