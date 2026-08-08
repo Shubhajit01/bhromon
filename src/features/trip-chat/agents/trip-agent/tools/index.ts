@@ -1,9 +1,17 @@
 import { getWeatherTool } from './get-weather';
 import { createSaveItineraryTool } from './save-itinerary';
 
-export function createTripAgentTools(tripId: string) {
+interface CreateTripAgentToolsOptions {
+  authHeaders: Headers;
+  tripId: string;
+}
+
+export function createTripAgentTools({
+  authHeaders,
+  tripId,
+}: CreateTripAgentToolsOptions) {
   return {
     getWeather: getWeatherTool,
-    saveItinerary: createSaveItineraryTool({ tripId }),
+    saveItinerary: createSaveItineraryTool({ authHeaders, tripId }),
   };
 }

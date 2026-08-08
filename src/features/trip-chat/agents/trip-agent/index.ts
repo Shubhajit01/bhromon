@@ -1,4 +1,5 @@
 import { AIChatAgent } from '@cloudflare/ai-chat';
+import { getCurrentAgent } from 'agents';
 import {
   convertToModelMessages,
   createUIMessageStreamResponse,
@@ -7,8 +8,10 @@ import {
   toUIMessageStream,
 } from 'ai';
 import { createWorkersAI } from 'workers-ai-provider';
+import { z } from 'zod';
 
 import type { OnChatMessageOptions } from '@cloudflare/ai-chat';
+import type { Connection, ConnectionContext } from 'agents';
 
 import { userTimeContextSchema } from '../../utils/user-time-context';
 import { createTripAgentSystemPrompt } from './prompt';
@@ -24,8 +27,28 @@ interface TripAgentState {
   userTimeContext: UserTimeContext | null;
 }
 
+const tripAgentConnectionStateSchema = z.object({
+  authorization: z.string().optional(),
+  cookie: z.string().optional(),
+});
+
+type TripAgentConnectionState = z.infer<typeof tripAgentConnectionStateSchema>;
+
 export class TripAgent extends AIChatAgent<Env, TripAgentState> {
   initialState: TripAgentState = { userTimeContext: null };
+
+  onConnect(
+    connection: Connection<TripAgentConnectionState>,
+    context: ConnectionContext,
+  ) {
+    const authorization = context.request.headers.get('authorization');
+    const cookie = context.request.headers.get('cookie');
+
+    connection.setState({
+      ...(authorization ? { authorization } : {}),
+      ...(cookie ? { cookie } : {}),
+    });
+  }
 
   async persistInitialPrompt(prompt: string, userTimeContext: UserTimeContext) {
     this.setState({ userTimeContext });
@@ -65,7 +88,11 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
     }
 
     const workersAI = createWorkersAI({ binding: this.env.AI });
-    const tools = createTripAgentTools(this.name);
+    const tools = createTripAgentTools({
+      tripId: this.name,
+      authHeaders: this.getAuthHeaders(),
+    });
+
     let reasoningStartedAt: number | undefined;
     const result = streamText({
       reasoning: 'medium',
@@ -103,6 +130,25 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
         },
       }),
     });
+  }
+
+  private getAuthHeaders() {
+    const state = getCurrentAgent().connection?.state;
+
+    const { authorization, cookie } =
+      tripAgentConnectionStateSchema.parse(state);
+
+    const headers = new Headers();
+    [
+      ['Authorization', authorization],
+      ['Cookie', cookie],
+    ].forEach(([key, value]) => {
+      if (value) {
+        headers.set(key!, value);
+      }
+    });
+
+    return headers;
   }
 
   getMessages(): TripChatMessage[] {
