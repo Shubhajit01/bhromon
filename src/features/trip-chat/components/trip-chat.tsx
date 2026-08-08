@@ -1,10 +1,11 @@
-import { useDeferredValue, useState } from 'react';
+import { useDeferredValue, useEffect, useEffectEvent, useState } from 'react';
 
 import { Navigate } from '@tanstack/react-router';
 
 import type { ChatStatus } from 'ai';
 
 import { MessageScrollerProvider } from '#/components/ui/message-scroller';
+import { useInvalidateTrip } from '#/features/trip/api/get-trip';
 
 import { useTripChat } from '../hooks/use-trip-chat';
 import { TRIP_CHAT_ACTIVITY } from '../types/trip-chat-activity';
@@ -38,12 +39,24 @@ export function TripChat({ tripId }: TripChatProps) {
     addToolApprovalResponse,
   } = useTripChat({ tripId });
 
-  const displayMessages = useDeferredValue(messages);
+  const invalidateTrip = useInvalidateTrip();
 
-  if (
-    approvedSaveToolCallId &&
-    hasSavedItinerary(messages, approvedSaveToolCallId)
-  ) {
+  const displayMessages = useDeferredValue(messages);
+  const isSaved =
+    !!approvedSaveToolCallId &&
+    hasSavedItinerary(messages, approvedSaveToolCallId);
+
+  const effect = useEffectEvent(() => {
+    invalidateTrip({ tripId });
+  });
+
+  useEffect(() => {
+    if (isSaved) {
+      effect();
+    }
+  }, [isSaved]);
+
+  if (isSaved) {
     return <Navigate to="/t/$tripId" params={{ tripId }} />;
   }
 

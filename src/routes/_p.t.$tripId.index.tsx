@@ -86,7 +86,7 @@ function RouteComponent() {
         </div>
       </header>
 
-      <main className="box pt-2">
+      <main className="box pt-2 pb-6">
         {days ? (
           <div className="flex flex-col gap-4">
             {days.map((day) => (
