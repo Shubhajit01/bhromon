@@ -52,7 +52,7 @@ function TripHeader({ tripId }: { tripId: string }) {
   const navigate = useNavigate();
 
   return (
-    <header className="box flex items-center gap-3 py-4 border-b border-muted lg:border-0 lg:gap-0">
+    <header className="box flex items-center gap-3 py-2.5 md:py-4 border-b border-muted lg:border-0 lg:gap-0">
       <Button
         size="icon-sm"
         variant="outline"
