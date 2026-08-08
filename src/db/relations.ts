@@ -31,5 +31,13 @@ export const relations = defineRelations(schemas, (r) => ({
       to: r.user.id,
       optional: false,
     }),
+    itineraryRevisions: r.many.itineraryRevision(),
+  },
+  itineraryRevision: {
+    trip: r.one.trip({
+      from: r.itineraryRevision.tripId,
+      to: r.trip.id,
+      optional: false,
+    }),
   },
 }));
