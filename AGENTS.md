@@ -19,6 +19,7 @@ Bhromon is an AI-powered self-tour planning platform. Build the smallest vertica
 ## Code conventions
 
 - Prefer interfaces over type aliases for object-shaped TypeScript declarations. Keep type aliases for unions, intersections, and other types that cannot be expressed naturally as interfaces.
+- When creating new UI, read `DESIGN.md` before making changes. Do not read it by default for existing-UI maintenance or non-UI work.
 - Prefer minimal, image-led UI with one dominant action, warm personal copy, and no elements that do not support the user's next step.
 - Prefer conventional commit message format.
 

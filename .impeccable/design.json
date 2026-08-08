@@ -1,0 +1,380 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-08T13:22:50Z",
+  "title": "Design System: Bhromon",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Journey Violet",
+        "canonical": "oklch(0.457 0.24 277.023)",
+        "tonalRamp": [
+          "oklch(0.15 0.05 277.023)",
+          "oklch(0.25 0.11 277.023)",
+          "oklch(0.35 0.18 277.023)",
+          "oklch(0.457 0.24 277.023)",
+          "oklch(0.58 0.20 277.023)",
+          "oklch(0.70 0.14 277.023)",
+          "oklch(0.83 0.08 277.023)",
+          "oklch(0.95 0.025 277.023)"
+        ]
+      },
+      "primary-foreground": {
+        "role": "neutral",
+        "displayName": "Mist Lavender",
+        "canonical": "oklch(0.962 0.018 272.314)",
+        "tonalRamp": [
+          "oklch(0.15 0.018 272.314)",
+          "oklch(0.27 0.018 272.314)",
+          "oklch(0.40 0.018 272.314)",
+          "oklch(0.54 0.018 272.314)",
+          "oklch(0.68 0.018 272.314)",
+          "oklch(0.80 0.018 272.314)",
+          "oklch(0.90 0.018 272.314)",
+          "oklch(0.962 0.018 272.314)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Open Sky",
+        "canonical": "oklch(1 0 0)",
+        "tonalRamp": [
+          "#1c1c1c",
+          "#353535",
+          "#555555",
+          "#777777",
+          "#999999",
+          "#bbbbbb",
+          "#dddddd",
+          "#ffffff"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Night Trail",
+        "canonical": "oklch(0.148 0.004 228.8)",
+        "tonalRamp": [
+          "oklch(0.15 0.004 228.8)",
+          "oklch(0.27 0.004 228.8)",
+          "oklch(0.40 0.004 228.8)",
+          "oklch(0.54 0.004 228.8)",
+          "oklch(0.68 0.004 228.8)",
+          "oklch(0.80 0.004 228.8)",
+          "oklch(0.90 0.004 228.8)",
+          "oklch(0.97 0.004 228.8)"
+        ]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Cloud Neutral",
+        "canonical": "oklch(0.967 0.001 286.375)",
+        "tonalRamp": [
+          "oklch(0.15 0.001 286.375)",
+          "oklch(0.27 0.001 286.375)",
+          "oklch(0.40 0.001 286.375)",
+          "oklch(0.54 0.001 286.375)",
+          "oklch(0.68 0.001 286.375)",
+          "oklch(0.80 0.001 286.375)",
+          "oklch(0.90 0.001 286.375)",
+          "oklch(0.967 0.001 286.375)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Quiet Ground",
+        "canonical": "oklch(0.963 0.002 197.1)",
+        "tonalRamp": [
+          "oklch(0.15 0.002 197.1)",
+          "oklch(0.27 0.002 197.1)",
+          "oklch(0.40 0.002 197.1)",
+          "oklch(0.54 0.002 197.1)",
+          "oklch(0.68 0.002 197.1)",
+          "oklch(0.80 0.002 197.1)",
+          "oklch(0.90 0.002 197.1)",
+          "oklch(0.963 0.002 197.1)"
+        ]
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Distant Ridge",
+        "canonical": "oklch(0.56 0.021 213.5)",
+        "tonalRamp": [
+          "oklch(0.15 0.021 213.5)",
+          "oklch(0.27 0.021 213.5)",
+          "oklch(0.40 0.021 213.5)",
+          "oklch(0.56 0.021 213.5)",
+          "oklch(0.68 0.021 213.5)",
+          "oklch(0.80 0.021 213.5)",
+          "oklch(0.90 0.021 213.5)",
+          "oklch(0.96 0.021 213.5)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hairline Mist",
+        "canonical": "oklch(0.925 0.005 214.3)",
+        "tonalRamp": [
+          "oklch(0.15 0.005 214.3)",
+          "oklch(0.27 0.005 214.3)",
+          "oklch(0.40 0.005 214.3)",
+          "oklch(0.54 0.005 214.3)",
+          "oklch(0.68 0.005 214.3)",
+          "oklch(0.80 0.005 214.3)",
+          "oklch(0.925 0.005 214.3)",
+          "oklch(0.97 0.005 214.3)"
+        ]
+      },
+      "destructive": {
+        "role": "primary",
+        "displayName": "Signal Red",
+        "canonical": "oklch(0.577 0.245 27.325)",
+        "tonalRamp": [
+          "oklch(0.15 0.05 27.325)",
+          "oklch(0.27 0.10 27.325)",
+          "oklch(0.40 0.17 27.325)",
+          "oklch(0.577 0.245 27.325)",
+          "oklch(0.68 0.19 27.325)",
+          "oklch(0.78 0.13 27.325)",
+          "oklch(0.88 0.07 27.325)",
+          "oklch(0.96 0.025 27.325)"
+        ]
+      },
+      "logo-blue": {
+        "role": "primary",
+        "displayName": "Trailmark Blue",
+        "canonical": "#3754fa",
+        "tonalRamp": [
+          "#10163f",
+          "#17246b",
+          "#22349a",
+          "#2d44cb",
+          "#3754fa",
+          "#7186fb",
+          "#abb7fd",
+          "#eef1ff"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Threshold Display",
+        "purpose": "Emotional landing-page statements only."
+      },
+      "headline": {
+        "displayName": "Workspace Headline",
+        "purpose": "Primary operational page headings."
+      },
+      "title": {
+        "displayName": "Section Title",
+        "purpose": "Collection and subsection headings."
+      },
+      "body": {
+        "displayName": "Planning Body",
+        "purpose": "Prompts, explanations, and general UI copy."
+      },
+      "label": {
+        "displayName": "Interface Label",
+        "purpose": "Controls, filters, status, and compact metadata."
+      }
+    },
+    "shadows": [
+      {
+        "name": "approval-lift",
+        "value": "0 1px 3px rgba(9, 11, 12, 0.10), 0 1px 2px rgba(9, 11, 12, 0.06)",
+        "purpose": "Approval and decision surfaces that temporarily float above the conversation."
+      },
+      {
+        "name": "focus-halo",
+        "value": "0 0 0 3px color-mix(in oklab, var(--ring) 30%, transparent)",
+        "purpose": "Keyboard focus and validation communication, never decorative elevation."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "100ms ease-out",
+        "purpose": "Hover color and compact list-item state changes."
+      },
+      {
+        "name": "disclosure",
+        "value": "200ms cubic-bezier(0.25, 1, 0.5, 1)",
+        "purpose": "Reasoning disclosures and scroll-assistance controls."
+      },
+      {
+        "name": "atmosphere-focus",
+        "value": "500ms ease-out",
+        "purpose": "Softens landing imagery when the prompt receives focus."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single dominant action on a surface.",
+      "html": "<button class=\"ds-btn-primary\">Start planning</button>",
+      "css": ".ds-btn-primary { height: 36px; padding: 0 12px; border: 1px solid transparent; border-radius: 9999px; background: var(--primary, #432dd7); color: var(--primary-foreground, #eef2ff); font: 500 14px/1.4 'Geist Variable', Arial, sans-serif; transition: background-color 150ms ease-out, transform 100ms ease-out, box-shadow 150ms ease-out; } .ds-btn-primary:hover { background: color-mix(in oklab, var(--primary, #432dd7) 80%, transparent); } .ds-btn-primary:focus-visible { outline: none; border-color: var(--ring, #9ca8ab); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring, #9ca8ab) 30%, transparent); } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "A visible but subordinate action for navigation and account choices.",
+      "html": "<button class=\"ds-btn-outline\">Claim</button>",
+      "css": ".ds-btn-outline { height: 36px; padding: 0 12px; border: 1px solid var(--border, #e3e7e8); border-radius: 9999px; background: var(--background, #fff); color: var(--foreground, #090b0c); font: 500 14px/1.4 'Geist Variable', Arial, sans-serif; transition: background-color 150ms ease-out, transform 100ms ease-out, box-shadow 150ms ease-out; } .ds-btn-outline:hover { background: var(--muted, #f1f3f3); } .ds-btn-outline:focus-visible { outline: none; border-color: var(--ring, #9ca8ab); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring, #9ca8ab) 30%, transparent); } .ds-btn-outline:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Paper Prompt Composer",
+      "kind": "input",
+      "refersTo": "prompt-paper",
+      "description": "The bright invitation surface used over photographic entry imagery.",
+      "html": "<div class=\"ds-prompt-paper\"><textarea placeholder=\"I want a food-and-train journey through Japan in October…\"></textarea><button aria-label=\"Start planning\">↑</button></div>",
+      "css": ".ds-prompt-paper { position: relative; min-height: 154px; border: 1px solid var(--border, #e3e7e8); border-radius: 22px; background: var(--background, #fff); color: var(--foreground, #090b0c); transition: border-color 150ms ease-out, box-shadow 150ms ease-out; } .ds-prompt-paper:focus-within { border-color: var(--ring, #9ca8ab); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring, #9ca8ab) 30%, transparent); } .ds-prompt-paper textarea { box-sizing: border-box; width: 100%; min-height: 96px; padding: 16px 20px 10px; border: 0; outline: 0; resize: none; background: transparent; color: inherit; font: 400 18px/28px 'Geist Variable', Arial, sans-serif; } .ds-prompt-paper textarea::placeholder { color: var(--muted-foreground, #67787c); } .ds-prompt-paper button { position: absolute; right: 16px; bottom: 16px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--primary, #432dd7); color: var(--primary-foreground, #eef2ff); }"
+    },
+    {
+      "name": "Workspace Prompt Composer",
+      "kind": "input",
+      "refersTo": "prompt-workspace",
+      "description": "The same signature interaction quieted for a white planning surface.",
+      "html": "<div class=\"ds-prompt-workspace\"><textarea placeholder=\"Where will we wander next?\"></textarea><button aria-label=\"Start planning\">↑</button></div>",
+      "css": ".ds-prompt-workspace { position: relative; min-height: 154px; border: 1px solid transparent; border-radius: 22px; background: color-mix(in oklab, var(--muted, #f1f3f3) 50%, transparent); color: var(--foreground, #090b0c); transition: border-color 150ms ease-out, box-shadow 150ms ease-out; } .ds-prompt-workspace:focus-within { border-color: var(--ring, #9ca8ab); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring, #9ca8ab) 30%, transparent); } .ds-prompt-workspace textarea { box-sizing: border-box; width: 100%; min-height: 96px; padding: 16px 20px 10px; border: 0; outline: 0; resize: none; background: transparent; color: inherit; font: 400 18px/28px 'Geist Variable', Arial, sans-serif; } .ds-prompt-workspace textarea::placeholder { color: var(--muted-foreground, #67787c); } .ds-prompt-workspace button { position: absolute; right: 16px; bottom: 16px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--primary, #432dd7); color: var(--primary-foreground, #eef2ff); }"
+    },
+    {
+      "name": "Filter Pill",
+      "kind": "chip",
+      "refersTo": "filter-pill",
+      "description": "A compact, neutral collection filter that never competes with the main prompt.",
+      "html": "<button class=\"ds-filter-pill\">All <span aria-hidden=\"true\">⌄</span></button>",
+      "css": ".ds-filter-pill { display: inline-flex; height: 32px; align-items: center; gap: 6px; padding: 0 12px; border: 1px solid transparent; border-radius: 22px; background: color-mix(in oklab, var(--muted, #f1f3f3) 50%, transparent); color: var(--foreground, #090b0c); font: 500 14px/1.4 'Geist Variable', Arial, sans-serif; transition: background-color 100ms ease-out, box-shadow 150ms ease-out; } .ds-filter-pill:hover { background: var(--muted, #f1f3f3); } .ds-filter-pill:focus-visible { outline: none; border-color: var(--ring, #9ca8ab); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring, #9ca8ab) 30%, transparent); }"
+    },
+    {
+      "name": "Trip Card",
+      "kind": "card",
+      "refersTo": "trip-card",
+      "description": "A flat, container-aware trip row with quiet status metadata.",
+      "html": "<a class=\"ds-trip-card\" href=\"#\"><span aria-hidden=\"true\">⚐</span><strong>Weekend Bike Escapade</strong><small><i></i> Draft</small></a>",
+      "css": ".ds-trip-card { display: flex; align-items: center; gap: 14px; box-sizing: border-box; width: 100%; padding: 14px 16px; border: 1px solid var(--border, #e3e7e8); border-radius: 18px; background: var(--background, #fff); color: var(--foreground, #090b0c); text-decoration: none; font: 400 14px/1.4 'Geist Variable', Arial, sans-serif; transition: background-color 100ms ease-out, border-color 100ms ease-out, box-shadow 150ms ease-out; } .ds-trip-card strong { font-weight: 500; } .ds-trip-card small { display: inline-flex; align-items: center; gap: 6px; color: var(--muted-foreground, #67787c); } .ds-trip-card i { width: 6px; height: 6px; border-radius: 50%; background: var(--destructive, #e7000b); } .ds-trip-card:hover { background: color-mix(in oklab, var(--muted, #f1f3f3) 50%, transparent); } .ds-trip-card:focus-visible { outline: none; border-color: var(--primary, #432dd7); box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary, #432dd7) 20%, transparent); }"
+    },
+    {
+      "name": "User Message",
+      "kind": "custom",
+      "refersTo": "user-message",
+      "description": "A compact end-aligned bubble that distinguishes traveller input from open assistant guidance.",
+      "html": "<div class=\"ds-message-row\"><p class=\"ds-user-message\">Make day two slower and swap the flight for a train.</p></div>",
+      "css": ".ds-message-row { display: flex; justify-content: flex-end; width: 100%; } .ds-user-message { box-sizing: border-box; width: fit-content; max-width: 80%; margin: 0; padding: 10px 14px; border: 1px solid transparent; border-radius: 22px; background: var(--secondary, #f4f4f5); color: var(--secondary-foreground, #18181b); font: 500 14px/1.6 'Geist Variable', Arial, sans-serif; }"
+    },
+    {
+      "name": "Guest Banner",
+      "kind": "nav",
+      "refersTo": "guest-banner",
+      "description": "A full-width account-safety notice that remains warm and action-oriented.",
+      "html": "<aside class=\"ds-guest-banner\"><div><strong>You're exploring as a guest.</strong><small>Claim this account to keep your trips safe and available anytime.</small></div><button>Claim</button></aside>",
+      "css": ".ds-guest-banner { display: flex; align-items: center; gap: 16px; box-sizing: border-box; width: 100%; padding: 10px 24px; background: var(--primary, #432dd7); color: var(--primary-foreground, #eef2ff); font-family: 'Geist Variable', Arial, sans-serif; } .ds-guest-banner div { display: flex; flex: 1; flex-direction: column; } .ds-guest-banner strong { font-size: 16px; line-height: 20px; font-weight: 500; } .ds-guest-banner small { color: color-mix(in oklab, var(--primary-foreground, #eef2ff) 75%, transparent); font-size: 14px; line-height: 18px; } .ds-guest-banner button { height: 32px; padding: 0 12px; border: 1px solid var(--border, #e3e7e8); border-radius: 9999px; background: var(--background, #fff); color: var(--foreground, #090b0c); font: 500 14px/1.4 'Geist Variable', Arial, sans-serif; } .ds-guest-banner button:hover { background: var(--muted, #f1f3f3); } .ds-guest-banner button:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, white 35%, transparent); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Trailhead",
+    "overview": "Bhromon should feel like arriving at the beginning of a well-considered journey: open, calm, and full of possibility, with enough guidance to make the next step obvious. Entry surfaces are cinematic and emotional; planning surfaces are quiet and utilitarian. Every screen must support the traveller's next thought and reject generic AI spectacle, abstract geometric imagery, and busy marketing surfaces.",
+    "keyCharacteristics": [
+      "One dominant action or decision per surface.",
+      "A centered content measure of 768px with 24px mobile gutters.",
+      "Generous whitespace and an 8px-centered spacing rhythm, with 12px and 24px used for close relationships.",
+      "Expressive serif typography only at the emotional threshold; neutral sans-serif everywhere operational.",
+      "Real natural imagery creates anticipation; interface decoration never tries to replace it.",
+      "Soft, continuous geometry, hairline boundaries, and almost no decorative elevation.",
+      "Responsive layouts preserve hierarchy and emotional scale instead of merely shrinking desktop UI.",
+      "Copy speaks to the traveller as a capable collaborator: personal, specific, and quietly encouraging."
+    ],
+    "rules": [
+      {
+        "name": "The Two-Register Rule",
+        "body": "Inspiration may be cinematic; planning must be calm. Carry the same identity across both through the violet accent, logomark, narrow content measure, rounded controls, and nature imagery.",
+        "section": "overview"
+      },
+      {
+        "name": "The 768px Rule",
+        "body": "Default application content to a centered 768px column. Use 24px horizontal gutters below the large breakpoint and remove those gutters only when the full column fits comfortably.",
+        "section": "overview"
+      },
+      {
+        "name": "The One-Thought Rule",
+        "body": "Every element must help the traveller express, refine, review, or confirm the next decision. If it does not, remove it.",
+        "section": "overview"
+      },
+      {
+        "name": "The Violet Rarity Rule",
+        "body": "Violet signals agency, selection, or important state. It must not wash across routine cards, long text, or decorative backgrounds.",
+        "section": "colors"
+      },
+      {
+        "name": "The True-White Rule",
+        "body": "Application surfaces are white or cool neutral. Warm cream, sand, paper, parchment, and beige backgrounds are prohibited.",
+        "section": "colors"
+      },
+      {
+        "name": "The Natural-Color Rule",
+        "body": "Let photography carry environmental color. UI colors remain quiet enough that the traveller's destination stays visually dominant.",
+        "section": "colors"
+      },
+      {
+        "name": "The Threshold Serif Rule",
+        "body": "Merriweather belongs to the emotional entry point. Do not use it in forms, chat transcripts, lists, filters, account UI, or itinerary controls.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence-Case Rule",
+        "body": "Use natural sentence case. Repeated uppercase labels, tracked eyebrows, and numbered section scaffolding are forbidden.",
+        "section": "typography"
+      },
+      {
+        "name": "The Comfortable Reading Rule",
+        "body": "Balance headings, pretty-wrap prose, and keep conversational text airy. Never tighten line height to manufacture density.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-by-Default Rule",
+        "body": "Resting surfaces are separated with spacing, a cool tonal shift, or one hairline border. Do not add a shadow simply to make a component feel finished.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One-Boundary Rule",
+        "body": "A component may use a border or a decorative shadow, never both. Focus rings are state communication and are exempt.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do begin every surface by identifying the traveller's single next thought or decision.",
+      "Do default application content to a centered 768px column with 24px mobile gutters.",
+      "Do use the existing semantic color variables and component primitives; extend variants rather than introducing near-duplicate values.",
+      "Do reserve Journey Violet for decisive actions, selection, status, focus, and the guest-state banner.",
+      "Do use real natural imagery to create anticipation on entry surfaces and a subtle landscape stencil in the workspace.",
+      "Do maintain the serif-to-sans transition between emotional entry and operational planning.",
+      "Do use generous whitespace: 24px between closely related hero elements, 32px between major workspace groups, and 48–64px for section endings or page breathing room.",
+      "Do preserve clear focus rings, WCAG 2.2 AA contrast, reduced-motion behavior, reduced-transparency fallbacks, and safe-area spacing.",
+      "Do write warm, personal, specific copy that reinforces traveller agency.",
+      "Do test at narrow mobile widths and at the 768px content boundary; hierarchy must survive without horizontal overflow."
+    ],
+    "donts": [
+      "Don't introduce generic AI spectacle.",
+      "Don't use abstract geometric imagery.",
+      "Don't create busy marketing surfaces that compete with the traveller's idea.",
+      "Don't use cream, sand, parchment, beige, or other warm-neutral page backgrounds; Bhromon's workspace is true white and cool neutral.",
+      "Don't spread violet across routine cards or long content. Its rarity is part of the hierarchy.",
+      "Don't use Merriweather inside operational UI or turn the product into an editorial-magazine layout.",
+      "Don't add repeated uppercase tracked eyebrows, numbered section markers, gradient text, decorative glassmorphism, or identical card grids.",
+      "Don't use side-stripe accents, diagonal stripe backgrounds, sketchy SVG illustrations, or colored placeholder rectangles where real imagery belongs.",
+      "Don't combine a decorative border with a wide soft shadow. Pick one structural boundary.",
+      "Don't invent arbitrary radii. Cards stop at 18px, multiline inputs at 22px, and pills at 26px or fully circular.",
+      "Don't place assistant replies in bubbles. Open text is an intentional part of the conversation hierarchy.",
+      "Don't shrink expressive type reflexively on mobile; wrap it deliberately and verify every line.",
+      "Don't add navigation, explanatory copy, badges, or secondary actions that do not help the traveller take the next step."
+    ]
+  }
+}
