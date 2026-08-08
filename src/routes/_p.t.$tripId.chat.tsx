@@ -54,7 +54,7 @@ function TripHeader({ tripId }: { tripId: string }) {
   return (
     <header className="box flex items-center gap-3 py-4 border-b border-muted lg:border-0 lg:gap-0">
       <Button
-        size="icon-lg"
+        size="icon-sm"
         variant="outline"
         className="lg:-ml-10 lg:-translate-x-2/4"
         aria-label="Back"

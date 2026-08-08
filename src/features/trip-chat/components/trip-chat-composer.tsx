@@ -39,6 +39,11 @@ export function TripChatComposer(props: TripChatComposerProps) {
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (props.mode === 'stop') {
+      props.onStop();
+      return;
+    }
+
     if (props.mode !== 'compose' || !normalizedPrompt) {
       return;
     }
@@ -86,7 +91,7 @@ export function TripChatComposer(props: TripChatComposerProps) {
             />
             <InputGroupAddon align="block-end" className="px-4 pb-4">
               <InputGroupButton
-                type={isComposeMode ? 'submit' : 'button'}
+                type="submit"
                 variant="default"
                 size="icon-sm"
                 aria-label={
@@ -100,7 +105,6 @@ export function TripChatComposer(props: TripChatComposerProps) {
                 isDisabled={
                   isUnavailable || (isComposeMode && !normalizedPrompt)
                 }
-                onPress={props.mode === 'stop' ? props.onStop : undefined}
               >
                 {props.mode === 'stop' ? (
                   <StopIcon weight="fill" />
