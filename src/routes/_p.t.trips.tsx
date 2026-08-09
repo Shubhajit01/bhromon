@@ -1,10 +1,12 @@
 import { Suspense } from 'react';
 
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 
 import { z } from 'zod';
 
 import { Logo } from '#/components/logo';
+import { Page } from '#/components/page';
+import { site } from '#/config/site';
 import { useCurrentUser } from '#/features/auth/api/get-current-user';
 import { AnonymousUserBanner } from '#/features/auth/components/anonymous-user-banner';
 import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
@@ -47,7 +49,7 @@ function TripsPage() {
   });
 
   return (
-    <>
+    <Page>
       <picture
         aria-hidden="true"
         className="fixed left-0 bottom-0 w-full h-full md:w-3/4 md:h-3/4 xl:w-2/4 xl:h-2/4 opacity-10"
@@ -60,22 +62,25 @@ function TripsPage() {
         />
       </picture>
 
-      <main
-        data-anonymous={isAnonymous}
-        className="group min-h-svh flex flex-col gap-8 items-stretch isolate"
-      >
-        <AnonymousUserBanner />
+      <AnonymousUserBanner className="static" />
 
-        <header className="flex gap-4 group-data-[anonymous=false]:pt-12 items-center justify-between box group-data-[anonymous=false]:sm:pt-16">
-          <Link to="/">
-            <Logo variant="light" size={32} />
-          </Link>
+      <Page.Header>
+        <Page.Brand>
+          <Logo variant="light" size={28} />
+          <span>{site.name}</span>
+        </Page.Brand>
 
+        <Page.Actions>
           <CurrentUserAvatar />
-        </header>
+        </Page.Actions>
+      </Page.Header>
 
+      <Page.Main
+        data-anonymous={isAnonymous}
+        className="group flex flex-col gap-8 items-stretch isolate pt-8 pb-8 sm:pb-12 sm:pt-10"
+      >
         <section className="text-left gap-4 flex flex-col box">
-          <h1 className="mt-3 text-balance text-3xl tracking-tight text-foreground">
+          <h1 className="text-balance text-2xl sm:text-3xl tracking-tight text-foreground">
             Hi {isAnonymous ? 'there' : name}, Where will we wander next?
           </h1>
 
@@ -102,7 +107,7 @@ function TripsPage() {
             <TripList status={status} />
           </Suspense>
         </section>
-      </main>
-    </>
+      </Page.Main>
+    </Page>
   );
 }

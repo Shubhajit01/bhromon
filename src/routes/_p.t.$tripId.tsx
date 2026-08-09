@@ -4,6 +4,7 @@ import type { ErrorComponentProps } from '@tanstack/react-router';
 
 import { EmptyIcon } from '@phosphor-icons/react';
 
+import { Page } from '#/components/page';
 import {
   Empty,
   EmptyDescription,
@@ -19,19 +20,21 @@ export const Route = createFileRoute('/_p/t/$tripId')({
   },
   errorComponent: function ErrorComponent({ error }: ErrorComponentProps) {
     return (
-      <main className="w-screen h-dvh grid place-items-center">
-        <Empty className="border border-dashed max-w-md">
-          <EmptyHeader>
-            <EmptyMedia variant="icon" className="text-destructive">
-              <EmptyIcon />
-            </EmptyMedia>
-            <EmptyTitle>{error.message}</EmptyTitle>
-            <EmptyDescription>
-              The trip you're looking for doesn't exist.
-            </EmptyDescription>
-          </EmptyHeader>{' '}
-        </Empty>
-      </main>
+      <Page>
+        <Page.Main className="grid place-items-center p-6">
+          <Empty className="border border-dashed max-w-md">
+            <EmptyHeader>
+              <EmptyMedia variant="icon" className="text-destructive">
+                <EmptyIcon />
+              </EmptyMedia>
+              <EmptyTitle>{error.message}</EmptyTitle>
+              <EmptyDescription>
+                The trip you're looking for doesn't exist.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        </Page.Main>
+      </Page>
     );
   },
 });

@@ -26,7 +26,10 @@ export function ItineraryDay({ day }: ItineraryDayProps) {
   ) : null;
 
   return (
-    <Card size="sm" className="pb-0">
+    <Card
+      size="sm"
+      className="pb-0 transition-transform has-aria-expanded:scale-101"
+    >
       <CardHeader className="gap-px">
         <div className="flex md:items-center justify-between flex-col md:flex-row">
           <h2 className="text-lg font-medium">
@@ -58,7 +61,7 @@ export function ItineraryDay({ day }: ItineraryDayProps) {
             size="sm"
             slot="trigger"
             variant="secondary"
-            className="w-full px-4 justify-between font-medium rounded-none aria-[expanded=false]:rounded-b-xl border-none aria-[expanded=false]:rounded-t-0!"
+            className="w-full px-4 justify-between font-medium rounded-none aria-expanded:bg-primary/5 aria-expanded:text-primary transition-colors aria-[expanded=false]:rounded-b-xl border-none aria-[expanded=false]:rounded-t-0!"
           >
             <div className="grow text-left">
               <span className="group-aria-expanded/button:inline hidden">
@@ -96,7 +99,7 @@ function ItineraryStop({ item }: { item: ItineraryItem }) {
       <div className="min-w-0 py-3">
         <h3 className="text-base font-medium tracking-tight">{item.title}</h3>
         {item.description ? (
-          <p className="text-pretty text-sm/6 text-muted-foreground -mt-0.5">
+          <p className="text-balance leading-tight text-sm/6 text-muted-foreground -mt-0.5">
             {item.description}
           </p>
         ) : null}

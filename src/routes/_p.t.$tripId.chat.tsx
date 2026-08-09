@@ -7,8 +7,12 @@ import {
 
 import { ArrowLeftIcon } from '@phosphor-icons/react';
 
+import { Logo } from '#/components/logo';
+import { Page } from '#/components/page';
 import { Button } from '#/components/ui/button';
+import { site } from '#/config/site';
 import { AnonymousUserBanner } from '#/features/auth/components/anonymous-user-banner';
+import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
 import { loadTrip, useTrip } from '#/features/trip/api/get-trip';
 import { loadTripMessages } from '#/features/trip-chat/api/get-trip-messages';
 import { TripChat } from '#/features/trip-chat/components/trip-chat';
@@ -34,13 +38,28 @@ function Trip() {
   const { tripId } = Route.useParams();
 
   return (
-    <div className="flex h-dvh min-h-0 flex-col">
-      <AnonymousUserBanner />
-      <TripHeader tripId={tripId} />
-      <main className="grid min-h-0 grow">
-        <TripChat tripId={tripId} />
-      </main>
-    </div>
+    <Page isScrollable={false}>
+      <AnonymousUserBanner className="static" />
+
+      <Page.Header>
+        <Page.Brand>
+          <Logo variant="light" size={28} />
+          <span>{site.name}</span>
+        </Page.Brand>
+
+        <Page.Actions>
+          <Page.ActionLink to="/t/trips">My Trips</Page.ActionLink>
+          <CurrentUserAvatar />
+        </Page.Actions>
+      </Page.Header>
+
+      <Page.Main className="flex min-h-0 flex-col">
+        <TripHeader tripId={tripId} />
+        <div className="grid min-h-0 grow">
+          <TripChat tripId={tripId} />
+        </div>
+      </Page.Main>
+    </Page>
   );
 }
 
