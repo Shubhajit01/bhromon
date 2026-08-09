@@ -5,6 +5,7 @@ import {
   HourglassSimpleIcon,
   RobotIcon,
 } from '@phosphor-icons/react';
+import { motion } from 'motion/react';
 
 import { Logo } from '#/components/logo';
 import { Page } from '#/components/page';
@@ -63,9 +64,13 @@ function RouteComponent() {
         <header>
           <div className="flex box flex-col gap-3 sm:gap-6 pt-6 pb-1 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0 flex flex-col gap-1">
-              <h1 className="text-balance text-3xl font-medium tracking-tight text-foreground sm:text-2xl">
+              <motion.h1
+                layout="position"
+                layoutId={`trip-title-${tripId}`}
+                className="text-balance text-3xl font-medium tracking-tight text-foreground sm:text-2xl"
+              >
                 {trip.title}
-              </h1>
+              </motion.h1>
 
               <div className="flex gap-2">
                 {dateRange ? (

@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-router';
 
 import { ArrowLeftIcon } from '@phosphor-icons/react';
+import { motion } from 'motion/react';
 
 import { Logo } from '#/components/logo';
 import { Page } from '#/components/page';
@@ -87,9 +88,13 @@ function TripHeader({ tripId }: { tripId: string }) {
       </Button>
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-base font-medium tracking-tight">
+        <motion.h1
+          layout="position"
+          layoutId={`trip-title-${tripId}`}
+          className="truncate text-base font-medium tracking-tight"
+        >
           {trip.title}
-        </p>
+        </motion.h1>
         <p className="text-sm text-muted-foreground -mt-1">
           Chat and decide your itinerary
         </p>
