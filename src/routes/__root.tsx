@@ -8,6 +8,7 @@ import {
 import type { QueryClient } from '@tanstack/react-query';
 
 import { logoOnDarkUrl, logoUrl } from '#/components/logo';
+import NavigationProgress from '#/components/navigation-progress';
 import { site } from '#/config/site';
 import { loadCurrentUser } from '#/features/auth/api/get-current-user';
 import { preloadFontAsLink } from '#/lib/helpers';
@@ -65,6 +66,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="antialiased">
         {children}
+        <NavigationProgress />
         <ReactQueryDevtools />
         <Scripts />
       </body>

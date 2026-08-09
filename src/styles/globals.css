@@ -145,6 +145,14 @@
   [data-streamdown='list-item'] {
     @apply py-0.5!;
   }
+
+  #nprogress {
+    @apply fixed left-0 top-0 w-full z-20;
+  }
+
+  #nprogress .bar {
+    @apply bg-primary h-1;
+  }
 }
 
 @media (prefers-reduced-transparency: reduce) {
