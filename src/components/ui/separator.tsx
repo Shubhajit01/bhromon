@@ -1,10 +1,10 @@
-import { Separator as SeparatorPrimitive } from "react-aria-components"
+import { Separator as SeparatorPrimitive } from 'react-aria-components';
 
-import { cn } from "#/lib/utils.ts"
+import { cn } from '#/lib/utils.ts';
 
 function Separator({
   className,
-  orientation = "horizontal",
+  orientation = 'horizontal',
   ...props
 }: React.ComponentProps<typeof SeparatorPrimitive>) {
   return (
@@ -12,12 +12,12 @@ function Separator({
       data-slot="separator"
       orientation={orientation}
       className={cn(
-        "block shrink-0 border-0 bg-border aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full aria-[orientation=vertical]:w-px aria-[orientation=vertical]:self-stretch [:is(hr)]:h-px [:is(hr)]:w-full",
-        className
+        'block shrink-0 border-0 bg-border aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full aria-[orientation=vertical]:w-px aria-[orientation=vertical]:self-stretch [:is(hr)]:h-px [:is(hr)]:w-full',
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Separator }
+export { Separator };

@@ -48,7 +48,7 @@ export const getTrips = createServerFn({ method: 'GET' }).handler(async () => {
 export const getTripsQueryOptions = () =>
   queryOptions({
     staleTime: ms('1d'),
-    queryKey: [ANCHOR_KEYS.TRIP, COLLECTION.MANY],
+    queryKey: [ANCHOR_KEYS.CURRENT_USER, ANCHOR_KEYS.TRIP, COLLECTION.MANY],
     queryFn: ({ signal }) => getTrips({ signal }),
   });
 

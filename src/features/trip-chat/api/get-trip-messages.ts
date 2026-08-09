@@ -33,7 +33,13 @@ export const getTripMessages = createServerFn({ method: 'GET' })
 
 export const getTripMessagesQueryOptions = (input: GetTripMessagesInput) =>
   queryOptions({
-    queryKey: [ANCHOR_KEYS.TRIP, 'messages', COLLECTION.MANY, input.tripId],
+    queryKey: [
+      ANCHOR_KEYS.CURRENT_USER,
+      ANCHOR_KEYS.TRIP,
+      'messages',
+      COLLECTION.MANY,
+      input.tripId,
+    ],
     queryFn: ({ signal }) => getTripMessages({ data: input, signal }),
   });
 

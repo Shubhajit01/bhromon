@@ -66,7 +66,12 @@ export type Trip = NonNullable<Awaited<ReturnType<typeof getTrip>>>;
 export const getTripQueryOptions = (input: GetTripInput) =>
   queryOptions({
     staleTime: ms('1d'),
-    queryKey: [ANCHOR_KEYS.TRIP, COLLECTION.ONE, input.tripId],
+    queryKey: [
+      ANCHOR_KEYS.CURRENT_USER,
+      ANCHOR_KEYS.TRIP,
+      COLLECTION.ONE,
+      input.tripId,
+    ],
     queryFn: ({ signal }) => getTrip({ data: input, signal }),
   });
 
