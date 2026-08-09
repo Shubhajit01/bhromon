@@ -66,7 +66,6 @@ function RouteComponent() {
             <div className="min-w-0 flex flex-col gap-1">
               <motion.h1
                 layout="position"
-                layoutId={`trip-title-${tripId}`}
                 className="text-balance text-3xl font-medium tracking-tight text-foreground sm:text-2xl"
               >
                 {trip.title}

@@ -45,7 +45,7 @@ function TripCard({ trip }: TripCardProps) {
           {isConfirmed ? <IslandIcon size={20} /> : <BarricadeIcon size={20} />}
         </ItemMedia>
         <ItemContent className="flex @sm:items-center @sm:gap-2 @sm:flex-row">
-          <motion.div layout="position" layoutId={`trip-title-${trip.id}`}>
+          <motion.div layout="position">
             <ItemTitle className="text-balance">{trip.title}</ItemTitle>
           </motion.div>
           <ItemDescription className="flex items-center gap-1.5">

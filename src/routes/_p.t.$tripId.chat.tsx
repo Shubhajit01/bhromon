@@ -90,7 +90,6 @@ function TripHeader({ tripId }: { tripId: string }) {
       <div className="min-w-0 flex-1">
         <motion.h1
           layout="position"
-          layoutId={`trip-title-${tripId}`}
           className="truncate text-base font-medium tracking-tight"
         >
           {trip.title}
