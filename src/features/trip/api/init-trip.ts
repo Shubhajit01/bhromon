@@ -10,10 +10,7 @@ import { db, trip } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
 import { getAuthorizedTripAgent } from '#/features/trip-chat/agents/trip-agent/require-trip-agent-access.server';
-import {
-  getUserTimeContext,
-  userTimeContextSchema,
-} from '#/features/trip-chat/utils/user-time-context';
+import { userTimeContextSchema } from '#/features/trip-chat/utils/user-time-context';
 
 import { generateTripTitle } from './generate-trip-title';
 import { useInvalidateTrips } from './get-trips';
@@ -27,8 +24,6 @@ export const initTripInputSchema = z.object({
 });
 
 export type InitTripInput = z.infer<typeof initTripInputSchema>;
-
-type InitTripMutationInput = Pick<InitTripInput, 'prompt'>;
 
 export const initTrip = createServerFn({ method: 'POST' })
   .validator(initTripInputSchema)
@@ -68,11 +63,9 @@ export function useInitTrip() {
   const invalidateTrips = useInvalidateTrips();
 
   return useMutation({
-    mutationFn: async (data: InitTripMutationInput) => {
+    mutationFn: async (data: InitTripInput) => {
       await initAuthSession.mutateAsync();
-      return initTripServerFn({
-        data: { ...data, userTimeContext: getUserTimeContext() },
-      });
+      return initTripServerFn({ data });
     },
     onSuccess: () => {
       void invalidateTrips();
