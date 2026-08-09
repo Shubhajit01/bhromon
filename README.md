@@ -4,7 +4,7 @@ Bhromon is an AI-powered workspace for planning self-guided trips. A traveller s
 
 The product is designed for independent travellers who care about their own interests, pace, constraints, and sense of discovery. Its interface is intentionally calm, personal, and focused on the next planning decision rather than on bookings or travel inventory.
 
-> Bhromon is under active development. The core prompt-to-itinerary flow is available; maps, confirmed-trip revisions, preference memory, and destination guidance are planned next.
+> Bhromon is under active development. The core prompt-to-itinerary flow, explicit itinerary approval, versioned confirmed saves, and day-by-day trip view are available. Maps, traveller-managed revisions, preference memory, and destination guidance are planned next.
 
 ## What works today
 
@@ -15,7 +15,8 @@ The product is designed for independent travellers who care about their own inte
 - Review and explicitly approve a structured itinerary before it is saved.
 - Browse saved trips and filter them by draft or confirmed status.
 - View a saved itinerary as a day-by-day schedule with highlights, times, and locations.
-- Begin immediately with an anonymous account; Better Auth also provides the email/password backend for future account flows.
+- Preserve prior confirmed itineraries as superseded revisions when a newly approved itinerary is saved.
+- Begin immediately with an anonymous account, then claim it through email/password sign-in or sign-up.
 
 Bookings, payments, sharing, collaboration, live availability, and live pricing are intentionally outside the current product scope.
 
@@ -25,7 +26,7 @@ Bookings, payments, sharing, collaboration, live availability, and live pricing 
 2. Bhromon creates an anonymous session when needed, generates a short trip title, and opens a dedicated planning workspace.
 3. A stateful Cloudflare Agent asks focused follow-up questions about dates, destination, companions, pace, budget, interests, and constraints.
 4. When the plan is complete, the agent produces a Zod-validated itinerary and asks for explicit approval before persisting it.
-5. The saved draft appears on the trip page as a structured, day-by-day plan.
+5. The saved confirmed itinerary appears on the trip page as a structured, day-by-day plan.
 
 ## Tech stack
 
@@ -187,12 +188,15 @@ public/                     Static public assets and response headers
 
 ## Roadmap
 
-- Complete the trip lifecycle: confirm, revise, accept, and safely discard itinerary revisions.
-- Add mapped travel legs and richer trip views, including estimated costs.
-- Remember only traveller-approved preferences and apply them to future plans.
-- Attach sourced cultural and legal guidance to destinations.
-- Expand authentication from automatic anonymous sessions to user-facing account flows.
-- Add automated unit and integration coverage for the core planning journey.
+- [x] Create trips from a prompt, refine them in a dedicated conversation, and explicitly approve a validated itinerary.
+- [x] Persist draft and confirmed trips, preserve versioned itinerary revisions, and supersede the prior revision when a new itinerary is approved.
+- [x] Browse draft and confirmed trips and view a saved itinerary day by day.
+- [x] Provide anonymous sessions and user-facing email/password sign-in and sign-up flows.
+- [ ] Let travellers actively revise, accept, and safely discard itinerary revisions.
+- [ ] Add mapped travel legs and richer trip views, including estimated costs.
+- [ ] Remember only traveller-approved preferences and apply them to future plans.
+- [ ] Attach sourced cultural and legal guidance to destinations.
+- [ ] Add automated unit and integration coverage for the core planning journey.
 
 ## Contributing
 
