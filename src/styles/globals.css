@@ -121,7 +121,12 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50 overscroll-y-none;
+    @apply border-border outline-ring/50;
+  }
+
+  html,
+  body {
+    @apply overscroll-y-none;
   }
 
   body {
