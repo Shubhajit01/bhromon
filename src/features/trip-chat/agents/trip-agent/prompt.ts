@@ -15,6 +15,52 @@ export function createTripAgentSystemPrompt(
     ? `The traveller's current local date and time is ${formattedDateTime}. Their IANA time zone is ${userTimeContext.timeZone}. Use this as the reference point for relative dates such as "today", "tomorrow", "this weekend", and "next month". When helpful, repeat the resolved calendar dates explicitly.`
     : `The traveller's current local date and time is unavailable. Do not use server time to interpret relative dates. Ask the traveller to clarify with explicit calendar dates when their wording depends on the current date.`;
 
+  const saveItineraryExample = JSON.stringify(
+    {
+      itinerary: {
+        schemaVersion: 1,
+        destinationTimeZone: 'Asia/Tokyo',
+        days: [
+          {
+            id: 'day-1',
+            dayNumber: 1,
+            date: '2026-10-12',
+            title: 'Old Tokyo and evening views',
+            summary: 'A relaxed first day around Asakusa and Tokyo Skytree.',
+            highlights: ['Senso-ji', 'Tokyo Skytree'],
+            items: [
+              {
+                id: 'day-1-sensoji',
+                startTime: '09:00',
+                endTime: '11:00',
+                title: 'Explore Senso-ji',
+                description: 'Visit the temple and browse Nakamise Street.',
+                location: {
+                  name: 'Senso-ji',
+                  address: '2 Chome-3-1 Asakusa, Taito City, Tokyo',
+                  latitude: 35.7148,
+                  longitude: 139.7967,
+                },
+              },
+              {
+                id: 'day-1-skytree',
+                timeLabel: 'Early evening',
+                title: 'See the city from Tokyo Skytree',
+                location: {
+                  name: 'Tokyo Skytree',
+                  latitude: 35.7101,
+                  longitude: 139.8107,
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+    null,
+    2,
+  );
+
   return `
 <persona>
 You are Bhromon, a thoughtful travel-planning companion. You are curious, practical, and attentive to what makes a trip feel personal to the traveller.
@@ -46,6 +92,19 @@ ${travellerTimeContext}
 - The save tool requires a separate approval in the interface. Treat that approval as consent to persist the itinerary, and do not claim the itinerary was saved until the tool succeeds.
 - If the traveller denies the save, acknowledge their choice and do not retry unless they later ask to save.
 </tools>
+
+<save-itinerary-format>
+Before calling saveItinerary, check the entire input against these requirements:
+- The top level contains itinerary. The itinerary contains schemaVersion: 1 and at least one day.
+- Every day contains a unique non-empty id, sequential dayNumber starting at 1, title, summary, at least one highlight, and at least one item. Include date as YYYY-MM-DD whenever dates are known.
+- Every item contains a unique non-empty id, title, and location. Every location contains name, numeric latitude, and numeric longitude; address is optional.
+- Every item contains either startTime or timeLabel. Use startTime and endTime only as zero-padded 24-hour local times in HH:mm format: use "09:00" or "17:30", never "9:00 AM", "5:30 PM", or an ISO date-time. If timing is flexible, omit startTime and endTime and use a phrase such as "Morning" in timeLabel. Never provide endTime without startTime.
+- Use destinationTimeZone only when known, and format it as an IANA time zone such as "Asia/Tokyo".
+- Do not include status in the tool input. A successful approved save is confirmed by the server.
+
+Example of a valid saveItinerary input:
+${saveItineraryExample}
+</save-itinerary-format>
 
 <rules>
 - Treat every itinerary and recommendation as a draft until the traveller explicitly confirms it.

@@ -4,7 +4,7 @@ import { createServerFn, useServerFn } from '@tanstack/react-start';
 import { ulid } from 'ulid';
 import { z } from 'zod';
 
-import { and, db, eq, itineraryRevision, sql, trip } from '#/db/db.server';
+import { and, db, eq, itineraryRevision, or, sql, trip } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 
 import { itinerarySchema } from '../schemas/itinerary/schema';
@@ -40,6 +40,7 @@ export const saveItinerary = createServerFn({ method: 'POST' })
     }
 
     const revisionId = ulid();
+    const confirmedAt = new Date();
     const nextRevisionNumber = sql<number>`(
       select coalesce(max(${itineraryRevision.revisionNumber}), 0) + 1
       from ${itineraryRevision}
@@ -53,7 +54,10 @@ export const saveItinerary = createServerFn({ method: 'POST' })
         .where(
           and(
             eq(itineraryRevision.tripId, data.tripId),
-            eq(itineraryRevision.status, 'draft'),
+            or(
+              eq(itineraryRevision.status, 'draft'),
+              eq(itineraryRevision.status, 'confirmed'),
+            ),
           ),
         ),
       db
@@ -62,8 +66,9 @@ export const saveItinerary = createServerFn({ method: 'POST' })
           id: revisionId,
           tripId: data.tripId,
           revisionNumber: nextRevisionNumber,
-          status: 'draft',
+          status: 'confirmed',
           content: data.itinerary,
+          confirmedAt,
         })
         .returning({
           id: itineraryRevision.id,
@@ -73,7 +78,7 @@ export const saveItinerary = createServerFn({ method: 'POST' })
         }),
       db
         .update(trip)
-        .set({ updatedAt: new Date() })
+        .set({ status: 'confirmed', updatedAt: confirmedAt })
         .where(eq(trip.id, data.tripId)),
     ]);
 

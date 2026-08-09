@@ -57,7 +57,7 @@ Bhromon is a full-stack TanStack Start application deployed as a Cloudflare Work
 - Itineraries are stored as versioned JSON documents after schema validation.
 - React Query supplies canonical cache keys, route preloading, and mutation invalidation.
 
-The current data model supports `draft` and `confirmed` trips plus `draft`, `confirmed`, `superseded`, and `discarded` itinerary revisions. Only draft itinerary creation is exposed in the UI today.
+The current data model supports `draft` and `confirmed` trips plus `draft`, `confirmed`, `superseded`, and `discarded` itinerary revisions. Approving a chat-generated itinerary saves it as the trip's current confirmed revision.
 
 ## Getting started
 
