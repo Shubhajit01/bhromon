@@ -25,7 +25,7 @@ import mountainBgAvif from '#/assets/images/mountain-stencil.png?grayscale&w=850
 import mountainBgWebp from '#/assets/images/mountain-stencil.png?grayscale&w=850&format=webp&enhanced';
 
 const tripSearchSchema = z.object({
-  status: tripStatusFilterSchema.catch('all'),
+  status: tripStatusFilterSchema.nullish().default('all').catch('all'),
 });
 
 export const Route = createFileRoute('/_p/t/trips')({

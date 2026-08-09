@@ -66,9 +66,9 @@ function PageBrand({ className, ...props }: ComponentProps<'div'>) {
 
 function PageActions({ className, ...props }: ComponentProps<'div'>) {
   return (
-    <div
+    <nav
       data-slot="page-actions"
-      className={cn('ml-auto flex items-center gap-4', className)}
+      className={cn('ml-auto flex items-center gap-3.5', className)}
       {...props}
     />
   );
@@ -82,7 +82,7 @@ function PageActionLink({
     <LinkButton
       variant="link"
       data-slot="page-action-link"
-      className={cn('text-foreground', className)}
+      className={cn('px-0 text-foreground', className)}
       {...props}
     />
   );

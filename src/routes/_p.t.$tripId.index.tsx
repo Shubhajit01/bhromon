@@ -55,7 +55,9 @@ function RouteComponent() {
         </Page.Brand>
 
         <Page.Actions>
-          <Page.ActionLink to="/t/trips">My Trips</Page.ActionLink>
+          <Page.ActionLink to="/t/trips">Trips</Page.ActionLink>
+          <Page.ActionLink to="/">About</Page.ActionLink>
+          <Page.ActionLink to="/">Contact</Page.ActionLink>
           <CurrentUserAvatar />
         </Page.Actions>
       </Page.Header>
