@@ -67,10 +67,11 @@ function TripsPage() {
       <Page.Header>
         <Page.Brand>
           <Logo variant="light" size={28} />
-          <span>{site.name}</span>
         </Page.Brand>
 
         <Page.Actions>
+          <Page.ActionLink to="/">About</Page.ActionLink>
+          <Page.ActionLink to="/">Contact</Page.ActionLink>
           <CurrentUserAvatar />
         </Page.Actions>
       </Page.Header>
