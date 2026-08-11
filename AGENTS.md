@@ -23,6 +23,13 @@ Bhromon is an AI-powered self-tour planning platform. Build the smallest vertica
 - Prefer minimal, image-led UI with one dominant action, warm personal copy, and no elements that do not support the user's next step.
 - Prefer conventional commit message format.
 
+## Date and time conventions
+
+- Use `@formkit/tempo` for application-level date construction, parsing, formatting, and arithmetic. Keep native date APIs only at platform boundaries where Tempo has no equivalent, such as `Intl.DurationFormat`, browser timezone discovery, and database timestamp types.
+- Read the traveller's IANA timezone through `getUserTimeZone()` from `src/utils/user-time-zone.ts`. Use `getUserDate()` when constructing a date in that timezone instead of pairing `tzDate(...)` with a separately derived timezone.
+- Treat instants, calendar dates, and destination-local times as different concepts. Do not apply the traveller's timezone to destination-local itinerary data unless the product explicitly calls for that conversion.
+- Derive agent timezone context from the timezone cookie/header. Do not send a client-generated current timestamp or timezone object in chat payloads. Compute the current instant when the agent prompt is generated, using the connection cookie when available and the server-derived stored timezone for the initial server-triggered reply.
+
 ## Data-query convention
 
 Use this structure for entity queries by default. A `get-<entity-in-kebab-case>.ts` filename is the usual home, but choose a different filename when it better fits the feature.

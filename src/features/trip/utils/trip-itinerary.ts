@@ -1,13 +1,10 @@
-import { tzDate } from '@formkit/tempo';
+import { format } from '@formkit/tempo';
+
+import { getUserDate, getUserTimeZone } from '#/utils/user-time-zone';
 
 import type { Trip } from '../api/get-trip';
 
 export type ItineraryRevision = Trip['itineraryRevisions'][number];
-
-const itineraryDateFormatter = new Intl.DateTimeFormat('en-GB', {
-  dateStyle: 'long',
-  timeZone: 'UTC',
-});
 
 export function getCurrentItineraryRevision(
   revisions: Array<ItineraryRevision>,
@@ -38,8 +35,21 @@ export function formatItineraryDateRange(dates: Array<string | undefined>) {
     return undefined;
   }
 
-  return itineraryDateFormatter.formatRange(
-    tzDate(completeDates[0], 'UTC'),
-    tzDate(completeDates[completeDates.length - 1], 'UTC'),
+  const timeZone = getUserTimeZone();
+  const startDate = formatCalendarDate(completeDates[0], timeZone);
+  const endDate = formatCalendarDate(
+    completeDates[completeDates.length - 1],
+    timeZone,
   );
+
+  return startDate === endDate ? startDate : `${startDate} – ${endDate}`;
+}
+
+function formatCalendarDate(value: string, timeZone: string) {
+  return format({
+    date: getUserDate(value),
+    format: 'long',
+    locale: 'en-GB',
+    tz: timeZone,
+  });
 }

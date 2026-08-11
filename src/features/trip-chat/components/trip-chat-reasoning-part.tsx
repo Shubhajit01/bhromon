@@ -104,8 +104,8 @@ function ReasoningStatus({
   endedAt,
 }: {
   isStreaming: boolean;
-  startedAt?: number;
-  endedAt?: number;
+  startedAt?: string | number;
+  endedAt?: string | number;
 }) {
   const status = isStreaming ? 'Thinking' : 'Thought';
   const hasDuration =

@@ -3,8 +3,8 @@ import type { InferUITools, UIMessage } from 'ai';
 import type { createTripAgentTools } from '../agents/trip-agent/tools';
 
 export interface TripChatMessageMetadata {
-  reasoningStartedAt?: number;
-  reasoningEndedAt?: number;
+  reasoningStartedAt?: string | number;
+  reasoningEndedAt?: string | number;
   reasoningDurationMs?: number;
 }
 

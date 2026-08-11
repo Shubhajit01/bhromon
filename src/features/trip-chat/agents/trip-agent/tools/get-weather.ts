@@ -41,7 +41,7 @@ export const getWeatherTool = tool({
     'Get the weather forecast for a destination on a specific date. Forecasts are available up to 16 days ahead.',
   inputSchema: z.object({
     location: z.string().describe('City or destination name'),
-    date: z.string().describe('Date in YYYY-MM-DD format'),
+    date: z.iso.date().describe('Date in YYYY-MM-DD format'),
   }),
   execute: async ({ location, date }, { abortSignal }) => {
     const normalizedLocation = location

@@ -10,7 +10,7 @@ import { db, trip } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
 import { getAuthorizedTripAgent } from '#/features/trip-chat/agents/trip-agent/require-trip-agent-access.server';
-import { userTimeContextSchema } from '#/features/trip-chat/utils/user-time-context';
+import { getUserTimeZone } from '#/utils/user-time-zone';
 
 import { generateTripTitle } from './generate-trip-title';
 import { useInvalidateTrips } from './get-trips';
@@ -20,7 +20,6 @@ export const MAX_PROMPT_LENGTH = 4000;
 
 export const initTripInputSchema = z.object({
   prompt: z.string().trim().min(MIN_PROMPT_LENGTH).max(MAX_PROMPT_LENGTH),
-  userTimeContext: userTimeContextSchema,
 });
 
 export type InitTripInput = z.infer<typeof initTripInputSchema>;
@@ -51,7 +50,7 @@ export const initTrip = createServerFn({ method: 'POST' })
       headers: getRequestHeaders(),
       tripId: id,
     });
-    await tripAgent.persistInitialPrompt(data.prompt, data.userTimeContext);
+    await tripAgent.persistInitialPrompt(data.prompt, getUserTimeZone());
 
     throw redirect({ to: '/t/$tripId', params: { tripId: id } });
   });

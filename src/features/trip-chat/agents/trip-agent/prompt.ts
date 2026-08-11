@@ -1,19 +1,14 @@
-import type { UserTimeContext } from '../../utils/user-time-context';
+import { date, format } from '@formkit/tempo';
 
-export function createTripAgentSystemPrompt(
-  userTimeContext: UserTimeContext | null,
-) {
-  const formattedDateTime = userTimeContext
-    ? new Intl.DateTimeFormat('en-GB', {
-        dateStyle: 'full',
-        timeStyle: 'long',
-        timeZone: userTimeContext.timeZone,
-      }).format(new Date(userTimeContext.currentDateTime))
-    : null;
+export function createTripAgentSystemPrompt(userTimeZone: string) {
+  const formattedDateTime = format({
+    date: date(),
+    format: { date: 'full', time: 'long' },
+    locale: 'en-GB',
+    tz: userTimeZone,
+  });
 
-  const travellerTimeContext = userTimeContext
-    ? `The traveller's current local date and time is ${formattedDateTime}. Their IANA time zone is ${userTimeContext.timeZone}. Use this as the reference point for relative dates such as "today", "tomorrow", "this weekend", and "next month". When helpful, repeat the resolved calendar dates explicitly.`
-    : `The traveller's current local date and time is unavailable. Do not use server time to interpret relative dates. Ask the traveller to clarify with explicit calendar dates when their wording depends on the current date.`;
+  const travellerTimeContext = `The traveller's current local date and time is ${formattedDateTime}. Their IANA time zone is ${userTimeZone}. Use this as the reference point for relative dates such as "today", "tomorrow", "this weekend", and "next month". When helpful, repeat the resolved calendar dates explicitly.`;
 
   const saveItineraryExample = JSON.stringify(
     {

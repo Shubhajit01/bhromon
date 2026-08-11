@@ -2,7 +2,6 @@ import { useAgentChat } from 'agents/chat/react';
 import { useAgent } from 'agents/react';
 
 import { useTripMessages } from '../api/get-trip-messages';
-import { getUserTimeContext } from '../utils/user-time-context';
 
 import type { TripChatMessage } from '../types/trip-chat-message';
 
@@ -16,7 +15,6 @@ export function useTripChat({ tripId }: UseTripChatOptions) {
 
   return useAgentChat<unknown, TripChatMessage>({
     agent,
-    body: () => ({ userTimeContext: getUserTimeContext() }),
     messages: initialMessages,
     getInitialMessages: null,
   });

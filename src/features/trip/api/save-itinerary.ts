@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { createServerFn, useServerFn } from '@tanstack/react-start';
 
+import { date } from '@formkit/tempo';
 import { ulid } from 'ulid';
 import { z } from 'zod';
 
@@ -40,7 +41,7 @@ export const saveItinerary = createServerFn({ method: 'POST' })
     }
 
     const revisionId = ulid();
-    const confirmedAt = new Date();
+    const confirmedAt = date();
     const nextRevisionNumber = sql<number>`(
       select coalesce(max(${itineraryRevision.revisionNumber}), 0) + 1
       from ${itineraryRevision}

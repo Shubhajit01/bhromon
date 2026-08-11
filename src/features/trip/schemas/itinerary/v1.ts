@@ -1,19 +1,14 @@
 import { z } from 'zod';
 
+import { isSupportedTimeZone } from '#/utils/user-time-zone';
+
 const itineraryIdSchema = z.string().trim().min(1);
 const itineraryTextSchema = z.string().trim().min(1);
 const itineraryTimeSchema = z
   .string()
   .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Time must use HH:mm');
 const itineraryTimeZoneSchema = itineraryTextSchema.refine(
-  (timeZone) => {
-    try {
-      new Intl.DateTimeFormat('en', { timeZone });
-      return true;
-    } catch {
-      return false;
-    }
-  },
+  isSupportedTimeZone,
   { message: 'Time zone must be a valid IANA time zone' },
 );
 

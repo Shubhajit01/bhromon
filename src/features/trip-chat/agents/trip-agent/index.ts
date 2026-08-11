@@ -1,4 +1,5 @@
 import { AIChatAgent } from '@cloudflare/ai-chat';
+import { date, diffMilliseconds, format } from '@formkit/tempo';
 import { getCurrentAgent } from 'agents';
 import {
   convertToModelMessages,
@@ -10,10 +11,13 @@ import {
 import { createWorkersAI } from 'workers-ai-provider';
 import { z } from 'zod';
 
-import type { OnChatMessageOptions } from '@cloudflare/ai-chat';
 import type { Connection, ConnectionContext } from 'agents';
 
-import { userTimeContextSchema } from '../../utils/user-time-context';
+import {
+  getUserTimeZoneFromCookie,
+  isSupportedTimeZone,
+} from '#/utils/user-time-zone';
+
 import { createTripAgentSystemPrompt } from './prompt';
 import { createTripAgentTools } from './tools';
 
@@ -21,10 +25,9 @@ import type {
   TripChatMessage,
   TripChatMessageMetadata,
 } from '../../types/trip-chat-message';
-import type { UserTimeContext } from '../../utils/user-time-context';
 
 interface TripAgentState {
-  userTimeContext: UserTimeContext | null;
+  userTimeZone: string | null;
 }
 
 const tripAgentConnectionStateSchema = z.object({
@@ -35,7 +38,7 @@ const tripAgentConnectionStateSchema = z.object({
 type TripAgentConnectionState = z.infer<typeof tripAgentConnectionStateSchema>;
 
 export class TripAgent extends AIChatAgent<Env, TripAgentState> {
-  initialState: TripAgentState = { userTimeContext: null };
+  initialState: TripAgentState = { userTimeZone: null };
 
   onConnect(
     connection: Connection<TripAgentConnectionState>,
@@ -50,8 +53,8 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
     });
   }
 
-  async persistInitialPrompt(prompt: string, userTimeContext: UserTimeContext) {
-    this.setState({ userTimeContext });
+  async persistInitialPrompt(prompt: string, userTimeZone: string) {
+    this.setState({ userTimeZone });
 
     await this.saveMessages([
       ...this.messages,
@@ -67,24 +70,23 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
     return this.saveMessages(this.messages);
   }
 
-  async onChatMessage(
-    _onFinish: Parameters<AIChatAgent['onChatMessage']>[0],
-    options?: OnChatMessageOptions,
-  ) {
-    const requestTimeContext = userTimeContextSchema.safeParse(
-      options?.body?.userTimeContext,
+  async onChatMessage(_onFinish: Parameters<AIChatAgent['onChatMessage']>[0]) {
+    const connectionState = tripAgentConnectionStateSchema.safeParse(
+      getCurrentAgent().connection?.state,
     );
-    const storedTimeContext = userTimeContextSchema.safeParse(
-      this.state.userTimeContext,
-    );
-    const userTimeContext = requestTimeContext.success
-      ? requestTimeContext.data
-      : storedTimeContext.success
-        ? storedTimeContext.data
-        : null;
+    const connectionCookie = connectionState.success
+      ? connectionState.data.cookie
+      : undefined;
+    const connectionTimeZone = connectionCookie
+      ? getUserTimeZoneFromCookie(connectionCookie)
+      : null;
+    const storedTimeZone = isSupportedTimeZone(this.state.userTimeZone ?? '')
+      ? this.state.userTimeZone
+      : null;
+    const userTimeZone = connectionTimeZone ?? storedTimeZone ?? 'UTC';
 
-    if (requestTimeContext.success) {
-      this.setState({ userTimeContext });
+    if (connectionTimeZone && connectionTimeZone !== storedTimeZone) {
+      this.setState({ userTimeZone: connectionTimeZone });
     }
 
     const workersAI = createWorkersAI({ binding: this.env.AI });
@@ -93,11 +95,11 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
       authHeaders: this.getAuthHeaders(),
     });
 
-    let reasoningStartedAt: number | undefined;
+    let reasoningStartedAt: string | undefined;
     const result = streamText({
       reasoning: 'medium',
       model: workersAI('@cf/zai-org/glm-4.7-flash'),
-      instructions: createTripAgentSystemPrompt(userTimeContext),
+      instructions: createTripAgentSystemPrompt(userTimeZone),
       messages: await convertToModelMessages(this.messages),
       tools,
       toolApproval: { saveItinerary: 'user-approval' },
@@ -109,7 +111,7 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
         stream: result.stream,
         messageMetadata: ({ part }): TripChatMessageMetadata | undefined => {
           if (part.type === 'reasoning-start') {
-            reasoningStartedAt = Date.now();
+            reasoningStartedAt = format(date(), 'ISO8601');
             return { reasoningStartedAt };
           }
 
@@ -117,12 +119,15 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
             part.type === 'reasoning-end' &&
             reasoningStartedAt !== undefined
           ) {
-            const reasoningEndedAt = Date.now();
+            const reasoningEndedAt = format(date(), 'ISO8601');
 
             return {
               reasoningStartedAt,
               reasoningEndedAt,
-              reasoningDurationMs: reasoningEndedAt - reasoningStartedAt,
+              reasoningDurationMs: diffMilliseconds(
+                reasoningEndedAt,
+                reasoningStartedAt,
+              ),
             };
           }
 

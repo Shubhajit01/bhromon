@@ -1,3 +1,4 @@
+import { format } from '@formkit/tempo';
 import { CaretDownIcon } from '@phosphor-icons/react';
 
 import { Badge } from '#/components/ui/badge';
@@ -10,6 +11,7 @@ import {
 } from '#/components/ui/card';
 import { Collapsible, CollapsibleContent } from '#/components/ui/collapsible';
 import { Separator } from '#/components/ui/separator';
+import { getUserDate, getUserTimeZone } from '#/utils/user-time-zone';
 
 import type { ItineraryV1 } from '../schemas/itinerary/v1';
 
@@ -121,10 +123,12 @@ function formatItemTime(item: ItineraryItem) {
 }
 
 function formatDayDate(date: string) {
-  return new Intl.DateTimeFormat('en', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    timeZone: 'UTC',
-  }).format(new Date(`${date}T00:00:00Z`));
+  const timeZone = getUserTimeZone();
+
+  return format({
+    date: getUserDate(date),
+    format: 'ddd, MMM D',
+    locale: 'en',
+    tz: timeZone,
+  });
 }

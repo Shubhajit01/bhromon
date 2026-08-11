@@ -17,7 +17,6 @@ import {
   MIN_PROMPT_LENGTH,
   useInitTrip,
 } from '#/features/trip/api/init-trip';
-import { getUserTimeContext } from '#/features/trip-chat/utils/user-time-context';
 
 import { useInvalidateTrips } from '../api/get-trips';
 
@@ -35,10 +34,7 @@ function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
 
   const handleSubmit = async (event: React.SubmitEvent) => {
     event.preventDefault();
-    initTrip.mutate(
-      { prompt, userTimeContext: getUserTimeContext() },
-      { onSuccess: () => invalidateTrips() },
-    );
+    initTrip.mutate({ prompt }, { onSuccess: () => invalidateTrips() });
   };
 
   return (
