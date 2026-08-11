@@ -5,7 +5,10 @@ import { Streamdown } from 'streamdown';
 import { Marker, MarkerContent, MarkerIcon } from '#/components/ui/marker';
 import { cn } from '#/lib/utils';
 
+import type { SaveItineraryInput } from '#/features/trip/api/save-itinerary';
+
 import { SaveItineraryApproval } from './save-itinerary-approval';
+import { StartNewTripAction } from './start-new-trip-action';
 import { TripChatReasoningPart } from './trip-chat-reasoning-part';
 
 import type {
@@ -20,8 +23,12 @@ interface TripChatMessagePartProps {
   partIndex: number;
   isStreaming: boolean;
   isUser: boolean;
+  isExistingItinerary: boolean;
+  isRetryingSave: boolean;
   metadata?: TripChatMessageMetadata;
   onToolApproval: (response: TripChatToolApprovalResponse) => void;
+  onRetrySave: (itinerary: SaveItineraryInput['itinerary']) => void;
+  onKeepRefining: () => void;
 }
 
 export function TripChatMessagePart({
@@ -30,8 +37,12 @@ export function TripChatMessagePart({
   partIndex,
   isStreaming,
   isUser,
+  isExistingItinerary,
+  isRetryingSave,
   metadata,
   onToolApproval,
+  onRetrySave,
+  onKeepRefining,
 }: TripChatMessagePartProps) {
   if (part.type === 'reasoning' && !isUser) {
     return (
@@ -64,8 +75,19 @@ export function TripChatMessagePart({
 
   if (part.type === 'tool-saveItinerary' && !isUser) {
     return (
-      <SaveItineraryApproval invocation={part} onRespond={onToolApproval} />
+      <SaveItineraryApproval
+        invocation={part}
+        isExistingItinerary={isExistingItinerary}
+        isRetrying={isRetryingSave}
+        onRespond={onToolApproval}
+        onRetry={onRetrySave}
+        onKeepRefining={onKeepRefining}
+      />
     );
+  }
+
+  if (part.type === 'tool-startNewTrip' && !isUser) {
+    return <StartNewTripAction invocation={part} />;
   }
 
   if (isToolUIPart(part) && !isUser) {

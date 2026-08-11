@@ -8,6 +8,8 @@ import {
 } from '#/components/ui/message';
 import { site } from '#/config/site';
 
+import type { SaveItineraryInput } from '#/features/trip/api/save-itinerary';
+
 import { TripChatMessagePart } from './trip-chat-message-part';
 
 import type { TripChatMessage as TripChatMessageType } from '../types/trip-chat-message';
@@ -16,13 +18,21 @@ import type { TripChatToolApprovalResponse } from './save-itinerary-approval';
 interface TripChatMessageProps {
   message: TripChatMessageType;
   isStreaming: boolean;
+  isExistingItinerary: boolean;
+  isRetryingSave: boolean;
   onToolApproval: (response: TripChatToolApprovalResponse) => void;
+  onRetrySave: (itinerary: SaveItineraryInput['itinerary']) => void;
+  onKeepRefining: () => void;
 }
 
 export const TripChatMessage = memo(function TripChatMessage({
   message,
   isStreaming,
+  isExistingItinerary,
+  isRetryingSave,
   onToolApproval,
+  onRetrySave,
+  onKeepRefining,
 }: TripChatMessageProps) {
   const isUser = message.role === 'user';
   const hasWeatherResult = message.parts.some(
@@ -51,6 +61,10 @@ export const TripChatMessage = memo(function TripChatMessage({
                 isUser={isUser}
                 metadata={message.metadata}
                 onToolApproval={onToolApproval}
+                onRetrySave={onRetrySave}
+                onKeepRefining={onKeepRefining}
+                isExistingItinerary={isExistingItinerary}
+                isRetryingSave={isRetryingSave}
               />
             ))}
           </BubbleContent>

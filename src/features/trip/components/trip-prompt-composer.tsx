@@ -21,11 +21,15 @@ import {
 import { useInvalidateTrips } from '../api/get-trips';
 
 interface TripPromptComposerProps {
+  initialPrompt?: string;
   variant?: ComponentProps<typeof InputGroup>['variant'];
 }
 
-function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
-  const [prompt, setPrompt] = useState('');
+function TripPromptComposer({
+  initialPrompt = '',
+  variant = 'paper',
+}: TripPromptComposerProps) {
+  const [prompt, setPrompt] = useState(initialPrompt);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { success: isValidPrompt } =
     initTripInputSchema.shape.prompt.safeParse(prompt);

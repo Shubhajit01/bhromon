@@ -9,13 +9,23 @@ export interface TripChatToolApprovalResponse {
 }
 
 interface SaveItineraryApprovalProps {
+  isExistingItinerary: boolean;
+  isRetrying: boolean;
   invocation: SaveItineraryToolInvocation;
   onRespond: (response: TripChatToolApprovalResponse) => void;
+  onRetry: (
+    itinerary: SaveItineraryToolInvocation['input']['itinerary'],
+  ) => void;
+  onKeepRefining: () => void;
 }
 
 export function SaveItineraryApproval({
+  isExistingItinerary,
+  isRetrying,
   invocation,
   onRespond,
+  onRetry,
+  onKeepRefining,
 }: SaveItineraryApprovalProps) {
   if (invocation.state === 'input-streaming') {
     return (
@@ -37,11 +47,14 @@ export function SaveItineraryApproval({
     return (
       <section className="mt-2 rounded-2xl border border-border bg-card p-4 shadow-sm">
         <p className="font-medium text-foreground">
-          Save this {days.length}-day itinerary?
+          {isExistingItinerary
+            ? 'Save these changes?'
+            : `Save this ${days.length}-day itinerary?`}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          This creates a saved draft for your trip. You can review it on the
-          trip page.
+          {isExistingItinerary
+            ? 'This will replace your current itinerary. You can revise it again anytime.'
+            : 'This saves your itinerary and opens it on the trip page.'}
         </p>
 
         <ol className="mt-3 space-y-1 text-sm text-foreground">
@@ -101,11 +114,31 @@ export function SaveItineraryApproval({
 
   if (invocation.state === 'output-error') {
     return (
-      <p className="text-sm text-destructive">
-        The itinerary could not be saved. Please try again.
-      </p>
+      <section className="mt-2 rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <p className="font-medium text-destructive">
+          The itinerary could not be saved.
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Your itinerary is still here. Try again or keep refining it.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button
+            isPending={isRetrying}
+            onPress={() => onRetry(invocation.input.itinerary)}
+          >
+            Try again
+          </Button>
+          <Button variant="outline" onPress={onKeepRefining}>
+            Keep refining
+          </Button>
+        </div>
+      </section>
     );
   }
 
-  return <p className="text-sm text-muted-foreground">Save cancelled.</p>;
+  return (
+    <p className="text-sm text-muted-foreground">
+      No problem—what would you like to change?
+    </p>
+  );
 }

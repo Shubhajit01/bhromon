@@ -9,6 +9,8 @@ import {
   MessageScrollerViewport,
 } from '#/components/ui/message-scroller';
 
+import type { SaveItineraryInput } from '#/features/trip/api/save-itinerary';
+
 import { groupTripChatMessages } from '../utils/group-trip-chat-messages';
 import { TripChatMessage } from './trip-chat-message';
 
@@ -18,13 +20,21 @@ import type { TripChatToolApprovalResponse } from './save-itinerary-approval';
 interface TripChatTranscriptProps {
   messages: TripChatMessageType[];
   isStreaming: boolean;
+  isExistingItinerary: boolean;
+  isRetryingSave: boolean;
   onToolApproval: (response: TripChatToolApprovalResponse) => void;
+  onRetrySave: (itinerary: SaveItineraryInput['itinerary']) => void;
+  onKeepRefining: () => void;
 }
 
 export const TripChatTranscript = memo(function TripChatTranscript({
   messages,
   isStreaming,
+  isExistingItinerary,
+  isRetryingSave,
   onToolApproval,
+  onRetrySave,
+  onKeepRefining,
 }: TripChatTranscriptProps) {
   const groups = groupTripChatMessages(messages);
   const activeMessageId = isStreaming
@@ -50,6 +60,10 @@ export const TripChatTranscript = memo(function TripChatTranscript({
                         message={message}
                         isStreaming={message.id === activeMessageId}
                         onToolApproval={onToolApproval}
+                        onRetrySave={onRetrySave}
+                        onKeepRefining={onKeepRefining}
+                        isExistingItinerary={isExistingItinerary}
+                        isRetryingSave={isRetryingSave}
                       />
                     ))}
                   </MessageGroup>

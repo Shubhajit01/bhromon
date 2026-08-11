@@ -25,6 +25,7 @@ import mountainBgAvif from '#/assets/images/mountain-stencil.png?grayscale&w=850
 import mountainBgWebp from '#/assets/images/mountain-stencil.png?grayscale&w=850&format=webp&enhanced';
 
 const tripSearchSchema = z.object({
+  prompt: z.string().trim().min(1).max(4000).optional().catch(undefined),
   status: tripStatusFilterSchema.nullish().default('all').catch('all'),
 });
 
@@ -46,6 +47,9 @@ function TripsPage() {
 
   const status = Route.useSearch({
     select: (s) => s.status,
+  });
+  const prompt = Route.useSearch({
+    select: (s) => s.prompt,
   });
 
   return (
@@ -86,7 +90,7 @@ function TripsPage() {
           </h1>
 
           <div className="backdrop-blur-sm">
-            <TripPromptComposer variant="default" />
+            <TripPromptComposer initialPrompt={prompt} variant="default" />
           </div>
         </section>
 

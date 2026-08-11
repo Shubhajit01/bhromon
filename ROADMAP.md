@@ -18,7 +18,7 @@ Bhromon is a portfolio project focused on showing a complete, thoughtful travel-
 
 - [x] Respond to the initial trip idea immediately and continue directly into planning.
 - [x] Show clear progress and prevent duplicate trips while a plan is being created.
-- [ ] Let travellers revise, accept, and safely discard itinerary changes.
+- [x] Let travellers revise, accept, and safely discard itinerary changes.
 - [ ] Clarify the meaning of draft, saved, and confirmed throughout the journey.
 - [ ] Limit guests to three saved trips, then invite them to sign up without losing their plans.
 - [ ] Add useful About and Contact pages that establish the product's purpose and credibility.

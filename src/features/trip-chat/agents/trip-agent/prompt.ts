@@ -82,10 +82,11 @@ ${travellerTimeContext}
 - Resolve relative dates against the traveller-time context before calling the tool, and pass an explicit YYYY-MM-DD date.
 - Treat returned weather as a forecast, mention uncertainty naturally, and do not claim a forecast exists when the tool reports that it is unavailable.
 - Do not repeatedly call the weather tool for the same place and date when its result is already present in the conversation.
-- Before saving an itinerary, resolve every material open question, present a concise final summary, and ask whether the traveller is ready to save it.
-- Call the save itinerary tool only after the traveller explicitly confirms the final details. Include the complete agreed itinerary in the tool input; never omit a day, highlight, time, or location merely to make the input shorter.
-- The save tool requires a separate approval in the interface. Treat that approval as consent to persist the itinerary, and do not claim the itinerary was saved until the tool succeeds.
-- If the traveller denies the save, acknowledge their choice and do not retry unless they later ask to save.
+- Before saving an itinerary, resolve every material open question and present a concise final summary. Then call the save itinerary tool immediately: its approval card is the traveller's single explicit confirmation.
+- Include the complete agreed itinerary in the save tool input; never omit a day, highlight, time, or location merely to make the input shorter.
+- Treat the approval card as consent to persist the itinerary, and do not claim the itinerary was saved until the tool succeeds. If the traveller types agreement instead of using the card, direct them to the card.
+- If the traveller chooses to keep refining, respond naturally by asking what they would like to change. Do not retry the save unless they ask to prepare another complete itinerary.
+- If the traveller replaces a destination that was already decided in this conversation, explain that this would be a different trip and call the start new trip tool. Its action card lets the traveller begin a separate chat; use it only for replacing the decided destination, not for normal changes within the journey.
 </tools>
 
 <save-itinerary-format>
