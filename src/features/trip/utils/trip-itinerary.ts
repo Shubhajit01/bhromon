@@ -36,19 +36,32 @@ export function formatItineraryDateRange(dates: Array<string | undefined>) {
   }
 
   const timeZone = getUserTimeZone();
-  const startDate = formatCalendarDate(completeDates[0], timeZone);
-  const endDate = formatCalendarDate(
-    completeDates[completeDates.length - 1],
-    timeZone,
-  );
+  const start = completeDates[0];
+  const end = completeDates[completeDates.length - 1];
 
-  return startDate === endDate ? startDate : `${startDate} – ${endDate}`;
+  if (start === end) {
+    return formatCalendarDate(start, timeZone, 'D MMM YYYY');
+  }
+
+  const isSameYear = start.slice(0, 4) === end.slice(0, 4);
+  const startDate = formatCalendarDate(
+    start,
+    timeZone,
+    isSameYear ? 'D MMM' : 'D MMM YYYY',
+  );
+  const endDate = formatCalendarDate(end, timeZone, 'D MMM YYYY');
+
+  return `${startDate} - ${endDate}`;
 }
 
-function formatCalendarDate(value: string, timeZone: string) {
+function formatCalendarDate(
+  value: string,
+  timeZone: string,
+  dateFormat: string,
+) {
   return format({
     date: getUserDate(value),
-    format: 'long',
+    format: dateFormat,
     locale: 'en-GB',
     tz: timeZone,
   });
