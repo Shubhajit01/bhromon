@@ -20,6 +20,7 @@ Bhromon is a portfolio project focused on showing a complete, thoughtful travel-
 - [ ] Show clear progress and prevent duplicate trips while a plan is being created.
 - [ ] Let travellers revise, accept, and safely discard itinerary changes.
 - [ ] Clarify the meaning of draft, saved, and confirmed throughout the journey.
+- [ ] Limit guests to three saved trips, then invite them to sign up without losing their plans.
 - [ ] Add useful About and Contact pages that establish the product's purpose and credibility.
 - [ ] Polish empty, loading, failure, and recovery states across the main journey.
 - [ ] Create a reliable showcase trip and guided demo path for portfolio visitors.
@@ -54,6 +55,7 @@ Bhromon is a portfolio project focused on showing a complete, thoughtful travel-
 ## Portfolio quality
 
 - [ ] Demonstrate the full prompt-to-confirmed-itinerary journey with representative scenarios.
+- [ ] Add an optional Dev Mode that reveals tool activity and concise planning rationale while keeping technical details hidden by default.
 - [ ] Add automated coverage for the core planning, routing, approval, and revision journeys.
 - [ ] Verify responsive behaviour, accessibility, and keyboard use across the showcase flow.
 - [ ] Document the product decisions, trade-offs, and differentiators in the project story.
