@@ -6,6 +6,11 @@ import {
   requireTripAgentAccess,
   TripAgentAccessError,
 } from '#/features/trip-chat/agents/trip-agent/require-trip-agent-access.server';
+import {
+  getTimeZoneBootstrapResponse,
+  getTimeZoneFallbackResponse,
+  needsTimeZoneCookie,
+} from '#/utils/time-zone.server';
 
 export { TripAgent } from '#/features/trip-chat/agents/trip-agent';
 
@@ -35,6 +40,16 @@ async function authorizeTripAgentRequest(request: Request, lobby: AgentLobby) {
 
 export default {
   async fetch(request: Request, env: Env) {
+    const timeZoneFallbackResponse = getTimeZoneFallbackResponse(request);
+
+    if (timeZoneFallbackResponse) {
+      return timeZoneFallbackResponse;
+    }
+
+    if (needsTimeZoneCookie(request)) {
+      return getTimeZoneBootstrapResponse();
+    }
+
     const agentResponse = await routeAgentRequest(request, env, {
       onBeforeConnect: authorizeTripAgentRequest,
       onBeforeRequest: authorizeTripAgentRequest,
