@@ -26,6 +26,7 @@ interface TripPromptComposerProps {
 
 function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
   const [prompt, setPrompt] = useState('');
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { success: isValidPrompt } =
     initTripInputSchema.shape.prompt.safeParse(prompt);
 
@@ -34,7 +35,14 @@ function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
 
   const handleSubmit = async (event: React.SubmitEvent) => {
     event.preventDefault();
-    initTrip.mutate({ prompt }, { onSuccess: () => invalidateTrips() });
+    initTrip.mutate(
+      { prompt },
+      {
+        onSuccess: () => invalidateTrips(),
+        onError: () =>
+          setSubmitError('We couldn’t start your trip. Please try again.'),
+      },
+    );
   };
 
   return (
@@ -55,13 +63,33 @@ function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
               placeholder="I want a food-and-train journey through Japan in October…"
               className="h-20 max-h-20 sm:max-h-24 px-5 pt-4 sm:min-h-24 text-lg!"
               value={prompt}
-              onChange={(event) => setPrompt(event.target.value)}
+              onChange={(event) => {
+                setPrompt(event.target.value);
+                setSubmitError(null);
+              }}
             />
             <InputGroupAddon align="block-end" className="px-4 pb-4">
-              <InputGroupText>
-                {prompt.length >= MIN_PROMPT_LENGTH / 4 && !isValidPrompt ? (
+              <InputGroupText
+                aria-atomic="true"
+                aria-live="polite"
+                role="status"
+              >
+                {initTrip.isPending ? (
+                  <span className="font-normal inline-flex items-center gap-1 animate-in fade-in text-primary">
+                    <CircleNotchIcon
+                      aria-hidden="true"
+                      className="animate-spin"
+                      weight="bold"
+                    />
+                    Starting your trip plan…
+                  </span>
+                ) : submitError ? (
                   <span className="font-normal text-destructive inline-flex items-center gap-1 animate-in fade-in">
-                    <InfoIcon weight="bold" />
+                    {submitError}
+                  </span>
+                ) : prompt.length >= MIN_PROMPT_LENGTH / 4 && !isValidPrompt ? (
+                  <span className="font-normal text-destructive inline-flex items-center gap-1 animate-in fade-in">
+                    <InfoIcon aria-hidden="true" weight="bold" />
                     Make it longer with atleast {MIN_PROMPT_LENGTH} characters
                   </span>
                 ) : null}
@@ -78,11 +106,7 @@ function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
                 isDisabled={initTrip.isPending || !isValidPrompt}
                 className="ml-auto"
               >
-                {initTrip.isPending ? (
-                  <CircleNotchIcon className="animate-spin" weight="bold" />
-                ) : (
-                  <ArrowUpIcon weight="bold" />
-                )}
+                <ArrowUpIcon weight="bold" />
               </InputGroupButton>
             </InputGroupAddon>
           </InputGroup>
