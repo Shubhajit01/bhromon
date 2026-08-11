@@ -56,7 +56,7 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
   async persistInitialPrompt(prompt: string, userTimeZone: string) {
     this.setState({ userTimeZone });
 
-    await this.saveMessages([
+    await this.persistMessages([
       ...this.messages,
       {
         id: crypto.randomUUID(),
@@ -64,6 +64,10 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
         parts: [{ type: 'text', text: prompt }],
       },
     ]);
+
+    void this.requestReply().catch((error: unknown) => {
+      console.error('Unable to generate the initial trip reply', error);
+    });
   }
 
   async requestReply() {
@@ -139,9 +143,10 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
 
   private getAuthHeaders() {
     const state = getCurrentAgent().connection?.state;
-
-    const { authorization, cookie } =
-      tripAgentConnectionStateSchema.parse(state);
+    const connectionState = tripAgentConnectionStateSchema.safeParse(state);
+    const { authorization, cookie } = connectionState.success
+      ? connectionState.data
+      : {};
 
     const headers = new Headers();
     [

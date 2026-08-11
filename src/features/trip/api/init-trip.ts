@@ -17,6 +17,7 @@ import { useInvalidateTrips } from './get-trips';
 
 export const MIN_PROMPT_LENGTH = 50;
 export const MAX_PROMPT_LENGTH = 4000;
+export const MAX_FALLBACK_TITLE_LENGTH = 32;
 
 export const initTripInputSchema = z.object({
   prompt: z.string().trim().min(MIN_PROMPT_LENGTH).max(MAX_PROMPT_LENGTH),
@@ -35,9 +36,7 @@ export const initTrip = createServerFn({ method: 'POST' })
 
     const id = ulid();
 
-    const title = await generateTripTitle({
-      data: { prompt: data.prompt },
-    });
+    const title = await getTripTitle(data.prompt);
 
     await db.insert(trip).values({
       id,
@@ -52,8 +51,34 @@ export const initTrip = createServerFn({ method: 'POST' })
     });
     await tripAgent.persistInitialPrompt(data.prompt, getUserTimeZone());
 
-    throw redirect({ to: '/t/$tripId', params: { tripId: id } });
+    throw redirect({ to: '/t/$tripId/chat', params: { tripId: id } });
   });
+
+async function getTripTitle(prompt: string) {
+  try {
+    const title = await generateTripTitle({ data: { prompt } });
+
+    if (title.trim()) {
+      return title.trim();
+    }
+  } catch {
+    // A title should not prevent a traveller from starting to plan.
+  }
+
+  return getFallbackTripTitle(prompt);
+}
+
+function getFallbackTripTitle(prompt: string) {
+  const normalizedPrompt = prompt.replace(/\s+/g, ' ').trim();
+
+  if (normalizedPrompt.length <= MAX_FALLBACK_TITLE_LENGTH) {
+    return normalizedPrompt;
+  }
+
+  return `${normalizedPrompt
+    .slice(0, MAX_FALLBACK_TITLE_LENGTH - 1)
+    .trimEnd()}…`;
+}
 
 export function useInitTrip() {
   const initAuthSession = useInitAuthSession();

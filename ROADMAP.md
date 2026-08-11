@@ -16,7 +16,7 @@ Bhromon is a portfolio project focused on showing a complete, thoughtful travel-
 
 ## P0 — Complete the core journey
 
-- [ ] Respond to the initial trip idea immediately and continue directly into planning.
+- [x] Respond to the initial trip idea immediately and continue directly into planning.
 - [ ] Show clear progress and prevent duplicate trips while a plan is being created.
 - [ ] Let travellers revise, accept, and safely discard itinerary changes.
 - [ ] Clarify the meaning of draft, saved, and confirmed throughout the journey.

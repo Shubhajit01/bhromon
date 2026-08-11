@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import type { ComponentProps } from 'react';
 
-import { ArrowUpIcon, InfoIcon } from '@phosphor-icons/react';
+import { ArrowUpIcon, CircleNotchIcon, InfoIcon } from '@phosphor-icons/react';
 
 import { Field, FieldGroup, FieldLabel } from '#/components/ui/field';
 import {
@@ -70,11 +70,19 @@ function TripPromptComposer({ variant = 'paper' }: TripPromptComposerProps) {
                 type="submit"
                 variant="default"
                 size="icon-sm"
-                aria-label="Start planning"
+                aria-label={
+                  initTrip.isPending
+                    ? 'Starting your trip plan'
+                    : 'Start planning'
+                }
                 isDisabled={initTrip.isPending || !isValidPrompt}
                 className="ml-auto"
               >
-                <ArrowUpIcon weight="bold" />
+                {initTrip.isPending ? (
+                  <CircleNotchIcon className="animate-spin" weight="bold" />
+                ) : (
+                  <ArrowUpIcon weight="bold" />
+                )}
               </InputGroupButton>
             </InputGroupAddon>
           </InputGroup>
