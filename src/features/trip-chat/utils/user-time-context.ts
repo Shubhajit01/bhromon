@@ -1,17 +1,10 @@
 import { z } from 'zod';
 
+import { getUserTimeZone, isSupportedTimeZone } from '#/utils/user-time-zone';
+
 export interface UserTimeContext {
   currentDateTime: string;
   timeZone: string;
-}
-
-function isSupportedTimeZone(timeZone: string) {
-  try {
-    new Intl.DateTimeFormat('en', { timeZone });
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 export const userTimeContextSchema: z.ZodType<UserTimeContext> = z.object({
@@ -27,6 +20,6 @@ export const userTimeContextSchema: z.ZodType<UserTimeContext> = z.object({
 export function getUserTimeContext(): UserTimeContext {
   return {
     currentDateTime: new Date().toISOString(),
-    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timeZone: getUserTimeZone(),
   };
 }
