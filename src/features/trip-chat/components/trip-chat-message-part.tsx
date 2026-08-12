@@ -8,7 +8,6 @@ import { cn } from '#/lib/utils';
 import type { SaveItineraryInput } from '#/features/trip/api/save-itinerary';
 
 import { SaveItineraryApproval } from './save-itinerary-approval';
-import { StartNewTripAction } from './start-new-trip-action';
 import { TripChatReasoningPart } from './trip-chat-reasoning-part';
 
 import type {
@@ -84,10 +83,6 @@ export function TripChatMessagePart({
         onKeepRefining={onKeepRefining}
       />
     );
-  }
-
-  if (part.type === 'tool-startNewTrip' && !isUser) {
-    return <StartNewTripAction invocation={part} />;
   }
 
   if (isToolUIPart(part) && !isUser) {
