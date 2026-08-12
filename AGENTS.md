@@ -57,10 +57,6 @@ Use the same function-boundary and input conventions for writes. Export the main
 
 Writes do not expose `get<Entity>QueryOptions`, `load<Entity>`, or `useInvalidate<Entity>` helpers. Those are read-query concerns.
 
-## Todo
+## Roadmap
 
-- [ ] `feat-001` Foundation: Create the TanStack Start and Cloudflare deployment foundation with D1, Drizzle, and repeatable local verification.
-- [ ] `feat-002` Trip domain and revisions: Persist trips, itinerary revisions, draft/confirmed states, and safe discard behavior.
-- [ ] `feat-003` Conversational trip planning: Stream a planning conversation that gathers requirements and produces a Zod-validated draft itinerary.
-- [ ] `feat-004` Trip views and map: Show draft and confirmed trips, day-by-day itinerary, costs, and mapped travel legs.
-- [ ] `feat-005` Preference memory and guidance: Use user-approved explicit preferences in planning and attach sourced cultural/legal guides to destinations.
+See [ROADMAP.md](ROADMAP.md) for the current product roadmap and delivery priorities.
