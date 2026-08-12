@@ -18,8 +18,8 @@ interface TripStatusFilterProps {
 
 const filterOptions = [
   { label: 'All', value: 'all' },
-  { label: 'Confirmed', value: 'confirmed' },
-  { label: 'Draft', value: 'draft' },
+  { label: 'Saved', value: 'confirmed' },
+  { label: 'Continue planning', value: 'draft' },
 ] as const;
 
 function TripStatusFilter({ status }: TripStatusFilterProps) {

@@ -50,13 +50,18 @@ function TripList({ status }: TripListProps) {
   }
 
   if (filteredTrips.length === 0) {
+    const emptyTitle =
+      status === 'confirmed'
+        ? 'No saved trips yet'
+        : 'No trips to continue planning';
+
     return (
       <Empty className="border bg-card/55">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <SuitcaseRollingIcon weight="duotone" />
           </EmptyMedia>
-          <EmptyTitle>No {status} trips yet</EmptyTitle>
+          <EmptyTitle>{emptyTitle}</EmptyTitle>
           <EmptyDescription>
             Try another filter to see the rest of your trips.
           </EmptyDescription>

@@ -29,7 +29,7 @@ function TripCard({ trip }: TripCardProps) {
 
   return (
     <Link
-      to="/t/$tripId"
+      to={isConfirmed ? '/t/$tripId' : '/t/$tripId/chat'}
       data-diff={diff}
       params={{ tripId: trip.id }}
       data-preload={isRecent ? 'render' : 'intent'}
@@ -56,7 +56,7 @@ function TripCard({ trip }: TripCardProps) {
                 isConfirmed ? 'bg-primary' : 'bg-destructive',
               )}
             />
-            {isConfirmed ? 'Confirmed' : 'Draft'}
+            {isConfirmed ? 'Saved' : 'Continue planning'}
           </ItemDescription>
         </ItemContent>
         <ItemActions className="ml-auto text-muted-foreground hidden @sm:flex">
