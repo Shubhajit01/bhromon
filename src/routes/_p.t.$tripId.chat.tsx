@@ -7,6 +7,7 @@ import { Page } from '#/components/page';
 import { site } from '#/config/site';
 import { AnonymousUserBanner } from '#/features/auth/components/anonymous-user-banner';
 import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
+import { SiteDialogLink } from '#/features/site/components/site-dialog';
 import { loadTrip, useTrip } from '#/features/trip/api/get-trip';
 import { loadTripMessages } from '#/features/trip-chat/api/get-trip-messages';
 import { TripChat } from '#/features/trip-chat/components/trip-chat';
@@ -42,8 +43,14 @@ function Trip() {
 
         <Page.Actions>
           <Page.ActionLink to="/t/trips">Trips</Page.ActionLink>
-          <Page.ActionLink to="/">About</Page.ActionLink>
-          <Page.ActionLink to="/">Contact</Page.ActionLink>
+          <SiteDialogLink
+            kind="about"
+            className="px-0 text-sm font-semibold text-foreground underline-offset-4 hover:underline"
+          />
+          <SiteDialogLink
+            kind="contact"
+            className="px-0 text-sm font-semibold text-foreground underline-offset-4 hover:underline"
+          />
           <CurrentUserAvatar />
         </Page.Actions>
       </Page.Header>

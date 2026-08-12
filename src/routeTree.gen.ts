@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PRouteImport } from './routes/_p'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PMeRouteImport } from './routes/_p.me'
 import { Route as PTIndexRouteImport } from './routes/_p.t.index'
 import { Route as PTTripIdRouteImport } from './routes/_p.t.$tripId'
@@ -27,6 +29,16 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const PRoute = PRouteImport.update({
   id: '/_p',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PMeRoute = PMeRouteImport.update({
@@ -72,6 +84,8 @@ const ApiTripsTripIdItineraryRoute = ApiTripsTripIdItineraryRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/me': typeof PMeRoute
   '/t/$tripId': typeof PTTripIdRouteWithChildren
   '/t/trips': typeof PTTripsRoute
@@ -83,6 +97,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/me': typeof PMeRoute
   '/t/trips': typeof PTTripsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -95,6 +111,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_p': typeof PRouteWithChildren
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/_p/me': typeof PMeRoute
   '/_p/t/$tripId': typeof PTTripIdRouteWithChildren
   '/_p/t/trips': typeof PTTripsRoute
@@ -108,6 +126,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/contact'
     | '/me'
     | '/t/$tripId'
     | '/t/trips'
@@ -119,6 +139,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/contact'
     | '/me'
     | '/t/trips'
     | '/api/auth/$'
@@ -130,6 +152,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_p'
+    | '/about'
+    | '/contact'
     | '/_p/me'
     | '/_p/t/$tripId'
     | '/_p/t/trips'
@@ -143,6 +167,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PRoute: typeof PRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  ContactRoute: typeof ContactRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiTripsTripIdItineraryRoute: typeof ApiTripsTripIdItineraryRoute
 }
@@ -161,6 +187,20 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof PRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_p/me': {
@@ -255,6 +295,8 @@ const PRouteWithChildren = PRoute._addFileChildren(PRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PRoute: PRouteWithChildren,
+  AboutRoute: AboutRoute,
+  ContactRoute: ContactRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiTripsTripIdItineraryRoute: ApiTripsTripIdItineraryRoute,
 }

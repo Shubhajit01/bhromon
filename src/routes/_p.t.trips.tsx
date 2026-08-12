@@ -10,6 +10,7 @@ import { site } from '#/config/site';
 import { useCurrentUser } from '#/features/auth/api/get-current-user';
 import { AnonymousUserBanner } from '#/features/auth/components/anonymous-user-banner';
 import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
+import { SiteDialogLink } from '#/features/site/components/site-dialog';
 import { loadTrips } from '#/features/trip/api/get-trips';
 import {
   TripList,
@@ -74,8 +75,14 @@ function TripsPage() {
         </Page.Brand>
 
         <Page.Actions>
-          <Page.ActionLink to="/">About</Page.ActionLink>
-          <Page.ActionLink to="/">Contact</Page.ActionLink>
+          <SiteDialogLink
+            kind="about"
+            className="px-0 text-sm font-semibold text-foreground underline-offset-4 hover:underline"
+          />
+          <SiteDialogLink
+            kind="contact"
+            className="px-0 text-sm font-semibold text-foreground underline-offset-4 hover:underline"
+          />
           <CurrentUserAvatar />
         </Page.Actions>
       </Page.Header>

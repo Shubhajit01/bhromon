@@ -7,10 +7,13 @@ import {
 
 import type { QueryClient } from '@tanstack/react-query';
 
+import { z } from 'zod';
+
 import { logoOnDarkUrl, logoUrl } from '#/components/logo';
 import NavigationProgress from '#/components/navigation-progress';
 import { site } from '#/config/site';
 import { loadCurrentUser } from '#/features/auth/api/get-current-user';
+import { SiteDialog } from '#/features/site/components/site-dialog';
 import { preloadFontAsLink } from '#/lib/helpers';
 
 import fontsCss from '../styles/fonts.css?url';
@@ -23,6 +26,9 @@ interface RootContext {
 }
 
 export const Route = createRootRouteWithContext<RootContext>()({
+  validateSearch: z.object({
+    overlay: z.enum(['about', 'contact']).optional().catch(undefined),
+  }),
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
@@ -59,6 +65,8 @@ export const Route = createRootRouteWithContext<RootContext>()({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const overlay = Route.useSearch({ select: (search) => search.overlay });
+
   return (
     <html lang="en">
       <head>
@@ -66,6 +74,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="antialiased">
         {children}
+        {overlay ? <SiteDialog kind={overlay} /> : null}
         <NavigationProgress />
         <ReactQueryDevtools />
         <Scripts />

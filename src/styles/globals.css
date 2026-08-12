@@ -165,6 +165,11 @@
     background: var(--background);
     backdrop-filter: none;
   }
+
+  [data-landing-dock] a {
+    background: oklch(0.148 0.004 228.8);
+    backdrop-filter: none;
+  }
 }
 
 @media (prefers-contrast: more) {
@@ -178,6 +183,19 @@
     border: 1px solid var(--foreground);
     background: var(--background);
     backdrop-filter: none;
+  }
+
+  [data-landing-dock] a {
+    border-color: white;
+    background: oklch(0.148 0.004 228.8);
+    backdrop-filter: none;
+  }
+}
+
+@media (width < 40rem) {
+  [data-landing-page]:has(#trip-prompt:focus) [data-landing-dock] {
+    pointer-events: none;
+    opacity: 0;
   }
 }
 
