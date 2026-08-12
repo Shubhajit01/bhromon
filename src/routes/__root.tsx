@@ -7,10 +7,21 @@ import {
 
 import type { QueryClient } from '@tanstack/react-query';
 
+import { EnvelopeSimpleIcon, LinkedinLogoIcon } from '@phosphor-icons/react';
 import { z } from 'zod';
 
 import { logoOnDarkUrl, logoUrl } from '#/components/logo';
 import NavigationProgress from '#/components/navigation-progress';
+import { Page } from '#/components/page';
+import { buttonVariants } from '#/components/ui/button';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '#/components/ui/empty';
 import { site } from '#/config/site';
 import { loadCurrentUser } from '#/features/auth/api/get-current-user';
 import { SiteDialog } from '#/features/site/components/site-dialog';
@@ -61,8 +72,48 @@ export const Route = createRootRouteWithContext<RootContext>()({
   async beforeLoad({ context }) {
     await loadCurrentUser(context.queryClient);
   },
+  errorComponent: GlobalError,
   shellComponent: RootDocument,
 });
+
+function GlobalError() {
+  return (
+    <Page>
+      <Page.Main className="grid place-items-center p-6">
+        <Empty className="max-w-md border" role="alert">
+          <EmptyHeader>
+            <EmptyMedia variant="icon" className="text-destructive">
+              <EnvelopeSimpleIcon weight="duotone" />
+            </EmptyMedia>
+            <EmptyTitle>Something went wrong</EmptyTitle>
+            <EmptyDescription>
+              Bhromon ran into an unexpected problem. Please get in touch if you
+              need help.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent className="flex-row justify-center">
+            <a
+              href="mailto:chatterjee.shubhajit01@gmail.com"
+              className={buttonVariants({ variant: 'secondary', size: 'sm' })}
+            >
+              <EnvelopeSimpleIcon aria-hidden="true" weight="fill" />
+              Email
+            </a>
+            <a
+              href="https://www.linkedin.com/in/shubhajit-chatterjee"
+              target="_blank"
+              rel="noreferrer"
+              className={buttonVariants({ variant: 'secondary', size: 'sm' })}
+            >
+              <LinkedinLogoIcon aria-hidden="true" weight="fill" />
+              LinkedIn
+            </a>
+          </EmptyContent>
+        </Empty>
+      </Page.Main>
+    </Page>
+  );
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const overlay = Route.useSearch({ select: (search) => search.overlay });
