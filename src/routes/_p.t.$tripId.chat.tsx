@@ -1,16 +1,9 @@
-import {
-  createFileRoute,
-  useCanGoBack,
-  useNavigate,
-  useRouter,
-} from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 
-import { ArrowLeftIcon } from '@phosphor-icons/react';
 import { motion } from 'motion/react';
 
 import { Logo } from '#/components/logo';
 import { Page } from '#/components/page';
-import { Button } from '#/components/ui/button';
 import { site } from '#/config/site';
 import { AnonymousUserBanner } from '#/features/auth/components/anonymous-user-banner';
 import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
@@ -68,30 +61,12 @@ function Trip() {
 function TripHeader({ tripId }: { tripId: string }) {
   const trip = useTrip({ tripId });
 
-  const can = useCanGoBack();
-  const router = useRouter();
-  const navigate = useNavigate();
-
   return (
     <header className="box flex items-center gap-3 py-2.5 md:py-4 border-b border-muted lg:border-0 lg:gap-0">
-      <Button
-        size="icon-sm"
-        variant="outline"
-        className="lg:-ml-8 lg:-translate-x-2/4"
-        aria-label="Back"
-        onPress={() =>
-          can
-            ? router.history.back()
-            : navigate({ to: '/t/$tripId', params: { tripId } })
-        }
-      >
-        <ArrowLeftIcon weight="bold" />
-      </Button>
-
       <div className="min-w-0 flex-1">
         <motion.h1
           layout="position"
-          className="truncate text-base font-medium tracking-tight"
+          className="truncate text-2xl font-medium tracking-tight"
         >
           {trip.title}
         </motion.h1>
