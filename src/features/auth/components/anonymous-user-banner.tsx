@@ -6,6 +6,7 @@ import { Button } from '#/components/ui/button';
 import { cn } from '#/lib/utils';
 
 import { useCurrentUser } from '../api/get-current-user';
+import { useUserLimits } from '../api/get-user-limits';
 import { AuthDialog } from './auth-dialog';
 
 function AnonymousUserBanner({
@@ -13,6 +14,7 @@ function AnonymousUserBanner({
   ...props
 }: React.ComponentProps<'aside'>) {
   const isAnonymous = useCurrentUser((s) => s.isAnonymous);
+  const userLimits = useUserLimits();
   const [isClaimDialogOpen, setIsClaimDialogOpen] = useState(false);
 
   if (!isAnonymous) {
@@ -23,10 +25,7 @@ function AnonymousUserBanner({
     <>
       <aside
         aria-label="Guest account notice"
-        className={cn(
-          'bg-accent-foreground w-full sticky top-0 left-0 z-2',
-          className,
-        )}
+        className={cn('bg-primary w-full sticky top-0 left-0 z-2', className)}
         {...props}
       >
         <div className="box py-2.5 flex items-center gap-4">
@@ -40,8 +39,10 @@ function AnonymousUserBanner({
             <p className="text-sm sm:text-base font-medium">
               You&apos;re exploring as a guest.
             </p>
-            <p className="text-xs sm:text-sm text-accent/75 -mt-1">
-              Claim this account to keep your trips safe and available anytime.
+            <p className="text-xs sm:text-sm text-primary-foreground/75 -mt-1">
+              {userLimits.savedTrips?.canCreate
+                ? `You can save ${userLimits.savedTrips.remaining} more ${userLimits.savedTrips.remaining === 1 ? 'trip' : 'trips'} before claiming your account.`
+                : 'Claim your account to keep planning.'}
             </p>
           </div>
 
@@ -50,7 +51,7 @@ function AnonymousUserBanner({
             variant="outline"
             onPress={() => setIsClaimDialogOpen(true)}
           >
-            Claim
+            Claim account
           </Button>
         </div>
       </aside>

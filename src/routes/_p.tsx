@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
 import { loadCurrentUser } from '#/features/auth/api/get-current-user';
+import { loadUserLimits } from '#/features/auth/api/get-user-limits';
 
 export const Route = createFileRoute('/_p')({
   async beforeLoad({ context }) {
@@ -11,5 +12,6 @@ export const Route = createFileRoute('/_p')({
         replace: true,
       });
     }
+    await loadUserLimits(context.queryClient);
   },
 });

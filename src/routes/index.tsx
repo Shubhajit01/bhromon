@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { Logo } from '#/components/logo';
+import { loadUserLimits } from '#/features/auth/api/get-user-limits';
 import { TripPromptComposer } from '#/features/trip/components/trip-prompt-composer';
 import { preloadImageAsLink } from '#/lib/helpers';
 import { seo } from '#/lib/seo';
@@ -10,6 +11,7 @@ import himalayanValleyWebp from '#/assets/images/himalayan-valley.png?format=web
 import himalayanValleyFallback from '#/assets/images/himalayan-valley.png?format=webp&w=20&inline&enhanced';
 
 export const Route = createFileRoute('/')({
+  loader: ({ context }) => loadUserLimits(context.queryClient),
   component: Home,
   head: () => ({
     meta: seo(),

@@ -8,10 +8,15 @@ import { z } from 'zod';
 
 import { db, trip } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
+import {
+  getUserLimits,
+  useInvalidateUserLimits,
+} from '#/features/auth/api/get-user-limits';
 import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
 import { getAuthorizedTripAgent } from '#/features/trip-chat/agents/trip-agent/require-trip-agent-access.server';
 import { getUserTimeZone } from '#/utils/user-time-zone';
 
+import { GuestTripLimitError } from '../errors/guest-trip-limit-error';
 import { generateTripTitle } from './generate-trip-title';
 import { useInvalidateTrips } from './get-trips';
 
@@ -32,6 +37,12 @@ export const initTrip = createServerFn({ method: 'POST' })
 
     if (!user) {
       throw new Error('Authentication required to create a trip');
+    }
+
+    const userLimits = await getUserLimits();
+
+    if (userLimits.savedTrips && !userLimits.savedTrips.canCreate) {
+      throw new GuestTripLimitError();
     }
 
     const id = ulid();
@@ -85,6 +96,7 @@ export function useInitTrip() {
   const initTripServerFn = useServerFn(initTrip);
 
   const invalidateTrips = useInvalidateTrips();
+  const invalidateUserLimits = useInvalidateUserLimits();
 
   return useMutation({
     mutationFn: async (data: InitTripInput) => {
@@ -93,6 +105,7 @@ export function useInitTrip() {
     },
     onSuccess: () => {
       void invalidateTrips();
+      void invalidateUserLimits();
     },
   });
 }

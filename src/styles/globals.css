@@ -160,6 +160,11 @@
     background: var(--background);
     backdrop-filter: none;
   }
+
+  [data-trip-limit-overlay] {
+    background: var(--background);
+    backdrop-filter: none;
+  }
 }
 
 @media (prefers-contrast: more) {
@@ -167,6 +172,12 @@
     border-color: var(--foreground);
     background: var(--background);
     box-shadow: none;
+  }
+
+  [data-trip-limit-overlay] {
+    border: 1px solid var(--foreground);
+    background: var(--background);
+    backdrop-filter: none;
   }
 }
 
