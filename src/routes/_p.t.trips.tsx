@@ -10,6 +10,7 @@ import { site } from '#/config/site';
 import { useCurrentUser } from '#/features/auth/api/get-current-user';
 import { AnonymousUserBanner } from '#/features/auth/components/anonymous-user-banner';
 import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
+import { ScreenTour } from '#/features/product-tour/components/screen-tour';
 import { SiteDialogLink } from '#/features/site/components/site-dialog';
 import { loadTrips } from '#/features/trip/api/get-trips';
 import {
@@ -96,7 +97,7 @@ function TripsPage() {
             Hi {isAnonymous ? 'there' : name}, Where will we wander next?
           </h1>
 
-          <div className="backdrop-blur-sm">
+          <div data-tour="trips-new-trip" className="backdrop-blur-sm">
             <TripPromptComposer initialPrompt={prompt} variant="default" />
           </div>
         </section>
@@ -108,17 +109,44 @@ function TripsPage() {
           <div className="mb-3 flex items-baseline justify-between gap-4">
             <h2
               id="trip-list-heading"
+              data-tour="trips-list"
               className="text-xl font-medium tracking-[-0.02em] text-foreground"
             >
               Your trips
             </h2>
-            <TripStatusFilter status={status} />
+            <div data-tour="trips-filter">
+              <TripStatusFilter status={status} />
+            </div>
           </div>
 
           <Suspense fallback={<TripListFallback />}>
             <TripList status={status} />
           </Suspense>
         </section>
+
+        <ScreenTour
+          id="trips"
+          steps={[
+            {
+              target: '[data-tour="trips-new-trip"]',
+              title: 'Start another journey',
+              content:
+                'Describe a new trip here whenever you are ready to plan somewhere new.',
+            },
+            {
+              target: '[data-tour="trips-filter"]',
+              title: 'Find the plan you need',
+              content:
+                'Show every trip, saved itineraries, or journeys that still need planning.',
+            },
+            {
+              target: '[data-tour="trips-list"]',
+              title: 'Pick up where you left off',
+              content:
+                'Open any journey to review its itinerary or continue shaping the plan.',
+            },
+          ]}
+        />
       </Page.Main>
     </Page>
   );

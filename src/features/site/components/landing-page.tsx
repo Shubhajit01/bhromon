@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 
 import { Logo } from '#/components/logo';
 import { useMaybeCurrentUser } from '#/features/auth/api/get-current-user';
+import { ScreenTour } from '#/features/product-tour/components/screen-tour';
 import { TripPromptComposer } from '#/features/trip/components/trip-prompt-composer';
 import { cn } from '#/lib/utils';
 
@@ -60,7 +61,7 @@ function LandingPage() {
             </span>
           </h1>
 
-          <div className="mt-1 w-full max-w-3xl">
+          <div data-tour="home-trip-prompt" className="mt-1 w-full max-w-3xl">
             <TripPromptComposer />
           </div>
 
@@ -83,6 +84,18 @@ function LandingPage() {
           <SiteDialogLink kind="about" className={dockLinkClassName} />
           <SiteDialogLink kind="contact" className={dockLinkClassName} />
         </nav>
+
+        <ScreenTour
+          id="home"
+          steps={[
+            {
+              target: '[data-tour="home-trip-prompt"]',
+              title: 'Begin with your idea',
+              content:
+                'Share where you want to go, when you might travel, and what would make the journey feel like yours.',
+            },
+          ]}
+        />
       </section>
     </main>
   );

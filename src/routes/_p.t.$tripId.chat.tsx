@@ -69,7 +69,10 @@ function TripHeader({ tripId }: { tripId: string }) {
   const trip = useTrip({ tripId });
 
   return (
-    <header className="box flex items-center gap-3 py-2.5 md:py-4 border-b border-muted lg:border-0 lg:gap-0">
+    <header
+      data-tour="chat-conversation"
+      className="box flex items-center gap-3 py-2.5 md:py-4 border-b border-muted lg:border-0 lg:gap-0"
+    >
       <div className="min-w-0 flex-1">
         <motion.h1
           layout="position"

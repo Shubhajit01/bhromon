@@ -14,6 +14,7 @@ import { LinkButton } from '#/components/ui/button';
 import { site } from '#/config/site';
 import { AnonymousUserBanner } from '#/features/auth/components/anonymous-user-banner';
 import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
+import { ScreenTour } from '#/features/product-tour/components/screen-tour';
 import { SiteDialogLink } from '#/features/site/components/site-dialog';
 import { loadTrip, useTrip } from '#/features/trip/api/get-trip';
 import { ItineraryDay } from '#/features/trip/components/itinerary-day';
@@ -70,7 +71,10 @@ function RouteComponent() {
 
       <Page.Main className="flex flex-col gap-3 bg-background">
         <header>
-          <div className="flex box flex-col gap-3 sm:gap-6 pt-6 pb-1 sm:flex-row sm:items-center sm:justify-between">
+          <div
+            data-tour="itinerary-overview"
+            className="flex box flex-col gap-3 sm:gap-6 pt-6 pb-1 sm:flex-row sm:items-center sm:justify-between"
+          >
             <div className="min-w-0 flex flex-col gap-1">
               <motion.h1
                 layout="position"
@@ -106,6 +110,7 @@ function RouteComponent() {
 
             {revision ? (
               <LinkButton
+                data-tour="itinerary-open-chat"
                 size="default"
                 params={{ tripId }}
                 to="/t/$tripId/chat"
@@ -135,6 +140,31 @@ function RouteComponent() {
             />
           )}
         </div>
+
+        <ScreenTour
+          id="itinerary"
+          steps={[
+            {
+              target: '[data-tour="itinerary-overview"]',
+              title: revision
+                ? 'Review your journey'
+                : 'Your itinerary lives here',
+              content: revision
+                ? 'Follow the trip day by day, with each place and timing kept in the order you approved.'
+                : 'Once you save a plan in chat, its day-by-day itinerary will appear here.',
+            },
+            ...(revision
+              ? [
+                  {
+                    target: '[data-tour="itinerary-open-chat"]',
+                    title: 'Keep shaping the plan',
+                    content:
+                      'Return to the conversation whenever you want to revise this journey.',
+                  },
+                ]
+              : []),
+          ]}
+        />
       </Page.Main>
     </Page>
   );

@@ -5,6 +5,7 @@ import { Navigate } from '@tanstack/react-router';
 import type { ChatStatus } from 'ai';
 
 import { MessageScrollerProvider } from '#/components/ui/message-scroller';
+import { ScreenTour } from '#/features/product-tour/components/screen-tour';
 import { useInvalidateTrip, useTrip } from '#/features/trip/api/get-trip';
 import { useSaveItinerary } from '#/features/trip/api/save-itinerary';
 
@@ -127,10 +128,31 @@ export function TripChat({ tripId }: TripChatProps) {
           isRetryingSave={retrySaveItinerary.isPending}
         />
 
-        <div className="box flex shrink-0 flex-col gap-2">
+        <div
+          data-tour="chat-composer"
+          className="box flex shrink-0 flex-col gap-2"
+        >
           <TripChatFeedback activity={activity} onRetry={handleRetry} />
           <TripChatComposer {...composerMode} />
         </div>
+
+        <ScreenTour
+          id="chat"
+          steps={[
+            {
+              target: '[data-tour="chat-conversation"]',
+              title: 'Shape the plan together',
+              content:
+                'Your conversation keeps the trip’s questions, suggestions, and itinerary decisions in one place.',
+            },
+            {
+              target: '[data-tour="chat-composer"]',
+              title: 'Make the journey yours',
+              content:
+                'Reply with preferences, constraints, or changes. You decide when the itinerary is ready to save.',
+            },
+          ]}
+        />
       </div>
     </MessageScrollerProvider>
   );
