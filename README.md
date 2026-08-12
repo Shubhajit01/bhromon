@@ -188,15 +188,7 @@ public/                     Static public assets and response headers
 
 ## Roadmap
 
-- [x] Create trips from a prompt, refine them in a dedicated conversation, and explicitly approve a validated itinerary.
-- [x] Persist draft and confirmed trips, preserve versioned itinerary revisions, and supersede the prior revision when a new itinerary is approved.
-- [x] Browse draft and confirmed trips and view a saved itinerary day by day.
-- [x] Provide anonymous sessions and user-facing email/password sign-in and sign-up flows.
-- [ ] Let travellers actively revise, accept, and safely discard itinerary revisions.
-- [ ] Add mapped travel legs and richer trip views, including estimated costs.
-- [ ] Remember only traveller-approved preferences and apply them to future plans.
-- [ ] Attach sourced cultural and legal guidance to destinations.
-- [ ] Add automated unit and integration coverage for the core planning journey.
+See [ROADMAP.md](ROADMAP.md) for completed work, current priorities, and planned product improvements.
 
 ## Contributing
 
