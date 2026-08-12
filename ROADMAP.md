@@ -24,7 +24,7 @@ Bhromon is a portfolio project focused on showing a complete, thoughtful travel-
 - [x] Add useful About and Contact pages that establish the product's purpose and credibility.
 - [x] Polish empty, loading, failure, and recovery states across the main journey.
 - [x] Add first-visit contextual tours to the core journey screens.
-- [ ] Create a reliable showcase trip for portfolio visitors.
+- [x] Create a reliable showcase trip for portfolio visitors.
 
 ## P1 — Make the itinerary realistic
 
