@@ -29,7 +29,7 @@ Bhromon is a portfolio project focused on showing a complete, thoughtful travel-
 ## P1 — Make the itinerary realistic
 
 - [x] Ground every recommendation in a canonical place with current place details.
-- [ ] Show each day's ordered stops and travel legs on a map.
+- [x] Show each day's ordered stops and travel legs on a map.
 - [ ] Use route planning to recommend an efficient daily order within traveller constraints.
 - [ ] Validate travel time, opening hours, visit duration, fixed bookings, and meal windows.
 - [ ] Warn when a day is geographically inefficient, rushed, or physically unrealistic.

@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { createServerFn, useServerFn } from '@tanstack/react-start';
 
 import { date } from '@formkit/tempo';
+import { env } from 'cloudflare:workers';
 import { ulid } from 'ulid';
 import { z } from 'zod';
 
@@ -14,7 +15,9 @@ import {
   itineraryDay,
   itineraryDayHighlight,
   itineraryRevision,
+  itineraryTransition,
   or,
+  place,
   placeExternalId,
   placeVisit,
   sql,
@@ -22,6 +25,7 @@ import {
 } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 
+import { routeWithGeoapify } from '../providers/geoapify-routing.server';
 import { itinerarySaveSchema } from '../schemas/itinerary/save';
 import { useInvalidateTrip } from './get-trip';
 import { useInvalidateTrips } from './get-trips';
@@ -61,16 +65,20 @@ export const saveItinerary = createServerFn({ method: 'POST' })
         ),
       ),
     ];
-    const groundedPlaceIds = new Set(
-      (
-        await db
-          .selectDistinct({ placeId: placeExternalId.placeId })
-          .from(placeExternalId)
-          .where(inArray(placeExternalId.placeId, requestedPlaceIds))
-      ).map((record) => record.placeId),
+    const groundedPlaces = await db
+      .selectDistinct({
+        id: place.id,
+        latitude: place.latitude,
+        longitude: place.longitude,
+      })
+      .from(placeExternalId)
+      .innerJoin(place, eq(place.id, placeExternalId.placeId))
+      .where(inArray(placeExternalId.placeId, requestedPlaceIds));
+    const groundedPlacesById = new Map(
+      groundedPlaces.map((record) => [record.id, record]),
     );
     const ungroundedPlaceIds = requestedPlaceIds.filter(
-      (placeId) => !groundedPlaceIds.has(placeId),
+      (placeId) => !groundedPlacesById.has(placeId),
     );
 
     if (ungroundedPlaceIds.length > 0) {
@@ -92,8 +100,17 @@ export const saveItinerary = createServerFn({ method: 'POST' })
       [];
     const visitRecords: Array<typeof placeVisit.$inferInsert> = [];
     const activityRecords: Array<typeof itineraryActivity.$inferInsert> = [];
+    const transitionRecords: Array<typeof itineraryTransition.$inferInsert> =
+      [];
+    const routingDays: Array<{
+      transitions: Array<typeof itineraryTransition.$inferInsert>;
+      waypoints: Array<{ latitude: number; longitude: number }>;
+    }> = [];
+    let transitionSequence = 1;
+
     for (const itineraryDayInput of data.itinerary.days) {
       const dayId = ulid();
+      const dayVisitRecords: Array<typeof placeVisit.$inferInsert> = [];
 
       dayRecords.push({
         id: dayId,
@@ -124,6 +141,7 @@ export const saveItinerary = createServerFn({ method: 'POST' })
           sourceRef: visit.id,
           sequence: visitIndex + 1,
         });
+        dayVisitRecords.push(visitRecords.at(-1)!);
 
         visit.activities.forEach((activity, activityIndex) => {
           activityRecords.push({
@@ -141,7 +159,52 @@ export const saveItinerary = createServerFn({ method: 'POST' })
           });
         });
       });
+
+      const dayTransitionRecords = dayVisitRecords
+        .slice(0, -1)
+        .map((originVisit, index) => {
+          const destinationVisit = dayVisitRecords[index + 1];
+
+          return {
+            id: ulid(),
+            revisionId,
+            originVisitId: originVisit.id,
+            destinationVisitId: destinationVisit.id,
+            sequence: transitionSequence++,
+            status: 'pending' as const,
+            primaryMode: 'drive',
+          };
+        });
+
+      transitionRecords.push(...dayTransitionRecords);
+
+      if (dayTransitionRecords.length > 0) {
+        routingDays.push({
+          transitions: dayTransitionRecords,
+          waypoints: dayVisitRecords.map((visit) => {
+            const groundedPlace = groundedPlacesById.get(visit.placeId);
+
+            if (!groundedPlace) {
+              throw new Error(
+                `Itinerary contains unresolved place: ${visit.placeId}`,
+              );
+            }
+
+            return {
+              latitude: groundedPlace.latitude,
+              longitude: groundedPlace.longitude,
+            };
+          }),
+        });
+      }
     }
+
+    const transitionWrite = transitionRecords.length
+      ? db.insert(itineraryTransition).values(transitionRecords)
+      : db
+          .update(trip)
+          .set({ updatedAt: confirmedAt })
+          .where(eq(trip.id, data.tripId));
 
     const [, revisions] = await db.batch([
       db
@@ -177,6 +240,7 @@ export const saveItinerary = createServerFn({ method: 'POST' })
       db.insert(itineraryDayHighlight).values(highlightRecords),
       db.insert(placeVisit).values(visitRecords),
       db.insert(itineraryActivity).values(activityRecords),
+      transitionWrite,
       db
         .update(trip)
         .set({ status: 'confirmed', updatedAt: confirmedAt })
@@ -187,6 +251,61 @@ export const saveItinerary = createServerFn({ method: 'POST' })
 
     if (!revision) {
       throw new Error('Itinerary revision was not saved');
+    }
+
+    const geoapifyApiKey = z
+      .string()
+      .trim()
+      .min(1)
+      .safeParse(Reflect.get(env, 'GEOAPIFY_API_KEY'));
+
+    for (const routingDay of routingDays) {
+      try {
+        if (!geoapifyApiKey.success) {
+          throw new Error('Geoapify routing is not configured');
+        }
+
+        const routedTransitions = await routeWithGeoapify({
+          apiKey: geoapifyApiKey.data,
+          waypoints: routingDay.waypoints,
+        });
+
+        for (const [
+          index,
+          transitionRecord,
+        ] of routingDay.transitions.entries()) {
+          const routedTransition = routedTransitions[index];
+
+          await db
+            .update(itineraryTransition)
+            .set({
+              status: 'routed',
+              provider: 'geoapify',
+              distanceMeters: routedTransition.distanceMeters,
+              durationSeconds: routedTransition.durationSeconds,
+              encodedPolyline: routedTransition.encodedPolyline,
+            })
+            .where(eq(itineraryTransition.id, transitionRecord.id));
+        }
+      } catch (error) {
+        console.warn(
+          'Itinerary routing failed; straight-line map legs will be used.',
+          error instanceof Error ? error.message : error,
+        );
+
+        for (const transitionRecord of routingDay.transitions) {
+          await db
+            .update(itineraryTransition)
+            .set({
+              status: 'failed',
+              provider: null,
+              distanceMeters: null,
+              durationSeconds: null,
+              encodedPolyline: null,
+            })
+            .where(eq(itineraryTransition.id, transitionRecord.id));
+        }
+      }
     }
 
     return revision;

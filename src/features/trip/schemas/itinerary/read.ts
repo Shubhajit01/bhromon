@@ -12,11 +12,10 @@ import {
   tripRowSchema,
 } from '#/db/zod.schema';
 
-export const itineraryPlaceExternalIdSchema =
-  placeExternalIdRowSchema.pick({
-    provider: true,
-    externalId: true,
-  });
+export const itineraryPlaceExternalIdSchema = placeExternalIdRowSchema.pick({
+  provider: true,
+  externalId: true,
+});
 
 export const itineraryPlaceSchema = placeRowSchema
   .pick({
@@ -122,3 +121,5 @@ export const tripReadSchema = tripRowSchema
 
 export type ItineraryDay = z.infer<typeof itineraryDaySchema>;
 export type ItineraryActivity = z.infer<typeof itineraryActivitySchema>;
+export type ItineraryRevision = z.infer<typeof itineraryRevisionReadSchema>;
+export type ItineraryTransition = z.infer<typeof itineraryTransitionSchema>;

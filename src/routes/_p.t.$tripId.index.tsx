@@ -18,6 +18,7 @@ import { ScreenTour } from '#/features/product-tour/components/screen-tour';
 import { SiteDialogLink } from '#/features/site/components/site-dialog';
 import { loadTrip, useTrip } from '#/features/trip/api/get-trip';
 import { ItineraryDay } from '#/features/trip/components/itinerary-day';
+import { ItineraryMap } from '#/features/trip/components/itinerary-map';
 import { TripItineraryEmpty } from '#/features/trip/components/trip-itinerary-empty';
 import {
   formatItineraryDateRange,
@@ -133,31 +134,13 @@ function RouteComponent() {
         <div className="box sm:pt-2 pb-6">
           {days ? (
             <div className="flex flex-col gap-4">
+              <ItineraryMap
+                revision={revision}
+                usesGeoapify={usesGeoapify ?? false}
+              />
               {days.map((day) => (
                 <ItineraryDay key={day.id} day={day} />
               ))}
-              {usesGeoapify ? (
-                <p className="text-center text-xs text-muted-foreground">
-                  Powered by{' '}
-                  <a
-                    href="https://www.geoapify.com/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline underline-offset-2"
-                  >
-                    Geoapify
-                  </a>{' '}
-                  |{' '}
-                  <a
-                    href="https://www.openstreetmap.org/copyright"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline underline-offset-2"
-                  >
-                    © OpenStreetMap contributors
-                  </a>
-                </p>
-              ) : null}
             </div>
           ) : (
             <TripItineraryEmpty

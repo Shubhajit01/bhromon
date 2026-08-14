@@ -13,11 +13,12 @@ import { Collapsible, CollapsibleContent } from '#/components/ui/collapsible';
 import { Separator } from '#/components/ui/separator';
 import { getUserDate, getUserTimeZone } from '#/utils/user-time-zone';
 
+import { getItineraryDayColor } from '../utils/itinerary-map';
+
 import type {
   ItineraryActivity,
   ItineraryDay as ItineraryDayData,
 } from '../schemas/itinerary/read';
-
 
 interface ItineraryDayProps {
   day: ItineraryDayData;
@@ -37,6 +38,11 @@ export function ItineraryDay({ day }: ItineraryDayProps) {
         <div className="flex md:items-center justify-between flex-col md:flex-row">
           <h2 className="text-lg font-medium">
             <span className="text-primary text-sm md:text-lg">
+              <span
+                aria-hidden="true"
+                className="mr-2 inline-block size-2 rounded-full align-middle"
+                style={{ backgroundColor: getItineraryDayColor(day.dayNumber) }}
+              />
               Day {day.dayNumber}
               <span className="md:hidden">&nbsp;{date}</span>
             </span>
