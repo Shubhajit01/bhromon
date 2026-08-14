@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import { ClientOnly } from '@tanstack/react-router';
 
+import { setWorkerUrl } from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import {
   AttributionControl,
   Layer,
@@ -20,6 +22,8 @@ import { projectItineraryMap } from '../utils/itinerary-map';
 
 import type { ItineraryRevision } from '../schemas/itinerary/read';
 import type { ItineraryMapProjection } from '../utils/itinerary-map';
+
+setWorkerUrl(maplibreWorkerUrl);
 
 interface ItineraryMapProps {
   revision: ItineraryRevision;
