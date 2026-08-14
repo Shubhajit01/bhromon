@@ -76,7 +76,9 @@ pnpm install
 
 ### 2. Configure local environment variables
 
-Copy the committed template and add a strong, private authentication secret:
+Copy the committed template, add a strong private authentication secret, and
+[create a free Geoapify API key](https://myprojects.geoapify.com/). Geoapify's
+free plan does not require a credit card.
 
 ```bash
 cp .env.example .env
@@ -85,6 +87,7 @@ cp .env.example .env
 ```dotenv
 BETTER_AUTH_SECRET=replace-with-a-long-random-secret
 BETTER_AUTH_URL=http://localhost:3000
+GEOAPIFY_API_KEY=replace-with-your-geoapify-key
 ```
 
 Never commit `.env` or secret values. `.env.example` should contain names and safe placeholders only.
@@ -156,10 +159,12 @@ Before the first deployment:
 1. Create the production D1 database and replace the placeholder `database_id` in `wrangler.jsonc`.
 2. Configure `BETTER_AUTH_URL` for the deployed origin.
 3. Store `BETTER_AUTH_SECRET` as a Cloudflare secret rather than committing it.
-4. Authenticate Wrangler and apply the remote migrations.
+4. Store `GEOAPIFY_API_KEY` as a Cloudflare secret.
+5. Authenticate Wrangler and apply the remote migrations.
 
 ```bash
 pnpm exec wrangler login
+pnpm exec wrangler secret put GEOAPIFY_API_KEY
 pnpm db:migrate:remote
 pnpm deploy
 ```

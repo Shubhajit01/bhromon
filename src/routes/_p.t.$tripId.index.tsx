@@ -45,6 +45,13 @@ function RouteComponent() {
   const dateRange = days
     ? formatItineraryDateRange(days.map((day) => day.date))
     : undefined;
+  const usesGeoapify = days?.some((day) =>
+    day.visits.some((visit) =>
+      visit.place.externalIds.some(
+        (externalId) => externalId.provider === 'geoapify',
+      ),
+    ),
+  );
 
   return (
     <Page>
@@ -129,6 +136,28 @@ function RouteComponent() {
               {days.map((day) => (
                 <ItineraryDay key={day.id} day={day} />
               ))}
+              {usesGeoapify ? (
+                <p className="text-center text-xs text-muted-foreground">
+                  Powered by{' '}
+                  <a
+                    href="https://www.geoapify.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline underline-offset-2"
+                  >
+                    Geoapify
+                  </a>{' '}
+                  |{' '}
+                  <a
+                    href="https://www.openstreetmap.org/copyright"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline underline-offset-2"
+                  >
+                    © OpenStreetMap contributors
+                  </a>
+                </p>
+              ) : null}
             </div>
           ) : (
             <TripItineraryEmpty

@@ -25,12 +25,7 @@ export function createTripAgentSystemPrompt(userTimeZone: string) {
             visits: [
               {
                 id: 'day-1-sensoji',
-                place: {
-                  name: 'Senso-ji',
-                  address: '2 Chome-3-1 Asakusa, Taito City, Tokyo',
-                  latitude: 35.7148,
-                  longitude: 139.7967,
-                },
+                placeId: 'place:geoapify:resolved-sensoji-id',
                 activities: [
                   {
                     id: 'day-1-sensoji-explore',
@@ -38,18 +33,13 @@ export function createTripAgentSystemPrompt(userTimeZone: string) {
                     startTime: '09:00',
                     endTime: '11:00',
                     title: 'Explore Senso-ji',
-                    description:
-                      'Visit the temple and browse Nakamise Street.',
+                    description: 'Visit the temple and browse Nakamise Street.',
                   },
                 ],
               },
               {
                 id: 'day-1-skytree',
-                place: {
-                  name: 'Tokyo Skytree',
-                  latitude: 35.7101,
-                  longitude: 139.8107,
-                },
+                placeId: 'place:geoapify:resolved-skytree-id',
                 activities: [
                   {
                     id: 'day-1-skytree-view',
@@ -101,6 +91,9 @@ ${travellerTimeContext}
 - Resolve relative dates against the traveller-time context before calling the tool, and pass an explicit YYYY-MM-DD date.
 - Treat returned weather as a forecast, mention uncertainty naturally, and do not claim a forecast exists when the tool reports that it is unavailable.
 - Do not repeatedly call the weather tool for the same place and date when its result is already present in the conversation.
+- Before recommending any named attraction, restaurant, accommodation, station, or other stop, call searchPlaces with its specific name and destination. You may resolve up to five names in one call.
+- Use only candidates returned by searchPlaces. Match the name and address carefully; never treat an empty or ambiguous result as verified. Ask the traveller or propose a grounded alternative when the correct place cannot be identified.
+- Keep the canonical placeId returned for each selected candidate. Never invent, alter, or infer a placeId, provider ID, address, or coordinate.
 - Before saving an itinerary, resolve every material open question and present a concise final summary. Then call the save itinerary tool immediately: its approval card is the traveller's single explicit confirmation.
 - Include the complete agreed itinerary in the save tool input; never omit a day, highlight, time, or location merely to make the input shorter.
 - Treat the approval card as consent to persist the itinerary, and do not claim the itinerary was saved until the tool succeeds. If the traveller types agreement instead of using the card, direct them to the card.
@@ -111,7 +104,7 @@ ${travellerTimeContext}
 Before calling saveItinerary, check the entire input against these requirements:
 - The top level contains itinerary, and the itinerary contains at least one day.
 - Every day contains a unique non-empty id, sequential dayNumber starting at 1, title, summary, at least one highlight, and at least one visit. Include date as YYYY-MM-DD whenever dates are known.
-- Every visit contains a unique non-empty id, one place, and at least one activity. Every place contains name, numeric latitude, and numeric longitude; address is optional. Include provider and providerPlaceId together when the place was resolved by a Places provider.
+- Every visit contains a unique non-empty id, the exact placeId returned by searchPlaces, and at least one activity. Never put a place object, provider ID, address, or coordinates in the save input.
 - Every activity contains a globally unique non-empty id and a title. Use category to distinguish attractions, meals, rest, accommodation, shopping, and other planned experiences.
 - Every activity contains either startTime or timeLabel. Use startTime and endTime only as zero-padded 24-hour local times in HH:mm format: use "09:00" or "17:30", never "9:00 AM", "5:30 PM", or an ISO date-time. If timing is flexible, omit startTime and endTime and use a phrase such as "Morning" in timeLabel. Never provide endTime without startTime.
 - Use destinationTimeZone only when known, and format it as an IANA time zone such as "Asia/Tokyo".

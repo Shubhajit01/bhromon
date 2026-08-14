@@ -9,12 +9,12 @@ import {
   and,
   db,
   eq,
+  inArray,
   itineraryActivity,
   itineraryDay,
   itineraryDayHighlight,
   itineraryRevision,
   or,
-  place,
   placeExternalId,
   placeVisit,
   sql,
@@ -54,6 +54,31 @@ export const saveItinerary = createServerFn({ method: 'POST' })
       throw new Error('Trip not found');
     }
 
+    const requestedPlaceIds = [
+      ...new Set(
+        data.itinerary.days.flatMap((day) =>
+          day.visits.map((visit) => visit.placeId),
+        ),
+      ),
+    ];
+    const groundedPlaceIds = new Set(
+      (
+        await db
+          .selectDistinct({ placeId: placeExternalId.placeId })
+          .from(placeExternalId)
+          .where(inArray(placeExternalId.placeId, requestedPlaceIds))
+      ).map((record) => record.placeId),
+    );
+    const ungroundedPlaceIds = requestedPlaceIds.filter(
+      (placeId) => !groundedPlaceIds.has(placeId),
+    );
+
+    if (ungroundedPlaceIds.length > 0) {
+      throw new Error(
+        `Itinerary contains unresolved places: ${ungroundedPlaceIds.join(', ')}`,
+      );
+    }
+
     const revisionId = ulid();
     const confirmedAt = date();
     const nextRevisionNumber = sql<number>`(
@@ -67,12 +92,6 @@ export const saveItinerary = createServerFn({ method: 'POST' })
       [];
     const visitRecords: Array<typeof placeVisit.$inferInsert> = [];
     const activityRecords: Array<typeof itineraryActivity.$inferInsert> = [];
-    const placeRecordsById = new Map<string, typeof place.$inferInsert>();
-    const placeExternalIdRecordsById = new Map<
-      string,
-      typeof placeExternalId.$inferInsert
-    >();
-
     for (const itineraryDayInput of data.itinerary.days) {
       const dayId = ulid();
 
@@ -97,34 +116,11 @@ export const saveItinerary = createServerFn({ method: 'POST' })
 
       itineraryDayInput.visits.forEach((visit, visitIndex) => {
         const visitId = ulid();
-        const { provider, providerPlaceId } = visit.place;
-        const externalIdentity = provider
-          ? `${provider}:${providerPlaceId}`
-          : undefined;
-        const placeId = externalIdentity ? `place:${externalIdentity}` : ulid();
-
-        placeRecordsById.set(placeId, {
-          id: placeId,
-          name: visit.place.name,
-          address: visit.place.address,
-          latitude: visit.place.latitude,
-          longitude: visit.place.longitude,
-          createdAt: confirmedAt,
-          updatedAt: confirmedAt,
-        });
-        if (externalIdentity && provider && providerPlaceId) {
-          placeExternalIdRecordsById.set(externalIdentity, {
-            id: `place-external:${externalIdentity}`,
-            placeId,
-            provider,
-            externalId: providerPlaceId,
-          });
-        }
         visitRecords.push({
           id: visitId,
           revisionId,
           dayId,
-          placeId,
+          placeId: visit.placeId,
           sourceRef: visit.id,
           sequence: visitIndex + 1,
         });
@@ -146,9 +142,6 @@ export const saveItinerary = createServerFn({ method: 'POST' })
         });
       });
     }
-
-    const placeRecords = [...placeRecordsById.values()];
-    const placeExternalIdRecords = [...placeExternalIdRecordsById.values()];
 
     const [, revisions] = await db.batch([
       db
@@ -180,27 +173,6 @@ export const saveItinerary = createServerFn({ method: 'POST' })
           status: itineraryRevision.status,
           createdAt: itineraryRevision.createdAt,
         }),
-      db
-        .insert(place)
-        .values(placeRecords)
-        .onConflictDoUpdate({
-          target: place.id,
-          set: {
-            name: sql`excluded.name`,
-            address: sql`excluded.address`,
-            latitude: sql`excluded.latitude`,
-            longitude: sql`excluded.longitude`,
-            updatedAt: confirmedAt,
-          },
-        }),
-      ...(placeExternalIdRecords.length > 0
-        ? [
-            db
-              .insert(placeExternalId)
-              .values(placeExternalIdRecords)
-              .onConflictDoNothing(),
-          ]
-        : []),
       db.insert(itineraryDay).values(dayRecords),
       db.insert(itineraryDayHighlight).values(highlightRecords),
       db.insert(placeVisit).values(visitRecords),

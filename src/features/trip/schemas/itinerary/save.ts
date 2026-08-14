@@ -12,23 +12,6 @@ const itineraryTimeZoneSchema = itineraryTextSchema.refine(
   { message: 'Time zone must be a valid IANA time zone' },
 );
 
-export const itineraryPlaceInputSchema = z
-  .object({
-    name: itineraryTextSchema,
-    address: itineraryTextSchema.optional(),
-    latitude: z.number().min(-90).max(90),
-    longitude: z.number().min(-180).max(180),
-    provider: itineraryTextSchema.optional(),
-    providerPlaceId: itineraryTextSchema.optional(),
-  })
-  .refine(
-    (place) => Boolean(place.provider) === Boolean(place.providerPlaceId),
-    {
-      message: 'Provider and provider place ID must be supplied together',
-      path: ['providerPlaceId'],
-    },
-  );
-
 export const itineraryActivityInputSchema = z
   .object({
     id: itineraryIdSchema,
@@ -59,7 +42,9 @@ export const itineraryActivityInputSchema = z
 
 export const itineraryVisitInputSchema = z.object({
   id: itineraryIdSchema,
-  place: itineraryPlaceInputSchema,
+  placeId: itineraryIdSchema.describe(
+    'Canonical internal place ID returned by searchPlaces',
+  ),
   activities: z.array(itineraryActivityInputSchema).min(1),
 });
 

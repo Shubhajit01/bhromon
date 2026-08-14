@@ -1,15 +1,17 @@
 export interface FetchAsJsonOptions {
+  cacheKey?: string;
   cacheTtlSeconds: number;
   signal?: AbortSignal;
 }
 
 export async function fetchAsJson<T>(
   url: string | URL,
-  { cacheTtlSeconds, signal }: FetchAsJsonOptions,
+  { cacheKey, cacheTtlSeconds, signal }: FetchAsJsonOptions,
 ): Promise<T | null> {
   const response = await fetch(url, {
     signal,
     cf: {
+      ...(cacheKey ? { cacheKey } : {}),
       cacheTtlByStatus: {
         '200-299': cacheTtlSeconds,
         '400-599': -1,

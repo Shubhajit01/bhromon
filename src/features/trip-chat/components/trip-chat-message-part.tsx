@@ -85,6 +85,46 @@ export function TripChatMessagePart({
     );
   }
 
+  if (part.type === 'tool-searchPlaces' && !isUser) {
+    const isToolRunning =
+      part.state === 'input-streaming' || part.state === 'input-available';
+
+    return (
+      <div className="flex flex-wrap items-center gap-x-1 text-xs text-muted-foreground">
+        <Marker data-part-type="tool" className="w-auto gap-1">
+          <MarkerIcon>
+            <WrenchIcon />
+          </MarkerIcon>
+          <MarkerContent className={cn(isToolRunning && 'shimmer')}>
+            {getToolStatus(part.state, 'Search places')}
+          </MarkerContent>
+        </Marker>
+        {part.state === 'output-available' && part.output.available ? (
+          <span>
+            · Powered by{' '}
+            <a
+              href="https://www.geoapify.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2"
+            >
+              Geoapify
+            </a>{' '}
+            |{' '}
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2"
+            >
+              © OpenStreetMap contributors
+            </a>
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+
   if (isToolUIPart(part) && !isUser) {
     const isToolRunning =
       part.state === 'input-streaming' || part.state === 'input-available';
