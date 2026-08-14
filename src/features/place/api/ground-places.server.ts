@@ -1,15 +1,12 @@
 import { date } from '@formkit/tempo';
+import { and, eq, inArray } from 'drizzle-orm';
 
-import { db, place, placeExternalId, sql } from '#/db/db.server';
+import { db, place, placeExternalId } from '#/db/db.server';
 
 import type { PlaceSearchCandidate } from '../providers/geoapify';
 
 export interface GroundedPlace extends PlaceSearchCandidate {
-  placeId: string;
-}
-
-function getPlaceId(candidate: PlaceSearchCandidate) {
-  return `place:${candidate.provider}:${candidate.providerPlaceId}`;
+  placeId: number;
 }
 
 export async function groundPlaces(
@@ -20,47 +17,74 @@ export async function groundPlaces(
   }
 
   const updatedAt = date();
-  const groundedPlaces = candidates.map((candidate) => ({
-    ...candidate,
-    placeId: getPlaceId(candidate),
-  }));
+  const externalIds = [
+    ...new Set(candidates.map((candidate) => candidate.providerPlaceId)),
+  ];
+  const existingPlaces = await db
+    .select({
+      externalId: placeExternalId.externalId,
+      placeId: placeExternalId.placeId,
+    })
+    .from(placeExternalId)
+    .where(
+      and(
+        eq(placeExternalId.provider, 'geoapify'),
+        inArray(placeExternalId.externalId, externalIds),
+      ),
+    );
+  const placeIdByExternalId = new Map(
+    existingPlaces.map((record) => [record.externalId, record.placeId]),
+  );
 
-  await db.batch([
-    db
-      .insert(place)
-      .values(
-        groundedPlaces.map((candidate) => ({
-          id: candidate.placeId,
+  const groundedPlaces: Array<GroundedPlace> = [];
+
+  for (const candidate of candidates) {
+    const existingPlaceId = placeIdByExternalId.get(
+      candidate.providerPlaceId,
+    );
+
+    if (existingPlaceId !== undefined) {
+      await db
+        .update(place)
+        .set({
+          name: candidate.name,
+          address: candidate.address,
+          latitude: candidate.latitude,
+          longitude: candidate.longitude,
+          updatedAt,
+        })
+        .where(eq(place.id, existingPlaceId));
+      groundedPlaces.push({ ...candidate, placeId: existingPlaceId });
+      continue;
+    }
+
+    const insertedPlace = (
+      await db
+        .insert(place)
+        .values({
           name: candidate.name,
           address: candidate.address,
           latitude: candidate.latitude,
           longitude: candidate.longitude,
           createdAt: updatedAt,
           updatedAt,
-        })),
-      )
-      .onConflictDoUpdate({
-        target: place.id,
-        set: {
-          name: sql`excluded.name`,
-          address: sql`excluded.address`,
-          latitude: sql`excluded.latitude`,
-          longitude: sql`excluded.longitude`,
-          updatedAt,
-        },
-      }),
-    db
-      .insert(placeExternalId)
-      .values(
-        groundedPlaces.map((candidate) => ({
-          id: `place-external:${candidate.provider}:${candidate.providerPlaceId}`,
-          placeId: candidate.placeId,
-          provider: candidate.provider,
-          externalId: candidate.providerPlaceId,
-        })),
-      )
-      .onConflictDoNothing(),
-  ]);
+        })
+        .returning({ id: place.id })
+    ).at(0);
+
+    if (!insertedPlace) {
+      throw new Error(`Unable to ground place: ${candidate.name}`);
+    }
+
+    await db.insert(placeExternalId).values({
+      id: `place-external:${candidate.provider}:${candidate.providerPlaceId}`,
+      placeId: insertedPlace.id,
+      provider: candidate.provider,
+      externalId: candidate.providerPlaceId,
+    });
+    placeIdByExternalId.set(candidate.providerPlaceId, insertedPlace.id);
+    groundedPlaces.push({ ...candidate, placeId: insertedPlace.id });
+  }
 
   return groundedPlaces;
 }

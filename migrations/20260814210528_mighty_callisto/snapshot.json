@@ -1,7 +1,7 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "4a86601b-88a0-4a11-aff6-e02285b8c98a",
+  "id": "894ae6a3-7681-4077-ba12-2da22c689ed4",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -583,9 +583,9 @@
       "table": "itinerary_transition"
     },
     {
-      "type": "text",
+      "type": "integer",
       "notNull": false,
-      "autoincrement": false,
+      "autoincrement": true,
       "default": null,
       "generated": null,
       "name": "id",
@@ -663,7 +663,7 @@
       "table": "place_external_id"
     },
     {
-      "type": "text",
+      "type": "integer",
       "notNull": true,
       "autoincrement": false,
       "default": null,
@@ -723,7 +723,7 @@
       "table": "place_visit"
     },
     {
-      "type": "text",
+      "type": "integer",
       "notNull": true,
       "autoincrement": false,
       "default": null,

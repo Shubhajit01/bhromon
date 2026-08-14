@@ -156,7 +156,7 @@ export const itineraryDayHighlight = sqliteTable(
 export const place = sqliteTable(
   'place',
   {
-    id: text('id').primaryKey(),
+    id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
     address: text('address'),
     latitude: real('latitude').notNull(),
@@ -183,7 +183,7 @@ export const placeExternalId = sqliteTable(
   'place_external_id',
   {
     id: text('id').primaryKey(),
-    placeId: text('place_id')
+    placeId: integer('place_id')
       .notNull()
       .references(() => place.id, { onDelete: 'cascade' }),
     provider: text('provider').notNull(),
@@ -208,7 +208,7 @@ export const placeVisit = sqliteTable(
     id: text('id').primaryKey(),
     revisionId: text('revision_id').notNull(),
     dayId: text('day_id').notNull(),
-    placeId: text('place_id')
+    placeId: integer('place_id')
       .notNull()
       .references(() => place.id),
     sourceRef: text('source_ref').notNull(),

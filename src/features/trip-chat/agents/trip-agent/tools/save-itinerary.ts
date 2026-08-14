@@ -53,8 +53,15 @@ export function createSaveItineraryTool({
       );
 
       if (!response.ok) {
+        const responseBody: unknown = await response.json().catch(() => null);
+        const message = z
+          .object({ message: z.string().trim().min(1) })
+          .safeParse(responseBody);
+
         throw new Error(
-          `Itinerary could not be saved (${response.status} ${response.statusText})`,
+          message.success
+            ? message.data.message
+            : `Itinerary could not be saved (${response.status} ${response.statusText})`,
         );
       }
 

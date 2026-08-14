@@ -37,6 +37,13 @@ export const saveItineraryInputSchema = z.object({
 
 export type SaveItineraryInput = z.infer<typeof saveItineraryInputSchema>;
 
+export class UnresolvedItineraryPlacesError extends Error {
+  constructor(readonly placeIds: number[]) {
+    super(`Itinerary contains unresolved places: ${placeIds.join(', ')}`);
+    this.name = 'UnresolvedItineraryPlacesError';
+  }
+}
+
 export const saveItinerary = createServerFn({ method: 'POST' })
   .validator(saveItineraryInputSchema)
   .handler(async ({ data }) => {
@@ -82,9 +89,7 @@ export const saveItinerary = createServerFn({ method: 'POST' })
     );
 
     if (ungroundedPlaceIds.length > 0) {
-      throw new Error(
-        `Itinerary contains unresolved places: ${ungroundedPlaceIds.join(', ')}`,
-      );
+      throw new UnresolvedItineraryPlacesError(ungroundedPlaceIds);
     }
 
     const revisionId = ulid();

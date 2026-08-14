@@ -92,7 +92,7 @@ CREATE TABLE `itinerary_transition` (
 );
 --> statement-breakpoint
 CREATE TABLE `place` (
-	`id` text PRIMARY KEY,
+	`id` integer PRIMARY KEY AUTOINCREMENT,
 	`name` text NOT NULL,
 	`address` text,
 	`latitude` real NOT NULL,
@@ -105,7 +105,7 @@ CREATE TABLE `place` (
 --> statement-breakpoint
 CREATE TABLE `place_external_id` (
 	`id` text PRIMARY KEY,
-	`place_id` text NOT NULL,
+	`place_id` integer NOT NULL,
 	`provider` text NOT NULL,
 	`external_id` text NOT NULL,
 	CONSTRAINT `fk_place_external_id_place_id_place_id_fk` FOREIGN KEY (`place_id`) REFERENCES `place`(`id`) ON DELETE CASCADE
@@ -115,7 +115,7 @@ CREATE TABLE `place_visit` (
 	`id` text PRIMARY KEY,
 	`revision_id` text NOT NULL,
 	`day_id` text NOT NULL,
-	`place_id` text NOT NULL,
+	`place_id` integer NOT NULL,
 	`source_ref` text NOT NULL,
 	`sequence` integer NOT NULL,
 	CONSTRAINT `fk_place_visit_place_id_place_id_fk` FOREIGN KEY (`place_id`) REFERENCES `place`(`id`),

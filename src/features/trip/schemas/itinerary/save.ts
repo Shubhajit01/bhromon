@@ -42,7 +42,7 @@ export const itineraryActivityInputSchema = z
 
 export const itineraryVisitInputSchema = z.object({
   id: itineraryIdSchema,
-  placeId: itineraryIdSchema.describe(
+  placeId: z.number().int().positive().describe(
     'Canonical internal place ID returned by searchPlaces',
   ),
   activities: z.array(itineraryActivityInputSchema).min(1),
