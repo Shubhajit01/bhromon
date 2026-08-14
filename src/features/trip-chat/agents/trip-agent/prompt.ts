@@ -13,7 +13,6 @@ export function createTripAgentSystemPrompt(userTimeZone: string) {
   const saveItineraryExample = JSON.stringify(
     {
       itinerary: {
-        schemaVersion: 1,
         destinationTimeZone: 'Asia/Tokyo',
         days: [
           {
@@ -23,29 +22,42 @@ export function createTripAgentSystemPrompt(userTimeZone: string) {
             title: 'Old Tokyo and evening views',
             summary: 'A relaxed first day around Asakusa and Tokyo Skytree.',
             highlights: ['Senso-ji', 'Tokyo Skytree'],
-            items: [
+            visits: [
               {
                 id: 'day-1-sensoji',
-                startTime: '09:00',
-                endTime: '11:00',
-                title: 'Explore Senso-ji',
-                description: 'Visit the temple and browse Nakamise Street.',
-                location: {
+                place: {
                   name: 'Senso-ji',
                   address: '2 Chome-3-1 Asakusa, Taito City, Tokyo',
                   latitude: 35.7148,
                   longitude: 139.7967,
                 },
+                activities: [
+                  {
+                    id: 'day-1-sensoji-explore',
+                    category: 'attraction',
+                    startTime: '09:00',
+                    endTime: '11:00',
+                    title: 'Explore Senso-ji',
+                    description:
+                      'Visit the temple and browse Nakamise Street.',
+                  },
+                ],
               },
               {
                 id: 'day-1-skytree',
-                timeLabel: 'Early evening',
-                title: 'See the city from Tokyo Skytree',
-                location: {
+                place: {
                   name: 'Tokyo Skytree',
                   latitude: 35.7101,
                   longitude: 139.8107,
                 },
+                activities: [
+                  {
+                    id: 'day-1-skytree-view',
+                    category: 'attraction',
+                    timeLabel: 'Early evening',
+                    title: 'See the city from Tokyo Skytree',
+                  },
+                ],
               },
             ],
           },
@@ -97,10 +109,11 @@ ${travellerTimeContext}
 
 <save-itinerary-format>
 Before calling saveItinerary, check the entire input against these requirements:
-- The top level contains itinerary. The itinerary contains schemaVersion: 1 and at least one day.
-- Every day contains a unique non-empty id, sequential dayNumber starting at 1, title, summary, at least one highlight, and at least one item. Include date as YYYY-MM-DD whenever dates are known.
-- Every item contains a unique non-empty id, title, and location. Every location contains name, numeric latitude, and numeric longitude; address is optional.
-- Every item contains either startTime or timeLabel. Use startTime and endTime only as zero-padded 24-hour local times in HH:mm format: use "09:00" or "17:30", never "9:00 AM", "5:30 PM", or an ISO date-time. If timing is flexible, omit startTime and endTime and use a phrase such as "Morning" in timeLabel. Never provide endTime without startTime.
+- The top level contains itinerary, and the itinerary contains at least one day.
+- Every day contains a unique non-empty id, sequential dayNumber starting at 1, title, summary, at least one highlight, and at least one visit. Include date as YYYY-MM-DD whenever dates are known.
+- Every visit contains a unique non-empty id, one place, and at least one activity. Every place contains name, numeric latitude, and numeric longitude; address is optional. Include provider and providerPlaceId together when the place was resolved by a Places provider.
+- Every activity contains a globally unique non-empty id and a title. Use category to distinguish attractions, meals, rest, accommodation, shopping, and other planned experiences.
+- Every activity contains either startTime or timeLabel. Use startTime and endTime only as zero-padded 24-hour local times in HH:mm format: use "09:00" or "17:30", never "9:00 AM", "5:30 PM", or an ISO date-time. If timing is flexible, omit startTime and endTime and use a phrase such as "Morning" in timeLabel. Never provide endTime without startTime.
 - Use destinationTimeZone only when known, and format it as an IANA time zone such as "Asia/Tokyo".
 - Do not include status in the tool input. A successful approved save is confirmed by the server.
 

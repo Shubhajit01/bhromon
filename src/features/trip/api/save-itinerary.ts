@@ -5,16 +5,30 @@ import { date } from '@formkit/tempo';
 import { ulid } from 'ulid';
 import { z } from 'zod';
 
-import { and, db, eq, itineraryRevision, or, sql, trip } from '#/db/db.server';
+import {
+  and,
+  db,
+  eq,
+  itineraryActivity,
+  itineraryDay,
+  itineraryDayHighlight,
+  itineraryRevision,
+  or,
+  place,
+  placeExternalId,
+  placeVisit,
+  sql,
+  trip,
+} from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 
-import { itinerarySchema } from '../schemas/itinerary/schema';
+import { itinerarySaveSchema } from '../schemas/itinerary/save';
 import { useInvalidateTrip } from './get-trip';
 import { useInvalidateTrips } from './get-trips';
 
 export const saveItineraryInputSchema = z.object({
   tripId: z.string().trim().min(1),
-  itinerary: itinerarySchema,
+  itinerary: itinerarySaveSchema,
 });
 
 export type SaveItineraryInput = z.infer<typeof saveItineraryInputSchema>;
@@ -48,6 +62,94 @@ export const saveItinerary = createServerFn({ method: 'POST' })
       where ${itineraryRevision.tripId} = ${data.tripId}
     )`;
 
+    const dayRecords: Array<typeof itineraryDay.$inferInsert> = [];
+    const highlightRecords: Array<typeof itineraryDayHighlight.$inferInsert> =
+      [];
+    const visitRecords: Array<typeof placeVisit.$inferInsert> = [];
+    const activityRecords: Array<typeof itineraryActivity.$inferInsert> = [];
+    const placeRecordsById = new Map<string, typeof place.$inferInsert>();
+    const placeExternalIdRecordsById = new Map<
+      string,
+      typeof placeExternalId.$inferInsert
+    >();
+
+    for (const itineraryDayInput of data.itinerary.days) {
+      const dayId = ulid();
+
+      dayRecords.push({
+        id: dayId,
+        revisionId,
+        sourceRef: itineraryDayInput.id,
+        dayNumber: itineraryDayInput.dayNumber,
+        date: itineraryDayInput.date,
+        title: itineraryDayInput.title,
+        summary: itineraryDayInput.summary,
+      });
+
+      itineraryDayInput.highlights.forEach((highlight, highlightIndex) => {
+        highlightRecords.push({
+          id: ulid(),
+          dayId,
+          position: highlightIndex + 1,
+          text: highlight,
+        });
+      });
+
+      itineraryDayInput.visits.forEach((visit, visitIndex) => {
+        const visitId = ulid();
+        const { provider, providerPlaceId } = visit.place;
+        const externalIdentity = provider
+          ? `${provider}:${providerPlaceId}`
+          : undefined;
+        const placeId = externalIdentity ? `place:${externalIdentity}` : ulid();
+
+        placeRecordsById.set(placeId, {
+          id: placeId,
+          name: visit.place.name,
+          address: visit.place.address,
+          latitude: visit.place.latitude,
+          longitude: visit.place.longitude,
+          createdAt: confirmedAt,
+          updatedAt: confirmedAt,
+        });
+        if (externalIdentity && provider && providerPlaceId) {
+          placeExternalIdRecordsById.set(externalIdentity, {
+            id: `place-external:${externalIdentity}`,
+            placeId,
+            provider,
+            externalId: providerPlaceId,
+          });
+        }
+        visitRecords.push({
+          id: visitId,
+          revisionId,
+          dayId,
+          placeId,
+          sourceRef: visit.id,
+          sequence: visitIndex + 1,
+        });
+
+        visit.activities.forEach((activity, activityIndex) => {
+          activityRecords.push({
+            id: ulid(),
+            revisionId,
+            visitId,
+            sourceRef: activity.id,
+            position: activityIndex + 1,
+            category: activity.category,
+            startTime: activity.startTime,
+            endTime: activity.endTime,
+            timeLabel: activity.timeLabel,
+            title: activity.title,
+            description: activity.description,
+          });
+        });
+      });
+    }
+
+    const placeRecords = [...placeRecordsById.values()];
+    const placeExternalIdRecords = [...placeExternalIdRecordsById.values()];
+
     const [, revisions] = await db.batch([
       db
         .update(itineraryRevision)
@@ -68,7 +170,8 @@ export const saveItinerary = createServerFn({ method: 'POST' })
           tripId: data.tripId,
           revisionNumber: nextRevisionNumber,
           status: 'confirmed',
-          content: data.itinerary,
+          destinationTimeZone: data.itinerary.destinationTimeZone,
+          createdAt: confirmedAt,
           confirmedAt,
         })
         .returning({
@@ -77,6 +180,31 @@ export const saveItinerary = createServerFn({ method: 'POST' })
           status: itineraryRevision.status,
           createdAt: itineraryRevision.createdAt,
         }),
+      db
+        .insert(place)
+        .values(placeRecords)
+        .onConflictDoUpdate({
+          target: place.id,
+          set: {
+            name: sql`excluded.name`,
+            address: sql`excluded.address`,
+            latitude: sql`excluded.latitude`,
+            longitude: sql`excluded.longitude`,
+            updatedAt: confirmedAt,
+          },
+        }),
+      ...(placeExternalIdRecords.length > 0
+        ? [
+            db
+              .insert(placeExternalId)
+              .values(placeExternalIdRecords)
+              .onConflictDoNothing(),
+          ]
+        : []),
+      db.insert(itineraryDay).values(dayRecords),
+      db.insert(itineraryDayHighlight).values(highlightRecords),
+      db.insert(placeVisit).values(visitRecords),
+      db.insert(itineraryActivity).values(activityRecords),
       db
         .update(trip)
         .set({ status: 'confirmed', updatedAt: confirmedAt })

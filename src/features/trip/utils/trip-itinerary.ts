@@ -28,8 +28,12 @@ export function getCurrentItineraryRevision(
   );
 }
 
-export function formatItineraryDateRange(dates: Array<string | undefined>) {
-  const completeDates = dates.filter((date): date is string => Boolean(date));
+export function formatItineraryDateRange(
+  dates: Array<string | null | undefined>,
+) {
+  const completeDates = dates.filter(
+    (date): date is string => typeof date === 'string',
+  );
 
   if (completeDates.length !== dates.length || completeDates.length === 0) {
     return undefined;

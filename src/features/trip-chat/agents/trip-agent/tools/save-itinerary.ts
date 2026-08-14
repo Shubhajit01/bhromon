@@ -6,10 +6,10 @@ import { z } from 'zod';
 
 import type { UIToolInvocation } from 'ai';
 
-import { itinerarySchema } from '#/features/trip/schemas/itinerary/schema';
+import { itinerarySaveSchema } from '#/features/trip/schemas/itinerary/save';
 
 export const saveItineraryToolInputSchema = z.object({
-  itinerary: itinerarySchema.describe(
+  itinerary: itinerarySaveSchema.describe(
     'The complete, traveller-confirmed itinerary. Preserve every agreed day, highlight, time, and location.',
   ),
 });

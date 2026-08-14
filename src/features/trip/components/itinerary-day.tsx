@@ -13,10 +13,11 @@ import { Collapsible, CollapsibleContent } from '#/components/ui/collapsible';
 import { Separator } from '#/components/ui/separator';
 import { getUserDate, getUserTimeZone } from '#/utils/user-time-zone';
 
-import type { ItineraryV1 } from '../schemas/itinerary/v1';
+import type {
+  ItineraryActivity,
+  ItineraryDay as ItineraryDayData,
+} from '../schemas/itinerary/read';
 
-type ItineraryDayData = ItineraryV1['days'][number];
-type ItineraryItem = ItineraryDayData['items'][number];
 
 interface ItineraryDayProps {
   day: ItineraryDayData;
@@ -80,9 +81,11 @@ export function ItineraryDay({ day }: ItineraryDayProps) {
           </Button>
           <CollapsibleContent>
             <ol>
-              {day.items.map((item) => (
-                <ItineraryStop key={item.id} item={item} />
-              ))}
+              {day.visits.flatMap((visit) =>
+                visit.activities.map((activity) => (
+                  <ItineraryStop key={activity.id} activity={activity} />
+                )),
+              )}
             </ol>
           </CollapsibleContent>
         </Collapsible>
@@ -91,18 +94,20 @@ export function ItineraryDay({ day }: ItineraryDayProps) {
   );
 }
 
-function ItineraryStop({ item }: { item: ItineraryItem }) {
+function ItineraryStop({ activity }: { activity: ItineraryActivity }) {
   return (
     <li className="flex gap-4 items-start not-last:border-b border-foreground/5 px-4">
       <p className="pt-4 text-sm font-medium tabular-nums text-muted-foreground w-22 shrink-0">
-        {formatItemTime(item)}
+        {formatActivityTime(activity)}
       </p>
       <Separator orientation="vertical" className="bg-foreground/5" />
       <div className="min-w-0 py-3">
-        <h3 className="text-base font-medium tracking-tight">{item.title}</h3>
-        {item.description ? (
+        <h3 className="text-base font-medium tracking-tight">
+          {activity.title}
+        </h3>
+        {activity.description ? (
           <p className="text-balance leading-tight text-sm/6 text-muted-foreground -mt-0.5">
-            {item.description}
+            {activity.description}
           </p>
         ) : null}
       </div>
@@ -110,16 +115,16 @@ function ItineraryStop({ item }: { item: ItineraryItem }) {
   );
 }
 
-function formatItemTime(item: ItineraryItem) {
-  if (!item.startTime) {
-    return item.timeLabel;
+function formatActivityTime(activity: ItineraryActivity) {
+  if (!activity.startTime) {
+    return activity.timeLabel;
   }
 
-  if (!item.endTime) {
-    return item.startTime;
+  if (!activity.endTime) {
+    return activity.startTime;
   }
 
-  return `${item.startTime}–${item.endTime}`;
+  return `${activity.startTime}–${activity.endTime}`;
 }
 
 function formatDayDate(date: string) {

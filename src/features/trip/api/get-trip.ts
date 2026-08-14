@@ -16,7 +16,7 @@ import { db } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
 
 import { TripNotFoundError } from '../errors/trip-not-found-error';
-import { itineraryV1Schema } from '../schemas/itinerary/v1';
+import { tripReadSchema } from '../schemas/itinerary/read';
 
 export const getTripInputSchema = z.object({
   tripId: z.string(),
@@ -44,7 +44,30 @@ export const getTrip = createServerFn({ method: 'GET' })
         status: true,
       },
       with: {
-        itineraryRevisions: true,
+        itineraryRevisions: {
+          with: {
+            days: {
+              with: {
+                highlights: true,
+                visits: {
+                  with: {
+                    activities: true,
+                    place: {
+                      with: {
+                        externalIds: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            transitions: {
+              with: {
+                legs: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -52,13 +75,96 @@ export const getTrip = createServerFn({ method: 'GET' })
       throw new TripNotFoundError();
     }
 
-    return {
-      ...tripRecord,
-      itineraryRevisions: tripRecord.itineraryRevisions.map((it) => ({
-        ...it,
-        content: itineraryV1Schema.parse(it.content),
-      })),
-    };
+    return tripReadSchema.parse({
+      id: tripRecord.id,
+      title: tripRecord.title,
+      status: tripRecord.status,
+      itineraryRevisions: tripRecord.itineraryRevisions.map((revision) => {
+        return {
+          id: revision.id,
+          tripId: revision.tripId,
+          revisionNumber: revision.revisionNumber,
+          status: revision.status,
+          destinationTimeZone: revision.destinationTimeZone,
+          createdAt: revision.createdAt,
+          confirmedAt: revision.confirmedAt,
+          days: [...revision.days]
+            .sort((left, right) => left.dayNumber - right.dayNumber)
+            .map((day) => ({
+              id: day.id,
+              dayNumber: day.dayNumber,
+              date: day.date,
+              title: day.title,
+              summary: day.summary,
+              highlights: [...day.highlights]
+                .sort((left, right) => left.position - right.position)
+                .map((highlight) => highlight.text),
+              visits: [...day.visits]
+                .sort((left, right) => left.sequence - right.sequence)
+                .map((visit) => ({
+                  id: visit.id,
+                  sequence: visit.sequence,
+                  place: {
+                    id: visit.place.id,
+                    name: visit.place.name,
+                    address: visit.place.address,
+                    latitude: visit.place.latitude,
+                    longitude: visit.place.longitude,
+                    externalIds: [...visit.place.externalIds]
+                      .sort((left, right) =>
+                        left.provider.localeCompare(right.provider),
+                      )
+                      .map((externalId) => ({
+                        provider: externalId.provider,
+                        externalId: externalId.externalId,
+                      })),
+                  },
+                  activities: [...visit.activities]
+                    .sort((left, right) => left.position - right.position)
+                    .map((activity) => ({
+                      id: activity.id,
+                      position: activity.position,
+                      category: activity.category,
+                      startTime: activity.startTime,
+                      endTime: activity.endTime,
+                      timeLabel: activity.timeLabel,
+                      title: activity.title,
+                      description: activity.description,
+                    })),
+                })),
+            })),
+          transitions: [...revision.transitions]
+            .sort((left, right) => left.sequence - right.sequence)
+            .map((transition) => ({
+              id: transition.id,
+              originVisitId: transition.originVisitId,
+              destinationVisitId: transition.destinationVisitId,
+              sequence: transition.sequence,
+              status: transition.status,
+              primaryMode: transition.primaryMode,
+              distanceMeters: transition.distanceMeters,
+              durationSeconds: transition.durationSeconds,
+              provider: transition.provider,
+              providerRouteId: transition.providerRouteId,
+              encodedPolyline: transition.encodedPolyline,
+              legs: [...transition.legs]
+                .sort((left, right) => left.sequence - right.sequence)
+                .map((leg) => ({
+                  id: leg.id,
+                  sequence: leg.sequence,
+                  mode: leg.mode,
+                  fromLabel: leg.fromLabel,
+                  toLabel: leg.toLabel,
+                  departureTime: leg.departureTime,
+                  arrivalTime: leg.arrivalTime,
+                  distanceMeters: leg.distanceMeters,
+                  durationSeconds: leg.durationSeconds,
+                  encodedPolyline: leg.encodedPolyline,
+                })),
+            })),
+        };
+      }),
+    });
   });
 
 export type Trip = NonNullable<Awaited<ReturnType<typeof getTrip>>>;

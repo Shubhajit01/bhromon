@@ -1,6 +1,11 @@
+import type { z } from 'zod';
+
 import { Button } from '#/components/ui/button';
+import { itinerarySaveSchema } from '#/features/trip/schemas/itinerary/save';
 
 import type { SaveItineraryToolInvocation } from '../agents/trip-agent/tools/save-itinerary';
+
+type ItinerarySaveInput = z.infer<typeof itinerarySaveSchema>;
 
 export interface TripChatToolApprovalResponse {
   approvalId: string;
@@ -13,9 +18,7 @@ interface SaveItineraryApprovalProps {
   isRetrying: boolean;
   invocation: SaveItineraryToolInvocation;
   onRespond: (response: TripChatToolApprovalResponse) => void;
-  onRetry: (
-    itinerary: SaveItineraryToolInvocation['input']['itinerary'],
-  ) => void;
+  onRetry: (itinerary: ItinerarySaveInput) => void;
   onKeepRefining: () => void;
 }
 
@@ -113,6 +116,10 @@ export function SaveItineraryApproval({
   }
 
   if (invocation.state === 'output-error') {
+    const retryInput = itinerarySaveSchema.safeParse(
+      invocation.input?.itinerary,
+    );
+
     return (
       <section className="mt-2 rounded-2xl border border-border bg-card p-4 shadow-sm">
         <p className="font-medium text-destructive">
@@ -124,7 +131,12 @@ export function SaveItineraryApproval({
         <div className="mt-4 flex flex-wrap gap-2">
           <Button
             isPending={isRetrying}
-            onPress={() => onRetry(invocation.input.itinerary)}
+            isDisabled={!retryInput.success}
+            onPress={() => {
+              if (retryInput.success) {
+                onRetry(retryInput.data);
+              }
+            }}
           >
             Try again
           </Button>

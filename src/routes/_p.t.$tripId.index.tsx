@@ -41,7 +41,7 @@ function RouteComponent() {
   const trip = useTrip({ tripId });
 
   const revision = getCurrentItineraryRevision(trip.itineraryRevisions);
-  const days = revision?.content.days;
+  const days = revision?.days;
   const dateRange = days
     ? formatItineraryDateRange(days.map((day) => day.date))
     : undefined;
