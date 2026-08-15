@@ -12,7 +12,7 @@
     {
       "binding": "DB",
       "database_name": "bhromon",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "8205077b-ec1c-4f00-8e71-65aa4d3730b1",
       "migrations_dir": "migrations",
       "migrations_pattern": "migrations/*/migration.sql",
     },
