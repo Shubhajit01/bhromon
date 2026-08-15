@@ -14,9 +14,12 @@ import { ANCHOR_KEYS } from '#/config/anchor-keys';
 import { COLLECTION } from '#/config/collection';
 import { db } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
+import { createLogger, elapsedMilliseconds } from '#/lib/logger';
 
 import { TripNotFoundError } from '../errors/trip-not-found-error';
 import { tripReadSchema } from '../schemas/itinerary/read';
+
+const logger = createLogger('trip-query');
 
 export const getTripInputSchema = z.object({
   tripId: z.string(),
@@ -27,9 +30,14 @@ export type GetTripInput = z.infer<typeof getTripInputSchema>;
 export const getTrip = createServerFn({ method: 'GET' })
   .validator(getTripInputSchema)
   .handler(async ({ data }) => {
+    const startedAt = performance.now();
+    logger.info('trip_query.started', { tripId: data.tripId });
     const user = await getCurrentUser();
 
     if (!user) {
+      logger.warn('trip_query.authentication_required', {
+        tripId: data.tripId,
+      });
       throw new Error('Authentication required to view trip');
     }
 
@@ -72,10 +80,14 @@ export const getTrip = createServerFn({ method: 'GET' })
     });
 
     if (!tripRecord) {
+      logger.warn('trip_query.not_found', {
+        durationMs: elapsedMilliseconds(startedAt),
+        tripId: data.tripId,
+      });
       throw new TripNotFoundError();
     }
 
-    return tripReadSchema.parse({
+    const result = tripReadSchema.parse({
       id: tripRecord.id,
       title: tripRecord.title,
       status: tripRecord.status,
@@ -165,6 +177,16 @@ export const getTrip = createServerFn({ method: 'GET' })
         };
       }),
     });
+
+    logger.info('trip_query.completed', {
+      confirmedRevisionCount: result.itineraryRevisions.filter(
+        (revision) => revision.status === 'confirmed',
+      ).length,
+      durationMs: elapsedMilliseconds(startedAt),
+      revisionCount: result.itineraryRevisions.length,
+      tripId: data.tripId,
+    });
+    return result;
   });
 
 export type Trip = NonNullable<Awaited<ReturnType<typeof getTrip>>>;

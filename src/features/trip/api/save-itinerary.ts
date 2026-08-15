@@ -24,11 +24,14 @@ import {
   trip,
 } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
+import { createLogger, elapsedMilliseconds } from '#/lib/logger';
 
 import { routeWithGeoapify } from '../providers/geoapify-routing.server';
 import { itinerarySaveSchema } from '../schemas/itinerary/save';
 import { useInvalidateTrip } from './get-trip';
 import { useInvalidateTrips } from './get-trips';
+
+const logger = createLogger('itinerary-save');
 
 export const saveItineraryInputSchema = z.object({
   tripId: z.string().trim().min(1),
@@ -47,9 +50,21 @@ export class UnresolvedItineraryPlacesError extends Error {
 export const saveItinerary = createServerFn({ method: 'POST' })
   .validator(saveItineraryInputSchema)
   .handler(async ({ data }) => {
+    const startedAt = performance.now();
+    logger.info('itinerary_save.started', {
+      dayCount: data.itinerary.days.length,
+      tripId: data.tripId,
+      visitCount: data.itinerary.days.reduce(
+        (count, day) => count + day.visits.length,
+        0,
+      ),
+    });
     const user = await getCurrentUser();
 
     if (!user) {
+      logger.warn('itinerary_save.authentication_required', {
+        tripId: data.tripId,
+      });
       throw new Error('Authentication required to save itinerary');
     }
 
@@ -62,6 +77,7 @@ export const saveItinerary = createServerFn({ method: 'POST' })
     ).at(0);
 
     if (!tripRecord) {
+      logger.warn('itinerary_save.trip_not_found', { tripId: data.tripId });
       throw new Error('Trip not found');
     }
 
@@ -89,6 +105,10 @@ export const saveItinerary = createServerFn({ method: 'POST' })
     );
 
     if (ungroundedPlaceIds.length > 0) {
+      logger.warn('itinerary_save.places_unresolved', {
+        tripId: data.tripId,
+        unresolvedPlaceCount: ungroundedPlaceIds.length,
+      });
       throw new UnresolvedItineraryPlacesError(ungroundedPlaceIds);
     }
 
@@ -255,8 +275,22 @@ export const saveItinerary = createServerFn({ method: 'POST' })
     const revision = revisions.at(0);
 
     if (!revision) {
+      logger.error(
+        'itinerary_save.revision_missing',
+        new Error('Itinerary revision was not saved'),
+        { tripId: data.tripId },
+      );
       throw new Error('Itinerary revision was not saved');
     }
+
+    logger.info('itinerary_save.revision_persisted', {
+      activityCount: activityRecords.length,
+      dayCount: dayRecords.length,
+      revisionId: revision.id,
+      transitionCount: transitionRecords.length,
+      tripId: data.tripId,
+      visitCount: visitRecords.length,
+    });
 
     const geoapifyApiKey = z
       .string()
@@ -293,10 +327,10 @@ export const saveItinerary = createServerFn({ method: 'POST' })
             .where(eq(itineraryTransition.id, transitionRecord.id));
         }
       } catch (error) {
-        console.warn(
-          'Itinerary routing failed; straight-line map legs will be used.',
-          error instanceof Error ? error.message : error,
-        );
+        logger.error('itinerary_save.routing_failed', error, {
+          transitionCount: routingDay.transitions.length,
+          tripId: data.tripId,
+        });
 
         for (const transitionRecord of routingDay.transitions) {
           await db
@@ -313,6 +347,12 @@ export const saveItinerary = createServerFn({ method: 'POST' })
       }
     }
 
+    logger.info('itinerary_save.completed', {
+      durationMs: elapsedMilliseconds(startedAt),
+      revisionId: revision.id,
+      routingDayCount: routingDays.length,
+      tripId: data.tripId,
+    });
     return revision;
   });
 
@@ -322,7 +362,24 @@ export function useSaveItinerary() {
   const invalidateTrips = useInvalidateTrips();
 
   return useMutation({
-    mutationFn: (data: SaveItineraryInput) => saveItineraryServerFn({ data }),
+    mutationFn: async (data: SaveItineraryInput) => {
+      const startedAt = performance.now();
+      logger.info('itinerary_save.client_started', { tripId: data.tripId });
+      try {
+        const result = await saveItineraryServerFn({ data });
+        logger.info('itinerary_save.client_completed', {
+          durationMs: elapsedMilliseconds(startedAt),
+          tripId: data.tripId,
+        });
+        return result;
+      } catch (error) {
+        logger.error('itinerary_save.client_failed', error, {
+          durationMs: elapsedMilliseconds(startedAt),
+          tripId: data.tripId,
+        });
+        throw error;
+      }
+    },
     onSuccess: (_, input) => {
       void invalidateTrip({ tripId: input.tripId });
       void invalidateTrips();

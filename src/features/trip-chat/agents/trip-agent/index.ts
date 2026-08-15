@@ -13,6 +13,7 @@ import { z } from 'zod';
 
 import type { Connection, ConnectionContext } from 'agents';
 
+import { createLogger, elapsedMilliseconds } from '#/lib/logger';
 import {
   getUserTimeZoneFromCookie,
   isSupportedTimeZone,
@@ -37,6 +38,9 @@ const tripAgentConnectionStateSchema = z.object({
 
 type TripAgentConnectionState = z.infer<typeof tripAgentConnectionStateSchema>;
 
+const logger = createLogger('trip-agent');
+const CHAT_MODEL = '@cf/zai-org/glm-4.7-flash';
+
 export class TripAgent extends AIChatAgent<Env, TripAgentState> {
   initialState: TripAgentState = { userTimeZone: null };
 
@@ -51,9 +55,39 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
       ...(authorization ? { authorization } : {}),
       ...(cookie ? { cookie } : {}),
     });
+
+    logger.info('trip_agent.connection.opened', {
+      connectionId: connection.id,
+      hasAuthorization: Boolean(authorization),
+      hasCookie: Boolean(cookie),
+      tripId: this.name,
+    });
+  }
+
+  onClose(
+    connection: Connection<TripAgentConnectionState>,
+    code: number,
+    reason: string,
+    wasClean: boolean,
+  ) {
+    logger.info('trip_agent.connection.closed', {
+      closeCode: code,
+      closeReason: reason,
+      connectionId: connection.id,
+      tripId: this.name,
+      wasClean,
+    });
   }
 
   async persistInitialPrompt(prompt: string, userTimeZone: string) {
+    const startedAt = performance.now();
+    logger.info('trip_agent.initial_prompt.started', {
+      existingMessageCount: this.messages.length,
+      promptLength: prompt.length,
+      tripId: this.name,
+      userTimeZone,
+    });
+
     this.setState({ userTimeZone });
 
     await this.persistMessages([
@@ -65,18 +99,50 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
       },
     ]);
 
-    void this.requestReply().catch((error: unknown) => {
-      console.error('Unable to generate the initial trip reply', error);
+    logger.info('trip_agent.initial_prompt.persisted', {
+      durationMs: elapsedMilliseconds(startedAt),
+      messageCount: this.messages.length,
+      tripId: this.name,
     });
+
+    void this.requestReply().catch((error: unknown) => {
+      logger.error('trip_agent.initial_reply.failed', error, {
+        tripId: this.name,
+      });
+    });
+
+    logger.info('trip_agent.initial_reply.scheduled', { tripId: this.name });
   }
 
   async requestReply() {
-    return this.saveMessages(this.messages);
+    const startedAt = performance.now();
+    logger.info('trip_agent.reply_request.started', {
+      messageCount: this.messages.length,
+      tripId: this.name,
+    });
+
+    try {
+      const result = await this.saveMessages(this.messages);
+      logger.info('trip_agent.reply_request.completed', {
+        durationMs: elapsedMilliseconds(startedAt),
+        messageCount: this.messages.length,
+        tripId: this.name,
+      });
+      return result;
+    } catch (error) {
+      logger.error('trip_agent.reply_request.failed', error, {
+        durationMs: elapsedMilliseconds(startedAt),
+        tripId: this.name,
+      });
+      throw error;
+    }
   }
 
   async onChatMessage(_onFinish: Parameters<AIChatAgent['onChatMessage']>[0]) {
+    const startedAt = performance.now();
+    const currentAgent = getCurrentAgent();
     const connectionState = tripAgentConnectionStateSchema.safeParse(
-      getCurrentAgent().connection?.state,
+      currentAgent.connection?.state,
     );
     const connectionCookie = connectionState.success
       ? connectionState.data.cookie
@@ -88,6 +154,19 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
       ? this.state.userTimeZone
       : null;
     const userTimeZone = connectionTimeZone ?? storedTimeZone ?? 'UTC';
+
+    logger.info('trip_agent.generation.started', {
+      connectionId: currentAgent.connection?.id,
+      messageCount: this.messages.length,
+      model: CHAT_MODEL,
+      timeZoneSource: connectionTimeZone
+        ? 'connection'
+        : storedTimeZone
+          ? 'stored'
+          : 'default',
+      tripId: this.name,
+      userTimeZone,
+    });
 
     if (connectionTimeZone && connectionTimeZone !== storedTimeZone) {
       this.setState({ userTimeZone: connectionTimeZone });
@@ -102,12 +181,35 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
     let reasoningStartedAt: string | undefined;
     const result = streamText({
       reasoning: 'medium',
-      model: workersAI('@cf/zai-org/glm-4.7-flash'),
+      model: workersAI(CHAT_MODEL),
       instructions: createTripAgentSystemPrompt(userTimeZone),
       messages: await convertToModelMessages(this.messages),
       tools,
       toolApproval: { saveItinerary: 'user-approval' },
       stopWhen: isStepCount(3),
+      onAbort: ({ steps }) => {
+        logger.warn('trip_agent.generation.aborted', {
+          durationMs: elapsedMilliseconds(startedAt),
+          stepCount: steps.length,
+          tripId: this.name,
+        });
+      },
+      onError: ({ error }) => {
+        logger.error('trip_agent.generation.stream_failed', error, {
+          durationMs: elapsedMilliseconds(startedAt),
+          tripId: this.name,
+        });
+      },
+      onFinish: ({ finishReason, stepNumber, usage }) => {
+        logger.info('trip_agent.generation.completed', {
+          durationMs: elapsedMilliseconds(startedAt),
+          finishReason,
+          inputTokens: usage.inputTokens,
+          outputTokens: usage.outputTokens,
+          stepCount: stepNumber + 1,
+          tripId: this.name,
+        });
+      },
     });
 
     return createUIMessageStreamResponse({

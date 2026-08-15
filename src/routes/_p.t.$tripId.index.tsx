@@ -24,12 +24,24 @@ import {
   formatItineraryDateRange,
   getCurrentItineraryRevision,
 } from '#/features/trip/utils/trip-itinerary';
+import { createLogger, elapsedMilliseconds } from '#/lib/logger';
 import { seo } from '#/lib/seo';
+
+const logger = createLogger('trip-detail-route');
 
 export const Route = createFileRoute('/_p/t/$tripId/')({
   component: RouteComponent,
   async loader({ context, params }) {
+    const startedAt = performance.now();
+    logger.info('trip_detail_route.loader_started', { tripId: params.tripId });
     const trip = await loadTrip(context.queryClient, { tripId: params.tripId });
+    logger.info('trip_detail_route.loader_completed', {
+      confirmedRevisionCount: trip.itineraryRevisions.filter(
+        (revision) => revision.status === 'confirmed',
+      ).length,
+      durationMs: elapsedMilliseconds(startedAt),
+      tripId: params.tripId,
+    });
     return { trip };
   },
   head: ({ loaderData }) => ({

@@ -13,6 +13,9 @@ import { z } from 'zod';
 import { ANCHOR_KEYS } from '#/config/anchor-keys';
 import { COLLECTION } from '#/config/collection';
 import { getAuthorizedTripAgent } from '#/features/trip-chat/agents/trip-agent/require-trip-agent-access.server';
+import { createLogger, elapsedMilliseconds } from '#/lib/logger';
+
+const logger = createLogger('trip-messages');
 
 export const getTripMessagesInputSchema = z.object({
   tripId: z.string(),
@@ -23,12 +26,20 @@ export type GetTripMessagesInput = z.infer<typeof getTripMessagesInputSchema>;
 export const getTripMessages = createServerFn({ method: 'GET' })
   .validator(getTripMessagesInputSchema)
   .handler(async ({ data }) => {
+    const startedAt = performance.now();
+    logger.info('trip_messages.load_started', { tripId: data.tripId });
     const agent = await getAuthorizedTripAgent({
       headers: getRequestHeaders(),
       tripId: data.tripId,
     });
     // @ts-ignore TODO: Check once
-    return agent.getMessages() as any;
+    const messages = agent.getMessages() as any;
+    logger.info('trip_messages.load_completed', {
+      durationMs: elapsedMilliseconds(startedAt),
+      messageCount: Array.isArray(messages) ? messages.length : undefined,
+      tripId: data.tripId,
+    });
+    return messages;
   });
 
 export const getTripMessagesQueryOptions = (input: GetTripMessagesInput) =>
