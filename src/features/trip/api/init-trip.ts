@@ -1,24 +1,22 @@
 import { useMutation } from '@tanstack/react-query';
-import { redirect } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { createServerFn, useServerFn } from '@tanstack/react-start';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 
 import { ulid } from 'ulid';
 import { z } from 'zod';
 
-import { db, trip } from '#/db/db.server';
+import { db, eq, trip } from '#/db/db.server';
 import { getCurrentUser } from '#/features/auth/api/get-current-user';
-import {
-  getUserLimits,
-  useInvalidateUserLimits,
-} from '#/features/auth/api/get-user-limits';
+import { useInvalidateUserLimits } from '#/features/auth/api/get-user-limits';
+import { getUserLimitsImplementation } from '#/features/auth/api/get-user-limits.server';
 import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
 import { getAuthorizedTripAgent } from '#/features/trip-chat/agents/trip-agent/require-trip-agent-access.server';
 import { createLogger, elapsedMilliseconds } from '#/lib/logger';
 import { getUserTimeZone } from '#/utils/user-time-zone';
 
 import { GuestTripLimitError } from '../errors/guest-trip-limit-error';
-import { generateTripTitle } from './generate-trip-title';
+import { generateTripTitle } from './generate-trip-title.server';
 import { useInvalidateTrips } from './get-trips';
 
 export const MIN_PROMPT_LENGTH = 50;
@@ -51,7 +49,7 @@ export const initTrip = createServerFn({ method: 'POST' })
       throw new Error('Authentication required to create a trip');
     }
 
-    const userLimits = await getUserLimits();
+    const userLimits = await getUserLimitsImplementation();
 
     if (userLimits.savedTrips && !userLimits.savedTrips.canCreate) {
       logger.warn('trip_init.guest_limit_reached', {
@@ -63,28 +61,26 @@ export const initTrip = createServerFn({ method: 'POST' })
     const id = ulid();
 
     const title = await getTripTitle(data.prompt, data.diagnosticId);
-    logger.info('trip_init.title_resolved', {
-      diagnosticId: data.diagnosticId,
-      titleLength: title.length,
-      tripId: id,
-    });
-
     await db.insert(trip).values({
       id,
       userId: user.id,
       title,
       status: 'draft',
     });
-    logger.info('trip_init.trip_persisted', {
-      diagnosticId: data.diagnosticId,
-      tripId: id,
-    });
-
-    const tripAgent = await getAuthorizedTripAgent({
-      headers: getRequestHeaders(),
-      tripId: id,
-    });
-    await tripAgent.persistInitialPrompt(data.prompt, getUserTimeZone());
+    try {
+      const tripAgent = await getAuthorizedTripAgent({
+        headers: getRequestHeaders(),
+        tripId: id,
+      });
+      await tripAgent.persistInitialPrompt(data.prompt, getUserTimeZone());
+    } catch (error) {
+      await db.delete(trip).where(eq(trip.id, id));
+      logger.error('trip_init.rolled_back', error, {
+        diagnosticId: data.diagnosticId,
+        tripId: id,
+      });
+      throw error;
+    }
 
     logger.info('trip_init.completed', {
       diagnosticId: data.diagnosticId,
@@ -92,12 +88,12 @@ export const initTrip = createServerFn({ method: 'POST' })
       tripId: id,
     });
 
-    throw redirect({ to: '/t/$tripId/chat', params: { tripId: id } });
+    return { tripId: id };
   });
 
 async function getTripTitle(prompt: string, diagnosticId?: string) {
   try {
-    const title = await generateTripTitle({ data: { diagnosticId, prompt } });
+    const title = await generateTripTitle({ diagnosticId, prompt });
 
     if (title.trim()) {
       return title.trim();
@@ -126,6 +122,7 @@ function getFallbackTripTitle(prompt: string) {
 export function useInitTrip() {
   const initAuthSession = useInitAuthSession();
   const initTripServerFn = useServerFn(initTrip);
+  const navigate = useNavigate();
 
   const invalidateTrips = useInvalidateTrips();
   const invalidateUserLimits = useInvalidateUserLimits();
@@ -156,9 +153,10 @@ export function useInitTrip() {
         throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: ({ tripId }) => {
       void invalidateTrips();
       void invalidateUserLimits();
+      return navigate({ to: '/t/$tripId/chat', params: { tripId } });
     },
   });
 }

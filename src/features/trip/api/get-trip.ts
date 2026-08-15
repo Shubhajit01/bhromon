@@ -31,7 +31,6 @@ export const getTrip = createServerFn({ method: 'GET' })
   .validator(getTripInputSchema)
   .handler(async ({ data }) => {
     const startedAt = performance.now();
-    logger.info('trip_query.started', { tripId: data.tripId });
     const user = await getCurrentUser();
 
     if (!user) {
@@ -178,14 +177,6 @@ export const getTrip = createServerFn({ method: 'GET' })
       }),
     });
 
-    logger.info('trip_query.completed', {
-      confirmedRevisionCount: result.itineraryRevisions.filter(
-        (revision) => revision.status === 'confirmed',
-      ).length,
-      durationMs: elapsedMilliseconds(startedAt),
-      revisionCount: result.itineraryRevisions.length,
-      tripId: data.tripId,
-    });
     return result;
   });
 

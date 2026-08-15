@@ -21,6 +21,7 @@ interface AgentLobby {
 }
 
 const logger = createLogger('server');
+const SLOW_REQUEST_THRESHOLD_MS = 1_000;
 
 async function authorizeTripAgentRequest(request: Request, lobby: AgentLobby) {
   if (lobby.className !== 'TripAgent') {
@@ -31,10 +32,6 @@ async function authorizeTripAgentRequest(request: Request, lobby: AgentLobby) {
   try {
     await requireTripAgentAccess({
       headers: request.headers,
-      tripId: lobby.name,
-    });
-    logger.info('server.agent_authorization.allowed', {
-      durationMs: elapsedMilliseconds(startedAt),
       tripId: lobby.name,
     });
   } catch (error) {
@@ -67,24 +64,10 @@ export default {
 
     const timeZoneFallbackResponse = getTimeZoneFallbackResponse(request);
 
-    if (timeZoneFallbackResponse) {
-      logger.info('server.request.completed', {
-        ...requestFields,
-        durationMs: elapsedMilliseconds(startedAt),
-        handler: 'timezone-fallback',
-        status: timeZoneFallbackResponse.status,
-      });
-      return timeZoneFallbackResponse;
-    }
+    if (timeZoneFallbackResponse) return timeZoneFallbackResponse;
 
     if (needsTimeZoneCookie(request)) {
       const response = getTimeZoneBootstrapResponse();
-      logger.info('server.request.completed', {
-        ...requestFields,
-        durationMs: elapsedMilliseconds(startedAt),
-        handler: 'timezone-bootstrap',
-        status: response.status,
-      });
       return response;
     }
 
@@ -96,12 +79,15 @@ export default {
       const handler = agentResponse ? 'agent' : 'tanstack-start';
       const response = agentResponse ?? (await startServer.fetch(request));
 
-      logger.info('server.request.completed', {
-        ...requestFields,
-        durationMs: elapsedMilliseconds(startedAt),
-        handler,
-        status: response.status,
-      });
+      const durationMs = elapsedMilliseconds(startedAt);
+      if (durationMs >= SLOW_REQUEST_THRESHOLD_MS || response.status >= 400) {
+        logger.info('server.request.completed', {
+          ...requestFields,
+          durationMs,
+          handler,
+          status: response.status,
+        });
+      }
       return response;
     } catch (error) {
       logger.error('server.request.failed', error, {

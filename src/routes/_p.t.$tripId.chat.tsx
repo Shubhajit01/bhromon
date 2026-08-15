@@ -9,26 +9,17 @@ import { AnonymousUserBanner } from '#/features/auth/components/anonymous-user-b
 import { CurrentUserAvatar } from '#/features/auth/components/current-user-avatar';
 import { SiteDialogLink } from '#/features/site/components/site-dialog';
 import { loadTrip, useTrip } from '#/features/trip/api/get-trip';
-import { loadTripMessages } from '#/features/trip-chat/api/get-trip-messages';
+import { refreshTripMessages } from '#/features/trip-chat/api/get-trip-messages';
 import { TripChat } from '#/features/trip-chat/components/trip-chat';
-import { createLogger, elapsedMilliseconds } from '#/lib/logger';
 import { seo } from '#/lib/seo';
-
-const logger = createLogger('trip-chat-route');
 
 export const Route = createFileRoute('/_p/t/$tripId/chat')({
   component: Trip,
   async loader({ params, context }) {
-    const startedAt = performance.now();
-    logger.info('trip_chat_route.loader_started', { tripId: params.tripId });
     const [trip] = await Promise.all([
       loadTrip(context.queryClient, { tripId: params.tripId }),
-      loadTripMessages(context.queryClient, { tripId: params.tripId }),
+      refreshTripMessages(context.queryClient, { tripId: params.tripId }),
     ]);
-    logger.info('trip_chat_route.loader_completed', {
-      durationMs: elapsedMilliseconds(startedAt),
-      tripId: params.tripId,
-    });
     return { trip };
   },
   head: ({ loaderData }) => ({

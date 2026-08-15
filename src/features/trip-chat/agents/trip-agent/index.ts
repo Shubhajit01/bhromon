@@ -55,13 +55,6 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
       ...(authorization ? { authorization } : {}),
       ...(cookie ? { cookie } : {}),
     });
-
-    logger.info('trip_agent.connection.opened', {
-      connectionId: connection.id,
-      hasAuthorization: Boolean(authorization),
-      hasCookie: Boolean(cookie),
-      tripId: this.name,
-    });
   }
 
   onClose(
@@ -70,12 +63,13 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
     reason: string,
     wasClean: boolean,
   ) {
-    logger.info('trip_agent.connection.closed', {
+    if (wasClean) return;
+
+    logger.warn('trip_agent.connection.closed_abnormally', {
       closeCode: code,
       closeReason: reason,
       connectionId: connection.id,
       tripId: this.name,
-      wasClean,
     });
   }
 
@@ -104,33 +98,39 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
       messageCount: this.messages.length,
       tripId: this.name,
     });
-
-    void this.requestReply().catch((error: unknown) => {
-      logger.error('trip_agent.initial_reply.failed', error, {
-        tripId: this.name,
-      });
-    });
-
-    logger.info('trip_agent.initial_reply.scheduled', { tripId: this.name });
   }
 
-  async requestReply() {
+  async ensureInitialReply() {
+    const isStable = await this.waitUntilStable({ timeout: 30_000 });
+
+    if (!isStable) {
+      logger.warn('trip_agent.initial_reply.wait_timed_out', {
+        tripId: this.name,
+      });
+      return 'skipped' as const;
+    }
+
+    if (this.messages.length !== 1 || this.messages[0]?.role !== 'user') {
+      return 'skipped' as const;
+    }
+
     const startedAt = performance.now();
-    logger.info('trip_agent.reply_request.started', {
+    logger.info('trip_agent.initial_reply.started', {
       messageCount: this.messages.length,
       tripId: this.name,
     });
 
     try {
       const result = await this.saveMessages(this.messages);
-      logger.info('trip_agent.reply_request.completed', {
+      logger.info('trip_agent.initial_reply.completed', {
         durationMs: elapsedMilliseconds(startedAt),
         messageCount: this.messages.length,
+        status: result.status,
         tripId: this.name,
       });
-      return result;
+      return result.status;
     } catch (error) {
-      logger.error('trip_agent.reply_request.failed', error, {
+      logger.error('trip_agent.initial_reply.failed', error, {
         durationMs: elapsedMilliseconds(startedAt),
         tripId: this.name,
       });
@@ -138,7 +138,10 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
     }
   }
 
-  async onChatMessage(_onFinish: Parameters<AIChatAgent['onChatMessage']>[0]) {
+  async onChatMessage(
+    onFinish: Parameters<AIChatAgent['onChatMessage']>[0],
+    options?: Parameters<AIChatAgent['onChatMessage']>[1],
+  ) {
     const startedAt = performance.now();
     const currentAgent = getCurrentAgent();
     const connectionState = tripAgentConnectionStateSchema.safeParse(
@@ -187,6 +190,7 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
       tools,
       toolApproval: { saveItinerary: 'user-approval' },
       stopWhen: isStepCount(3),
+      abortSignal: options?.abortSignal,
       onAbort: ({ steps }) => {
         logger.warn('trip_agent.generation.aborted', {
           durationMs: elapsedMilliseconds(startedAt),
@@ -200,7 +204,8 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
           tripId: this.name,
         });
       },
-      onFinish: ({ finishReason, stepNumber, usage }) => {
+      onFinish: async (finishResult) => {
+        const { finishReason, stepNumber, usage } = finishResult;
         logger.info('trip_agent.generation.completed', {
           durationMs: elapsedMilliseconds(startedAt),
           finishReason,
@@ -209,6 +214,7 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
           stepCount: stepNumber + 1,
           tripId: this.name,
         });
+        await onFinish(finishResult);
       },
     });
 

@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import {
-  saveItinerary,
-  saveItineraryInputSchema,
+  saveItineraryImplementation,
   UnresolvedItineraryPlacesError,
-} from '#/features/trip/api/save-itinerary';
+} from '#/features/trip/api/save-itinerary.server';
+import { saveItineraryInputSchema } from '#/features/trip/api/save-itinerary-input';
 import { createLogger, elapsedMilliseconds } from '#/lib/logger';
 
 const logger = createLogger('itinerary-api');
@@ -18,23 +18,13 @@ export const Route = createFileRoute('/api/trips/$tripId/itinerary')({
     handlers: {
       POST: async ({ request, params }) => {
         const startedAt = performance.now();
-        logger.info('itinerary_api.request_started', {
-          tripId: params.tripId,
-        });
         try {
           const body = saveItineraryRequestSchema.parse(await request.json());
           const input = saveItineraryInputSchema.parse({
             ...body,
             tripId: params.tripId,
           });
-          const revision = await saveItinerary({ data: input });
-
-          logger.info('itinerary_api.request_completed', {
-            durationMs: elapsedMilliseconds(startedAt),
-            revisionId: revision.id,
-            status: 201,
-            tripId: params.tripId,
-          });
+          const revision = await saveItineraryImplementation(input);
 
           return Response.json(revision, {
             status: 201,

@@ -44,10 +44,6 @@ export function createSaveItineraryTool({
     inputSchema: saveItineraryToolInputSchema,
     execute: async ({ itinerary }) => {
       const startedAt = performance.now();
-      logger.info('save_itinerary_tool.request_started', {
-        dayCount: itinerary.days.length,
-        tripId,
-      });
       const headers = new Headers(authHeaders);
       headers.set('Content-Type', 'application/json');
 
@@ -59,12 +55,6 @@ export function createSaveItineraryTool({
           body: JSON.stringify({ itinerary }),
         },
       );
-
-      logger.info('save_itinerary_tool.response_received', {
-        durationMs: elapsedMilliseconds(startedAt),
-        status: response.status,
-        tripId,
-      });
 
       if (!response.ok) {
         const responseBody: unknown = await response.json().catch(() => null);
@@ -87,6 +77,7 @@ export function createSaveItineraryTool({
 
       logger.info('save_itinerary_tool.request_completed', {
         durationMs: elapsedMilliseconds(startedAt),
+        status: response.status,
         tripId,
       });
       return response.json();

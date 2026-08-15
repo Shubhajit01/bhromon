@@ -1,6 +1,12 @@
-import { useDeferredValue, useEffect, useEffectEvent, useState } from 'react';
+import {
+  useDeferredValue,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from 'react';
 
-import { Navigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 
 import type { ChatStatus } from 'ai';
 
@@ -8,6 +14,7 @@ import { MessageScrollerProvider } from '#/components/ui/message-scroller';
 import { ScreenTour } from '#/features/product-tour/components/screen-tour';
 import { useInvalidateTrip, useTrip } from '#/features/trip/api/get-trip';
 import { useSaveItinerary } from '#/features/trip/api/save-itinerary';
+import { createLogger } from '#/lib/logger';
 
 import type { SaveItineraryInput } from '#/features/trip/api/save-itinerary';
 
@@ -24,6 +31,8 @@ import type { TripChatToolApprovalResponse } from './save-itinerary-approval';
 interface TripChatProps {
   tripId: string;
 }
+
+const logger = createLogger('trip-chat');
 
 export function TripChat({ tripId }: TripChatProps) {
   const [approvedSaveToolCallId, setApprovedSaveToolCallId] = useState<
@@ -45,8 +54,10 @@ export function TripChat({ tripId }: TripChatProps) {
   } = useTripChat({ tripId });
 
   const invalidateTrip = useInvalidateTrip();
+  const navigate = useNavigate();
   const trip = useTrip({ tripId });
   const retrySaveItinerary = useSaveItinerary();
+  const isOpeningItinerary = useRef(false);
 
   const displayMessages = useDeferredValue(messages);
   const isSaved =
@@ -57,19 +68,26 @@ export function TripChat({ tripId }: TripChatProps) {
     (revision) => revision.status === 'confirmed',
   );
 
-  const effect = useEffectEvent(() => {
-    invalidateTrip({ tripId });
+  const openSavedItinerary = useEffectEvent(async () => {
+    if (isOpeningItinerary.current) return;
+
+    isOpeningItinerary.current = true;
+    try {
+      await invalidateTrip({ tripId });
+      await navigate({ to: '/t/$tripId', params: { tripId } });
+    } catch (navigationError) {
+      isOpeningItinerary.current = false;
+      logger.error('trip_chat.itinerary_navigation_failed', navigationError, {
+        tripId,
+      });
+    }
   });
 
   useEffect(() => {
     if (isSaved) {
-      effect();
+      void openSavedItinerary();
     }
   }, [isSaved]);
-
-  if (isSaved) {
-    return <Navigate to="/t/$tripId" params={{ tripId }} />;
-  }
 
   const activity = getTripChatActivity({
     connectionError,

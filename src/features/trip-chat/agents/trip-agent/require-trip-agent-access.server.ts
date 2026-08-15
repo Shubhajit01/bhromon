@@ -55,11 +55,6 @@ export async function requireTripAgentAccess({
     throw new TripAgentAccessError('Trip not found', 404);
   }
 
-  logger.info('trip_agent_access.allowed', {
-    durationMs: elapsedMilliseconds(startedAt),
-    tripId,
-  });
-
   return { trip: tripRecord, user: session.user };
 }
 

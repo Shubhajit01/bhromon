@@ -23,6 +23,11 @@ Bhromon is an AI-powered self-tour planning platform. Build the smallest vertica
 - Prefer minimal, image-led UI with one dominant action, warm personal copy, and no elements that do not support the user's next step.
 - Prefer conventional commit message format.
 
+## Logging conventions
+
+- Log structured lifecycle events at system boundaries and important state transitions: external calls, durable/background work, writes, authorization failures, retries, and unexpected errors. Include stable correlation fields (for example `tripId`, request/diagnostic ID, status, counts, and duration), but never prompts, chat content, credentials, cookies, tokens, or unnecessary personal data.
+- Keep routine success paths quiet. Do not log every render, query-cache hit, protocol frame, normal socket connection, or every step of one operation. Prefer one start/completion pair for a meaningful long-running operation, warnings for recoverable degradation, and one error at the boundary that can act on it. Remove temporary diagnostic logs once the issue is understood.
+
 ## Date and time conventions
 
 - Use `@formkit/tempo` for application-level date construction, parsing, formatting, and arithmetic. Keep native date APIs only at platform boundaries where Tempo has no equivalent, such as `Intl.DurationFormat`, browser timezone discovery, and database timestamp types.
@@ -56,6 +61,10 @@ See `src/features/auth/api/get-current-user.ts` for the reference implementation
 Use the same function-boundary and input conventions for writes. Export the main `createServerFn`, `createClientFn`, or `createIsomorphicFn` implementation. When it accepts input, export its Zod schema and inferred input type, and use the schema as its validator. Consumers and mutation hooks should take their arguments from that inferred type.
 
 Writes do not expose `get<Entity>QueryOptions`, `load<Entity>`, or `useInvalidate<Entity>` helpers. Those are read-query concerns.
+
+## Server-function boundaries
+
+- Treat `createServerFn` as a client/server RPC boundary, not as a reusable server implementation. Do not call one `createServerFn` from another server function or from a server route. Extract plain server-side implementation functions and have each boundary call those instead. Nested server-function calls failed after the production build when trip title generation and the itinerary API route tried to resolve extracted server-function IDs, even though the same paths worked locally.
 
 ## Roadmap
 
