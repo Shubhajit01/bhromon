@@ -25,7 +25,7 @@ function AnonymousUserBanner({
     <>
       <aside
         aria-label="Guest account notice"
-        className={cn('bg-primary w-full sticky top-0 left-0 z-2', className)}
+        className={cn('bg-accent w-full sticky top-0 left-0 z-2', className)}
         {...props}
       >
         <div className="box py-2.5 flex items-center gap-4">
@@ -33,13 +33,13 @@ function AnonymousUserBanner({
             aria-hidden="true"
             size={28}
             weight="fill"
-            className="text-primary-foreground hidden sm:inline"
+            className="text-secondary-foreground hidden sm:inline"
           />
-          <div className="text-primary-foreground mr-auto text-pretty">
+          <div className="mr-auto text-pretty">
             <p className="text-sm sm:text-base font-medium">
               You&apos;re exploring as a guest.
             </p>
-            <p className="text-xs sm:text-sm text-primary-foreground/75 -mt-1">
+            <p className="text-xs sm:text-sm text-accent-foreground/75 -mt-1">
               {userLimits.savedTrips?.canCreate
                 ? `You can save ${userLimits.savedTrips.remaining} more ${userLimits.savedTrips.remaining === 1 ? 'trip' : 'trips'} before claiming your account.`
                 : 'Claim your account to keep planning.'}

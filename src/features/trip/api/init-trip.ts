@@ -7,7 +7,10 @@ import { ulid } from 'ulid';
 import { z } from 'zod';
 
 import { db, eq, trip } from '#/db/db.server';
-import { getCurrentUser } from '#/features/auth/api/get-current-user';
+import {
+  getCurrentUser,
+  useInvalidateCurrentUser,
+} from '#/features/auth/api/get-current-user';
 import { useInvalidateUserLimits } from '#/features/auth/api/get-user-limits';
 import { getUserLimitsImplementation } from '#/features/auth/api/get-user-limits.server';
 import { useInitAuthSession } from '#/features/auth/api/init-auth-session';
@@ -126,6 +129,7 @@ export function useInitTrip() {
 
   const invalidateTrips = useInvalidateTrips();
   const invalidateUserLimits = useInvalidateUserLimits();
+  const invalidateCurrentUser = useInvalidateCurrentUser();
 
   return useMutation({
     mutationFn: async (data: InitTripInput) => {
@@ -153,9 +157,10 @@ export function useInitTrip() {
         throw error;
       }
     },
-    onSuccess: ({ tripId }) => {
+    onSuccess: async ({ tripId }) => {
       void invalidateTrips();
       void invalidateUserLimits();
+      await invalidateCurrentUser();
       return navigate({ to: '/t/$tripId/chat', params: { tripId } });
     },
   });
