@@ -30,7 +30,7 @@ Bhromon is a portfolio project focused on showing a complete, thoughtful travel-
 
 - [x] Ground every recommendation in a canonical place with current place details.
 - [x] Show each day's ordered stops and travel legs on a map.
-- [ ] Use route planning to recommend an efficient daily order within traveller constraints.
+- [x] Use route planning to recommend an efficient daily order within traveller constraints.
 - [ ] Validate travel time, opening hours, visit duration, fixed bookings, and meal windows.
 - [ ] Warn when a day is geographically inefficient, rushed, or physically unrealistic.
 - [ ] Support traveller pacing such as relaxed, balanced, or activity-heavy.

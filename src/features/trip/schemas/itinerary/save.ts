@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import { isSupportedTimeZone } from '#/utils/user-time-zone';
 
+import { routingModes } from '../../types/routing-mode';
+
 const itineraryIdSchema = z.string().trim().min(1);
 const itineraryTextSchema = z.string().trim().min(1);
 const itineraryTimeSchema = z
@@ -42,9 +44,11 @@ export const itineraryActivityInputSchema = z
 
 export const itineraryVisitInputSchema = z.object({
   id: itineraryIdSchema,
-  placeId: z.number().int().positive().describe(
-    'Canonical internal place ID returned by searchPlaces',
-  ),
+  placeId: z
+    .number()
+    .int()
+    .positive()
+    .describe('Canonical internal place ID returned by searchPlaces'),
   activities: z.array(itineraryActivityInputSchema).min(1),
 });
 
@@ -55,6 +59,7 @@ export const itineraryDayInputSchema = z.object({
   title: itineraryTextSchema,
   summary: itineraryTextSchema,
   highlights: z.array(itineraryTextSchema).min(1),
+  travelMode: z.enum(routingModes).default('drive'),
   visits: z.array(itineraryVisitInputSchema).min(1),
 });
 

@@ -113,6 +113,7 @@ export async function saveItineraryImplementation(data: SaveItineraryInput) {
   const activityRecords: Array<typeof itineraryActivity.$inferInsert> = [];
   const transitionRecords: Array<typeof itineraryTransition.$inferInsert> = [];
   const routingDays: Array<{
+    mode: (typeof data.itinerary.days)[number]['travelMode'];
     transitions: Array<typeof itineraryTransition.$inferInsert>;
     waypoints: Array<{ latitude: number; longitude: number }>;
   }> = [];
@@ -182,7 +183,7 @@ export async function saveItineraryImplementation(data: SaveItineraryInput) {
           destinationVisitId: destinationVisit.id,
           sequence: transitionSequence++,
           status: 'pending' as const,
-          primaryMode: 'drive',
+          primaryMode: itineraryDayInput.travelMode,
         };
       });
 
@@ -190,6 +191,7 @@ export async function saveItineraryImplementation(data: SaveItineraryInput) {
 
     if (dayTransitionRecords.length > 0) {
       routingDays.push({
+        mode: itineraryDayInput.travelMode,
         transitions: dayTransitionRecords,
         waypoints: dayVisitRecords.map((visit) => {
           const groundedPlace = groundedPlacesById.get(visit.placeId);
@@ -291,6 +293,7 @@ export async function saveItineraryImplementation(data: SaveItineraryInput) {
 
       const routedTransitions = await routeWithGeoapify({
         apiKey: geoapifyApiKey.data,
+        mode: routingDay.mode,
         waypoints: routingDay.waypoints,
       });
 

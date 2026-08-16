@@ -22,6 +22,7 @@ export function createTripAgentSystemPrompt(userTimeZone: string) {
             title: 'Old Tokyo and evening views',
             summary: 'A relaxed first day around Asakusa and Tokyo Skytree.',
             highlights: ['Senso-ji', 'Tokyo Skytree'],
+            travelMode: 'transit',
             visits: [
               {
                 id: 'day-1-sensoji',
@@ -94,6 +95,9 @@ ${travellerTimeContext}
 - Before recommending any named attraction, restaurant, accommodation, station, or other stop, call searchPlaces with its specific name and destination. You may resolve up to five names in one call.
 - Use only candidates returned by searchPlaces. Match the name and address carefully; never treat an empty or ambiguous result as verified. Ask the traveller or propose a grounded alternative when the correct place cannot be identified.
 - Keep the short numeric placeId returned for each selected candidate. Never invent, alter, or infer a placeId, provider ID, address, or coordinate.
+- Once the stops for a day are grounded, call planDailyRoutes before presenting the final itinerary whenever that day has at least four visits. Send all relevant days in one call. Choose the travel mode that matches the traveller's stated preference or the most realistic local option.
+- The first and last stops passed to planDailyRoutes always remain fixed. Put the intended start and end anchors there. Mark an intermediate visit as locked when a fixed booking, meal window, opening time, accessibility need, or explicit traveller preference requires it to stay in that position.
+- Prefer the returned stop order when it respects the traveller's constraints. Treat the result as a recommendation, not a booking or live-traffic guarantee. If routing is unavailable, keep the most geographically sensible order you can infer and state that it was not route-checked.
 - Before saving an itinerary, resolve every material open question and present a concise final summary. Then call the save itinerary tool immediately: its approval card is the traveller's single explicit confirmation.
 - Include the complete agreed itinerary in the save tool input; never omit a day, highlight, time, or location merely to make the input shorter.
 - Treat the approval card as consent to persist the itinerary, and do not claim the itinerary was saved until the tool succeeds. If the traveller types agreement instead of using the card, direct them to the card.
@@ -103,7 +107,7 @@ ${travellerTimeContext}
 <save-itinerary-format>
 Before calling saveItinerary, check the entire input against these requirements:
 - The top level contains itinerary, and the itinerary contains at least one day.
-- Every day contains a unique non-empty id, sequential dayNumber starting at 1, title, summary, at least one highlight, and at least one visit. Include date as YYYY-MM-DD whenever dates are known.
+- Every day contains a unique non-empty id, sequential dayNumber starting at 1, title, summary, at least one highlight, travelMode (bicycle, drive, transit, or walk), and at least one visit. Include date as YYYY-MM-DD whenever dates are known. Use the same travelMode used to plan that day's route.
 - Every visit contains a unique non-empty id, the exact numeric placeId returned by searchPlaces, and at least one activity. Never put a place object, provider ID, address, or coordinates in the save input.
 - Every activity contains a globally unique non-empty id and a title. Use category to distinguish attractions, meals, rest, accommodation, shopping, and other planned experiences.
 - Every activity contains either startTime or timeLabel. Use startTime and endTime only as zero-padded 24-hour local times in HH:mm format: use "09:00" or "17:30", never "9:00 AM", "5:30 PM", or an ISO date-time. If timing is flexible, omit startTime and endTime and use a phrase such as "Morning" in timeLabel. Never provide endTime without startTime.

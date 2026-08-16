@@ -1,4 +1,5 @@
 import { getWeatherTool } from './get-weather';
+import { createPlanDailyRoutesTool } from './plan-daily-routes';
 import { createSaveItineraryTool } from './save-itinerary';
 import { searchPlacesTool } from './search-places';
 
@@ -13,6 +14,7 @@ export function createTripAgentTools({
 }: CreateTripAgentToolsOptions) {
   return {
     getWeather: getWeatherTool,
+    planDailyRoutes: createPlanDailyRoutesTool({ tripId }),
     searchPlaces: searchPlacesTool,
     saveItinerary: createSaveItineraryTool({ authHeaders, tripId }),
   };
