@@ -189,7 +189,7 @@ export class TripAgent extends AIChatAgent<Env, TripAgentState> {
       messages: await convertToModelMessages(this.messages),
       tools,
       toolApproval: { saveItinerary: 'user-approval' },
-      stopWhen: isStepCount(3),
+      stopWhen: isStepCount(6),
       abortSignal: options?.abortSignal,
       onAbort: ({ steps }) => {
         logger.warn('trip_agent.generation.aborted', {
