@@ -96,7 +96,7 @@ The trip agent uses a bounded tool loop with five purpose-built tools:
 
 Model generations are capped at six steps per response. Tool inputs and itinerary outputs are validated with Zod, and cancellation signals propagate into external requests.
 
-## highlights
+## Highlights
 
 ### Guest-to-account continuity
 
