@@ -1,72 +1,185 @@
 # Bhromon
 
-Bhromon is an AI-powered workspace for planning self-guided trips. A traveller starts with a free-form idea, works through the details with a conversational planning agent, and saves a structured day-by-day itinerary for later review.
+**An AI trip-planning workspace that turns a traveller's idea into a grounded, route-aware itinerary they explicitly approve.**
 
-The product is designed for independent travellers who care about their own interests, pace, constraints, and sense of discovery. Its interface is intentionally calm, personal, and focused on the next planning decision rather than on bookings or travel inventory.
+Bhromon is built for independent travellers who want a journey shaped around their interests, pace, dates, and constraints—not a generic list of popular attractions. A traveller can begin without creating an account, refine the plan in a persistent conversation, review the proposed itinerary, and save a structured day-by-day trip with real places and mapped travel legs.
 
-> Bhromon is under active development. The core prompt-to-itinerary flow, explicit itinerary approval, versioned confirmed saves, and day-by-day trip view are available. Maps, traveller-managed revisions, preference memory, and destination guidance are planned next.
+The project is intentionally focused on planning rather than bookings. Its purpose is to demonstrate a complete, thoughtful AI product: conversational discovery, tool-assisted planning, human approval, reliable persistence, and a calm interface that keeps the traveller's next decision at the centre.
 
-## What works today
+## Product walkthrough
 
-- Start a trip from a natural-language prompt.
-- Continue planning in a persistent, trip-specific AI conversation.
-- Resolve relative travel dates using the traveller's local time zone.
-- Check short-range destination forecasts through Open-Meteo when relevant.
-- Review and explicitly approve a structured itinerary before it is saved.
-- Browse saved trips and filter them by draft or confirmed status.
-- View a saved itinerary as a day-by-day schedule with highlights, times, and locations.
-- Preserve prior confirmed itineraries as superseded revisions when a newly approved itinerary is saved.
-- Begin immediately with an anonymous account, then claim it through email/password sign-in or sign-up.
+See Bhromon turn an open-ended weekend idea into a researched, weather-aware plan, request approval, save the itinerary, and present it as a mapped daily journey.
 
-Bookings, payments, sharing, collaboration, live availability, and live pricing are intentionally outside the current product scope.
+https://github.com/user-attachments/assets/bdcfd1d0-1ace-4bcb-8ea9-f34e3c552486
 
-## How it works
+## Product experience
 
-1. The traveller describes the trip they have in mind.
-2. Bhromon creates an anonymous session when needed, generates a short trip title, and opens a dedicated planning workspace.
-3. A stateful Cloudflare Agent asks focused follow-up questions about dates, destination, companions, pace, budget, interests, and constraints.
-4. When the plan is complete, the agent produces a Zod-validated itinerary and asks for explicit approval before persisting it.
-5. The saved confirmed itinerary appears on the trip page as a structured, day-by-day plan.
+Bhromon supports the complete prompt-to-itinerary journey:
 
-## Tech stack
+1. **Describe the trip naturally.** Start with a destination, a rough idea, or a detailed set of interests and constraints.
+2. **Plan as a guest.** An anonymous account is created automatically, removing registration from the critical path.
+3. **Refine the journey in chat.** A stateful trip-specific agent asks focused questions and remembers the conversation.
+4. **Ground the recommendations.** Suggested stops are resolved to canonical places with coordinates and provider identifiers.
+5. **Check the plan.** The agent can inspect weather, validate timing constraints, and optimize the order of stops using real routes.
+6. **Approve before saving.** Persisting an itinerary is a human-controlled action, not an autonomous side effect.
+7. **Review the result visually.** The confirmed trip is presented as a structured daily schedule with an interactive route map.
+8. **Keep refining safely.** A newly approved itinerary supersedes the previous version without destroying its history.
 
-| Area                   | Technology                                                    |
-| ---------------------- | ------------------------------------------------------------- |
-| Application            | React 19, TypeScript, TanStack Start, TanStack Router         |
-| Data fetching          | TanStack Query with server functions and route loaders        |
-| UI                     | Tailwind CSS 4, shadcn, React Aria Components, Phosphor Icons |
-| AI                     | AI SDK, Cloudflare AI Chat, Workers AI                        |
-| Stateful chat          | Cloudflare Agents SDK and Durable Objects                     |
-| Database               | Cloudflare D1 (SQLite), Drizzle ORM, Drizzle Kit              |
-| Authentication         | Better Auth with anonymous and email/password support         |
-| Validation             | Zod for server boundaries, tool input, and itinerary output   |
-| External data          | Open-Meteo geocoding and weather APIs                         |
-| Runtime and deployment | Vite, Cloudflare Workers, Wrangler                            |
-| Quality                | ESLint, Prettier, strict TypeScript, React Compiler           |
+### Available today
 
-The planning agent currently uses Cloudflare-hosted GLM 4.7 Flash for conversation and Llama 3.1 8B Instruct Fast for trip-title generation.
+- Free-form trip creation with immediate transition into a dedicated planning workspace.
+- Persistent, trip-specific AI conversations backed by a Cloudflare Durable Object.
+- Guest-first access with a three-trip limit and account claiming without losing existing plans.
+- Traveller-time-zone handling for relative dates and destination-local itinerary times.
+- Short-range destination forecasts when weather is relevant to the plan.
+- Canonical place grounding through Geoapify, with reusable place records and provider identities.
+- Daily stop-order optimization using real routing while preserving fixed or traveller-constrained stops.
+- Validation for opening hours, visit duration, schedule overlap, fixed bookings, meal windows, and travel time.
+- Explicit approval, rejection, and revision of agent-proposed itineraries.
+- Versioned confirmed itineraries with `draft`, `confirmed`, `superseded`, and `discarded` lifecycle states.
+- Interactive MapLibre maps with ordered stops, route geometry, travel modes, and graceful routing fallbacks.
+- Trip browsing and filtering by draft or confirmed status.
+- Contextual first-visit tours plus intentional loading, empty, failure, and recovery states.
 
-## Architecture
+## What makes Bhromon different
 
-Bhromon is a full-stack TanStack Start application deployed as a Cloudflare Worker.
+### A planner, not a recommendation generator
 
-- File-based routes in `src/routes` own screens, loaders, and HTTP endpoints.
-- Feature modules in `src/features` group trip, chat, and authentication behaviour.
-- TanStack server functions form the application boundary for authenticated reads and writes.
-- Each trip chat is backed by a Durable Object, which keeps its messages and agent state together.
-- D1 stores users, sessions, trips, and versioned itinerary revisions.
-- Itineraries are stored as versioned JSON documents after schema validation.
-- React Query supplies canonical cache keys, route preloading, and mutation invalidation.
+Bhromon does not stop after producing attractive prose. Its agent works with structured places, dates, activities, timings, travel modes, route geometry, and revision state. The itinerary that reaches the database has crossed the same typed validation boundary used by the application.
 
-The current data model supports `draft` and `confirmed` trips plus `draft`, `confirmed`, `superseded`, and `discarded` itinerary revisions. Approving a chat-generated itinerary saves it as the trip's current confirmed revision.
+### Real places before persistence
 
-## Getting started
+The save boundary rejects unresolved places. Every persisted visit must reference a canonical local place associated with an external provider identity, so the itinerary, map, and routing system operate on the same entities.
+
+### Human approval as a product boundary
+
+Saving an itinerary is configured as an approval-required agent tool. Travellers can inspect the proposed structured change before it becomes the current plan, avoiding silent AI writes and making revision behaviour understandable.
+
+### Stateful planning without hiding history
+
+Each trip has its own durable conversation state. Confirming a revision creates a new immutable version and marks the earlier current revision as superseded, preserving how the journey evolved.
+
+### Time is treated as domain data
+
+Bhromon distinguishes the current instant, traveller-local calendar context, and destination-local itinerary time. Relative dates are interpreted using the traveller's IANA time zone, while destination schedules remain destination-local instead of being accidentally shifted.
+
+## System architecture
+
+Bhromon is a full-stack TanStack Start application deployed as a Cloudflare Worker. The interactive application, server functions, API route, Durable Object agent, database access, and AI inference run within the Cloudflare platform.
+
+```mermaid
+flowchart LR
+    Traveller["Traveller"] --> App["React + TanStack Start"]
+    App --> Server["Server functions and itinerary API"]
+    App <--> Agent["TripAgent Durable Object"]
+    Agent --> Model["Workers AI"]
+    Agent --> Tools["Typed planning tools"]
+    Tools --> Geoapify["Geoapify places and routing"]
+    Tools --> Weather["Open-Meteo forecast"]
+    Tools --> Server
+    Server --> D1["Cloudflare D1"]
+    D1 --> App
+    App --> Map["MapLibre itinerary view"]
+```
+
+### Agent toolchain
+
+The trip agent uses a bounded tool loop with five purpose-built tools:
+
+| Tool                | Responsibility                                                      | Reliability boundary                                                                         |
+| ------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `searchPlaces`      | Resolve recommendations to real destinations and points of interest | Returns canonical Geoapify-backed place records rather than model-invented coordinates       |
+| `getWeather`        | Retrieve destination weather for a specific date                    | Uses a 16-day forecast horizon and reports unavailable forecasts explicitly                  |
+| `planDailyRoutes`   | Optimize daily stop order using real route data                     | Keeps first, last, and explicitly locked stops fixed; supports bounded days and stops        |
+| `validateItinerary` | Check whether the proposed schedule is workable                     | Evaluates timing, opening hours, minimum duration, bookings, meal windows, and transitions   |
+| `saveItinerary`     | Persist the approved structured itinerary                           | Requires user approval, authentication, trip ownership, schema validity, and grounded places |
+
+Model generations are capped at six steps per response. Tool inputs and itinerary outputs are validated with Zod, and cancellation signals propagate into external requests.
+
+## highlights
+
+### Guest-to-account continuity
+
+Better Auth supplies both anonymous and email/password identities. Travellers can start immediately and later claim the anonymous account, preserving their existing trips rather than copying data between unrelated users.
+
+### Versioned relational itinerary model
+
+D1 stores the itinerary as relational domain data rather than one opaque AI response. The model includes trips, revisions, days, highlights, canonical places, visits, activities, and transitions. Database checks and unique indexes enforce important invariants, including:
+
+- one current draft and one current confirmed revision per trip;
+- monotonically numbered revisions;
+- ordered days, visits, activities, highlights, and transitions;
+- valid coordinates and valid itinerary status values;
+- consistent revision ownership across days, visits, activities, and transitions.
+
+### Routing with recoverable degradation
+
+Geoapify supplies route optimization and geometry. Routing state is persisted per transition as `pending`, `routed`, `failed`, or `stale`. The itinerary can still render when a provider cannot return geometry, using a clearly differentiated fallback connection instead of losing the entire saved plan.
+
+### Typed application boundaries
+
+TanStack server functions form the client/server RPC boundary. Zod schemas are the source of truth for mutation inputs and agent tools, while TanStack Query provides canonical query keys, route preloading, cache reuse, and targeted invalidation.
+
+### Operational visibility without sensitive logs
+
+Structured lifecycle events cover agent generations, external calls, routing, durable work, itinerary writes, authorization failures, retries, and unexpected errors. Events include stable fields such as `tripId`, status, counts, duration, model usage, and step count while intentionally excluding prompts, chat content, credentials, cookies, and tokens.
+
+Cloudflare observability and source-map uploads are enabled in the Worker configuration.
+
+## Technology
+
+| Area                   | Technology                                          | Role in Bhromon                                                                  |
+| ---------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Application            | React 19, TypeScript 6, TanStack Start              | Full-stack rendering and application boundaries                                  |
+| Navigation             | TanStack Router                                     | File-based routes, typed params, loaders, and preload behaviour                  |
+| Server state           | TanStack Query                                      | Canonical caching, loader integration, invalidation, and suspense queries        |
+| Agent runtime          | Cloudflare Agents SDK, Cloudflare AI Chat           | Durable trip-specific conversations and streaming chat                           |
+| AI orchestration       | AI SDK 7, Workers AI                                | Typed tool calling, approval gates, streaming, and bounded multi-step generation |
+| Models                 | GLM 4.7 Flash, Llama 3.1 8B Instruct Fast           | Trip conversation and concise title generation                                   |
+| Database               | Cloudflare D1, Drizzle ORM                          | Relational trips, places, activities, routes, and itinerary revision history     |
+| Authentication         | Better Auth                                         | Anonymous sessions, email/password accounts, and account claiming                |
+| Validation             | Zod                                                 | Server inputs, agent tools, connection state, and itinerary schemas              |
+| Place data and routing | Geoapify, OpenStreetMap data                        | Canonical places, route optimization, distance, duration, and geometry           |
+| Weather                | Open-Meteo                                          | Destination geocoding and short-range daily forecasts                            |
+| Maps                   | MapLibre GL, react-map-gl, CARTO basemap            | Interactive itinerary routes and numbered daily stops                            |
+| Dates and time zones   | FormKit Tempo                                       | Calendar parsing, formatting, arithmetic, and time-zone-aware context            |
+| Interface              | Tailwind CSS 4, shadcn, React Aria Components       | Accessible primitives and the custom nature-led visual system                    |
+| Motion and guidance    | Motion, AutoAnimate, React Joyride                  | Transitions, list motion, and contextual product tours                           |
+| Deployment             | Cloudflare Workers, Wrangler, Vite                  | Edge runtime, bindings, builds, migrations, and deployment                       |
+| Quality                | ESLint, Prettier, strict TypeScript, React Compiler | Static analysis, formatting, and compile-time optimisation                       |
+
+## Project structure
+
+```text
+src/
+├── components/                 Shared application and UI primitives
+├── config/                     Domain query-key and collection constants
+├── db/                         Drizzle schema, relations, and D1 access
+├── features/
+│   ├── auth/                   Anonymous and registered account flows
+│   ├── place/                  Place grounding and Geoapify integration
+│   ├── product-tour/           First-visit contextual guidance
+│   ├── site/                   Landing, About, and Contact experiences
+│   ├── trip/                   Trip data, itinerary domain, routing, and maps
+│   └── trip-chat/              Durable agent, tools, chat state, and UI
+├── routes/                     Screens, loaders, and HTTP boundaries
+├── styles/                     Global styles, typography, and fonts
+├── utils/                      Cache, form, date, and time-zone utilities
+├── router.tsx                  Router and Query integration
+└── server.ts                   Cloudflare Worker and agent entry point
+
+migrations/                     Versioned D1 schema migrations
+public/                         Static assets and response headers
+```
+
+## Running locally
 
 ### Prerequisites
 
 - Node.js with Corepack enabled
 - pnpm
-- A Cloudflare account with Workers AI access for AI-backed flows and deployment
+- A Cloudflare account with Workers AI access
+- A Geoapify API key; its free plan does not require a credit card
 
 ### 1. Install dependencies
 
@@ -74,11 +187,9 @@ The current data model supports `draft` and `confirmed` trips plus `draft`, `con
 pnpm install
 ```
 
-### 2. Configure local environment variables
+### 2. Configure local secrets
 
-Copy the committed template, add a strong private authentication secret, and
-[create a free Geoapify API key](https://myprojects.geoapify.com/). Geoapify's
-free plan does not require a credit card.
+Copy the committed template and replace its safe placeholders:
 
 ```bash
 cp .env.example .env
@@ -90,17 +201,15 @@ BETTER_AUTH_URL=http://localhost:3000
 GEOAPIFY_API_KEY=replace-with-your-geoapify-key
 ```
 
-Never commit `.env` or secret values. `.env.example` should contain names and safe placeholders only.
+Never commit `.env` or secret values. The checked-in `.env.example` contains variable names and safe placeholders only.
 
 ### 3. Create the local database
-
-Apply the checked-in D1 migrations:
 
 ```bash
 pnpm db:migrate:local
 ```
 
-### 4. Start the app
+### 4. Start the application
 
 ```bash
 pnpm dev
@@ -108,28 +217,28 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-If an AI request cannot reach Workers AI locally, authenticate Wrangler with `pnpm exec wrangler login` and restart the development server.
+If Workers AI cannot be reached locally, authenticate Wrangler with `pnpm exec wrangler login` and restart the development server.
 
-## Available commands
+## Commands
 
-| Command                  | Purpose                                               |
-| ------------------------ | ----------------------------------------------------- |
-| `pnpm dev`               | Start the Vite development server on port 3000        |
-| `pnpm build`             | Create a production build                             |
-| `pnpm preview`           | Build and preview the production output               |
-| `pnpm lint`              | Run ESLint                                            |
-| `pnpm check`             | Check formatting with Prettier                        |
-| `pnpm format`            | Format files and apply ESLint fixes                   |
-| `pnpm generate-routes`   | Regenerate the TanStack Router route tree             |
-| `pnpm db:generate`       | Generate a Drizzle migration from schema changes      |
-| `pnpm db:migrate:local`  | Apply D1 migrations to the local database             |
-| `pnpm db:migrate:remote` | Apply D1 migrations to the configured remote database |
-| `pnpm db:studio`         | Open Drizzle Studio for the local D1 database         |
-| `pnpm auth:generate`     | Regenerate the Better Auth database schema            |
-| `pnpm cf-typegen`        | Regenerate Cloudflare binding types                   |
-| `pnpm deploy`            | Build and deploy the Worker with Wrangler             |
+| Command                  | Purpose                                         |
+| ------------------------ | ----------------------------------------------- |
+| `pnpm dev`               | Start the Vite development server on port 3000  |
+| `pnpm build`             | Create the client and Worker production bundles |
+| `pnpm preview`           | Build and preview the production output         |
+| `pnpm lint`              | Run ESLint                                      |
+| `pnpm check`             | Verify formatting with Prettier                 |
+| `pnpm format`            | Apply Prettier and ESLint fixes                 |
+| `pnpm generate-routes`   | Regenerate the TanStack Router route tree       |
+| `pnpm db:generate`       | Generate a migration from the Drizzle schema    |
+| `pnpm db:migrate:local`  | Apply D1 migrations locally                     |
+| `pnpm db:migrate:remote` | Apply D1 migrations to the production database  |
+| `pnpm db:studio`         | Open Drizzle Studio for the local database      |
+| `pnpm auth:generate`     | Regenerate the Better Auth schema               |
+| `pnpm cf-typegen`        | Regenerate Cloudflare binding types             |
+| `pnpm deploy`            | Build and deploy the Worker                     |
 
-There is no automated test script configured yet. Before opening a change, run:
+Before opening a change, run:
 
 ```bash
 pnpm lint
@@ -137,66 +246,56 @@ pnpm check
 pnpm build
 ```
 
+Automated coverage for the core planning, routing, approval, and revision journeys is the next quality milestone.
+
 ## Database changes
 
-The Drizzle schema lives in `src/db/schema.ts`, while generated migrations are committed under `migrations/`.
-
-For a schema change:
+The application schema lives in `src/db/schema.ts`, while generated migrations are committed under `migrations/`.
 
 ```bash
 pnpm db:generate
 pnpm db:migrate:local
 ```
 
-Review the generated SQL before applying it remotely. Drizzle Studio expects a local Wrangler D1 database to exist, so run the local migration or development server first.
+Review generated SQL before applying it remotely. Drizzle Studio expects a local Wrangler D1 database, so apply the local migrations or start the development server first.
 
 ## Deployment
 
-The application is configured for Cloudflare Workers in `wrangler.jsonc`, with bindings for D1, Workers AI, and the `TripAgent` Durable Object.
+The application is configured for Cloudflare Workers with bindings for D1, Workers AI, and the `TripAgent` Durable Object. Production secrets are stored through Wrangler rather than committed to the repository.
 
 Before the first deployment:
 
-1. Create the production D1 database and replace the placeholder `database_id` in `wrangler.jsonc`.
-2. Configure `BETTER_AUTH_URL` for the deployed origin.
-3. Store `BETTER_AUTH_SECRET` as a Cloudflare secret rather than committing it.
-4. Store `GEOAPIFY_API_KEY` as a Cloudflare secret.
-5. Authenticate Wrangler and apply the remote migrations.
+1. Create the production D1 database and configure its ID in `wrangler.jsonc`.
+2. Set `BETTER_AUTH_URL` to the deployed origin.
+3. Store `BETTER_AUTH_SECRET` and `GEOAPIFY_API_KEY` as Cloudflare secrets.
+4. Apply the remote migrations.
+5. Build and deploy the Worker.
 
 ```bash
 pnpm exec wrangler login
+pnpm exec wrangler secret put BETTER_AUTH_SECRET
 pnpm exec wrangler secret put GEOAPIFY_API_KEY
 pnpm db:migrate:remote
 pnpm deploy
 ```
 
-Cloudflare observability and source-map uploads are enabled in the Worker configuration.
+## Scope and product decisions
 
-## Project structure
+Bhromon is not intended to recreate a travel marketplace. Booking, payments, commissions, live inventory, social feeds, and broad productivity integrations are deliberate non-goals. The project prioritises a credible end-to-end planning experience over exhaustive destination or commerce coverage.
 
-```text
-src/
-├── components/             Shared UI primitives
-├── config/                 Query-key and collection constants
-├── db/                     Drizzle schema, relations, and D1 client
-├── features/
-│   ├── auth/               Session queries and authentication UI
-│   ├── trip/               Trip queries, mutations, schemas, and views
-│   └── trip-chat/          Chat UI, Cloudflare Agent, prompts, and tools
-├── routes/                 TanStack Router routes and API handlers
-├── styles/                 Global styles, typography, and fonts
-├── router.tsx              Router and React Query integration
-└── server.ts               Worker entry point and agent request routing
+The next product priorities are realistic pacing warnings, accommodation anchors, transport context, trustworthy cost and source communication, read-only sharing, automated journey coverage, and a documented portfolio showcase.
 
-migrations/                 Generated D1 migration history
-public/                     Static public assets and response headers
-```
+See [ROADMAP.md](ROADMAP.md) for the ordered roadmap, [PRODUCT.md](PRODUCT.md) for the product principles, and [DESIGN.md](DESIGN.md) for the interface system.
 
-## Roadmap
+## What this project demonstrates
 
-See [ROADMAP.md](ROADMAP.md) for completed work, current priorities, and planned product improvements.
+Bhromon is a portfolio project built to demonstrate more than model integration:
 
-## Contributing
+- shaping an ambiguous consumer problem into a focused product journey;
+- designing human-in-the-loop agent actions and safe persistence boundaries;
+- modelling AI-generated output as validated, versioned relational data;
+- coordinating real-time state, server rendering, database state, and external providers;
+- handling time zones, routing degradation, authentication continuity, and recovery states;
+- building a distinctive interface around the traveller rather than around the AI.
 
-Read [AGENTS.md](AGENTS.md) before making changes. It contains the repository conventions, query and mutation patterns, current feature sequence, and UI guidance. New interface work should also follow [DESIGN.md](DESIGN.md) and the product principles in [PRODUCT.md](PRODUCT.md).
-
-Use conventional commit messages where practical, keep changes scoped to the smallest useful vertical slice, and do not commit generated secrets or local Cloudflare state.
+Contributions should follow [AGENTS.md](AGENTS.md), use conventional commits where practical, and remain scoped to the smallest useful vertical slice.
